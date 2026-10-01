@@ -203,6 +203,63 @@ names.
 
 ---
 
+## T-013 — Separate "the tool refused" from "the OS refused"
+
+**Technique:**
+When a security-relevant operation fails and you are about to record the failure as
+protection, run the same operation *inside a permitted area* to confirm which layer refused.
+
+**Worked:**
+Yes — and it inverted the conclusion.
+
+**Evidence:**
+Phase 5. `push … /data/local/tmp/../pd_escape.txt` returned exit 1, as did pushes to
+`/data/local`, `/etc` and `/system`. The natural reading was "adb blocks traversal".
+
+Re-running the same traversal inside a writable directory —
+`push … /data/local/tmp/pdsub/../pd_trav.txt` — **succeeded** and landed in
+`/data/local/tmp/`. The failures were **permission denials by the OS**, not a control.
+
+Without that second test, ADR-010's entire security model would have rested on a false
+premise, and would have been wrong in the direction of *understating* risk.
+
+**Recommended use:**
+Whenever a security-relevant operation fails and the failure is about to be recorded as
+protection. Confirm the refusing layer.
+
+**Avoid when:**
+The failure is already unambiguously attributed (e.g. an explicit "permission denied" that
+names the mechanism).
+
+---
+
+## T-014 — Verify the specific object, not the category it belongs to
+
+**Technique:**
+When a decision rests on a property of the environment, test that property on the **actual
+object** the code uses, not on a related one.
+
+**Worked:**
+No — it was violated, and cost a real-device failure.
+
+**Evidence:**
+Phase 5, FAIL-003. ADR-010 chose `/data/local/tmp` **because it is not world-readable**. The
+parent is 771 — correct. But `mkdir -p /data/local/tmp/pixeldesktop` produced mode **777**, so
+the directory the contract actually uses was world-readable and the stated rationale was
+untrue.
+
+The inference "the parent is restricted, therefore the child is restricted" was never tested
+until the real device was asked.
+
+**Recommended use:**
+Permissions, ownership, filesystem semantics, defaults inherited from a parent, anything where
+a nearby example is used as evidence for the target.
+
+**Avoid when:**
+The property is directly observed on the object itself.
+
+---
+
 ## T-011 — Make a rule's stated criterion executable
 
 **Technique:**

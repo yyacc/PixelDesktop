@@ -28,6 +28,27 @@ protocol TransportProtocol: AnyObject, Sendable {
     ///   thrown, because some callers (e.g. `pidof`) treat non-zero as a valid answer.
     func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult
 
+    /// Copies a local file to the device via `adb -s <serial> push`.
+    ///
+    /// **Transport primitive.** It takes already-validated absolute paths and performs no
+    /// path policy of its own — no allowlists, no staging roots, no worker semantics. It
+    /// must not be called with caller-supplied paths; the worker layer validates first.
+    ///
+    /// `adb` does not sanitize paths: `../` is resolved by the device filesystem, absolute
+    /// paths write wherever the destination is writable, and symlinks are followed. Any
+    /// containment therefore belongs to the caller, not to this method. See ADR-010.
+    ///
+    /// - Note: `adb` overwrites an existing destination **silently**, with exit code 0.
+    ///   It provides no overwrite protection.
+    func push(deviceSerial: String, localPath: String, remotePath: String, timeout: TimeInterval) async throws -> TransportResult
+
+    /// Copies a file from the device to a local path via `adb -s <serial> pull`.
+    ///
+    /// **Transport primitive**, with the same posture as `push`: no path policy, no
+    /// containment. Note that a local destination containing `../` will escape the intended
+    /// directory, because `adb` does not sanitize it. See ADR-010.
+    func pull(deviceSerial: String, remotePath: String, localPath: String, timeout: TimeInterval) async throws -> TransportResult
+
     /// Reads every system property in a single `adb shell getprop` invocation.
     ///
     /// Prefer this over repeated `getprop` calls when several properties are needed:

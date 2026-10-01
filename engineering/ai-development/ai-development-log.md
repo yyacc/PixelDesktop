@@ -481,6 +481,94 @@ into a guard.
 
 ---
 
+## Event 6 — Phase 5 (Part 1): Worker Transfer Contract
+
+**Date:** 2026-10-01
+**Phase:** 5
+
+### Agent
+Hermes (probe, design, implementation, verification)
+
+### Model
+`meituan/longcat-2.5-preview:free` (Nous Portal)
+
+### Task
+Implement the fixed transfer contract for the Pixel Compute Worker per D1–D8: narrow
+`push()`/`pull()` primitives, a `Worker/` layer owning all path policy, no caller-supplied
+paths, regular files only, size-verified transfers.
+
+### Context
+The approved proposal established that `adb` does not sanitize paths. The user required the
+reconnaissance be preserved as evidence, no API generalization, tests for each named case, and
+real-device proof of the *exact contract* rather than merely that `adb push`/`pull` works.
+
+### Tools Used
+- `terminal` (`adb` probes, `xcodegen`, `xcodebuild`, `swiftc`)
+- `patch`, `write_file`, `read_file`, `execute_code`
+
+### Approach
+1. Probed two mechanisms before writing code: `stat -c %s` on-device (works; exit 1 for a
+   missing path) and Swift's `attributesOfItem` symlink reporting (confirmed it does **not**
+   follow links, so the check cannot be bypassed).
+2. Implemented narrow `push()`/`pull()` primitives with no path policy.
+3. Built `WorkerTransferContract` (fixed paths, regular-file validation, size verification)
+   and `WorkerOperationsProtocol`/`ADBWorkerOperations` with **no path parameter**.
+4. Wrote 25 tests covering every case the user named.
+5. Ran the real-device verification of the exact contract. **It failed on one check**:
+   the created workspace was mode 777.
+6. Diagnosed it against ADR-010's own rationale, tightened the contract with `chmod 700`,
+   pinned it with a test, and re-ran — full PASS.
+
+### Result
+Transfer contract complete. BUILD SUCCEEDED; 131 tests, 0 failures. Real-device verification
+PASS on the exact contract: fixed paths, mode 700, size-verified push (69=69), deliberate
+overwrite, size-verified pull (226=226), byte-identical round trip, and all failure paths.
+
+### Errors
+1. **FAIL-003 — workspace created world-readable (777).** ADR-010 chose this root *because*
+   it is not world-readable; true of the parent (771), false of the created directory. Fixed
+   with `chmod 700`; pinned by test; recorded as FAIL-003.
+2. **Harness bug — a false FAIL.** The cleanup assertion read only stdout, but `ls` writes
+   "No such file" to stderr. The cleanup was correct; the check was blind.
+3. **Sendable warning** — `ADBWorkerOperations` stored a non-`Sendable` `FileManager` on a
+   `Sendable` struct. Replaced with an inline shared reference.
+4. **Swift compile error** — a single-line JSON payload written as a multi-line string
+   literal. Replaced with a raw string.
+
+### Recovery
+- FAIL-003 → tightened the contract rather than relaxing the check.
+- Harness bug → captured stderr so cleanup assertions are meaningful.
+- Warning and compile error → caught at build time.
+
+### Human Intervention
+Approval of D1–D8 and ADR-010. No physical device action needed.
+
+### Efficiency
+- ~35 tool calls
+- ~25 minutes
+- 5 files created, 4 modified
+- 25 tests added
+- 2 probe sessions, 2 builds, 3 test runs, 2 real-device verification runs
+
+### Quality
+- Correctly probed both mechanisms before depending on them.
+- Correctly refused to loosen the contract when verification failed.
+- Correctly preserved the permission-vs-control distinction as evidence.
+- Correctly added no path parameter, so the whole traversal class is structurally absent.
+- Did **not** anticipate that `mkdir -p` would produce a world-readable directory.
+
+### Lesson
+**A documented rationale is not a verified fact.** ADR-010 argued the root is not
+world-readable. The reasoning was sound about the parent directory and silently untrue about
+the directory the contract creates. **Verify the specific object, not the category it belongs
+to.**
+
+This is the third defect in this project that compiled cleanly and passed the full suite while
+being wrong. All three were caught by comparing against reality, not by the test suite — and
+all three involved an assumption that was reasonable but unmeasured.
+
+---
+
 ## Successful Techniques
 
 1. **xcodegen for project generation** — Eliminates pbxproj debugging

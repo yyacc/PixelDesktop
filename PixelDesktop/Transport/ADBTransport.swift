@@ -174,6 +174,22 @@ actor ADBTransport: TransportProtocol {
         return value
     }
 
+    func push(deviceSerial: String, localPath: String, remotePath: String, timeout: TimeInterval) async throws -> TransportResult {
+        try await execute(
+            command: "-s",
+            arguments: [deviceSerial, "push", localPath, remotePath],
+            timeout: timeout
+        )
+    }
+
+    func pull(deviceSerial: String, remotePath: String, localPath: String, timeout: TimeInterval) async throws -> TransportResult {
+        try await execute(
+            command: "-s",
+            arguments: [deviceSerial, "pull", remotePath, localPath],
+            timeout: timeout
+        )
+    }
+
     func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {
         try await execute(
             command: "-s",

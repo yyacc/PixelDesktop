@@ -1411,6 +1411,377 @@ final class DeviceLifecycleTests: XCTestCase {
     }
 }
 
+// MARK: - Phase 5: Worker Transfer Contract Tests
+
+final class WorkerTransferContractTests: XCTestCase {
+
+    // MARK: The contract has no path parameter
+
+    func testContractPathsAreFixedConstants() {
+        XCTAssertEqual(WorkerTransferContract.remoteRoot, "/data/local/tmp/pixeldesktop")
+        XCTAssertEqual(WorkerTransferContract.remoteInputPath, "/data/local/tmp/pixeldesktop/input.txt")
+        XCTAssertEqual(WorkerTransferContract.remoteResultPath, "/data/local/tmp/pixeldesktop/result.json")
+        // Both payload files live under the single root; neither escapes it.
+        XCTAssertTrue(WorkerTransferContract.remoteInputPath.hasPrefix(WorkerTransferContract.remoteRoot + "/"))
+        XCTAssertTrue(WorkerTransferContract.remoteResultPath.hasPrefix(WorkerTransferContract.remoteRoot + "/"))
+    }
+
+    func testLocalStagingIsInsideTheContainerAndNotUserVisible() {
+        let staging = WorkerTransferContract.stagingDirectory
+        XCTAssertTrue(staging.path.contains("Application Support"),
+                      "staging must live in the container, got \(staging.path)")
+        XCTAssertTrue(staging.path.hasSuffix("PixelDesktop/Staging"))
+        // Fixed filenames under staging.
+        XCTAssertEqual(WorkerTransferContract.localInputPath.lastPathComponent, "input.txt")
+        XCTAssertEqual(WorkerTransferContract.localResultPath.lastPathComponent, "result.json")
+    }
+
+    // MARK: Regular-file requirement (D7)
+
+    func testValidateRegularFileAcceptsRegularFile() throws {
+        let url = try makeTempFile(contents: "hello")
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let validated = try WorkerTransferContract.validateRegularFile(at: url)
+        XCTAssertEqual(validated.byteCount, 5)
+    }
+
+    func testValidateRegularFileRejectsMissingFile() {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("pd_definitely_missing_\(UUID()).txt")
+        XCTAssertThrowsError(try WorkerTransferContract.validateRegularFile(at: url)) { error in
+            guard case PixelDesktopError.invalidInput = error else { return XCTFail("got \(error)") }
+        }
+    }
+
+    /// The escape found in reconnaissance: a symlink in staging pointed outside it, and adb
+    /// pushed the *target's* contents.
+    func testValidateRegularFileRejectsSymlink() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let target = dir.appendingPathComponent("target.txt")
+        try "secret".write(to: target, atomically: true, encoding: .utf8)
+        let link = dir.appendingPathComponent("link.txt")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
+
+        XCTAssertThrowsError(try WorkerTransferContract.validateRegularFile(at: link)) { error in
+            guard case PixelDesktopError.invalidInput(let message) = error else {
+                return XCTFail("got \(error)")
+            }
+            XCTAssertTrue(message.contains("symbolic link"), "got: \(message)")
+        }
+    }
+
+    /// A symlink pointing at a *regular file* must also be refused — the check must not
+    /// follow the link and then accept it.
+    func testValidateRegularFileRejectsSymlinkToRegularFile() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let real = dir.appendingPathComponent("real.txt")
+        try "data".write(to: real, atomically: true, encoding: .utf8)
+        let link = dir.appendingPathComponent("link.txt")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: real)
+
+        XCTAssertThrowsError(try WorkerTransferContract.validateRegularFile(at: link))
+    }
+
+    /// adb recurses on a directory operand, so a directory must never be accepted.
+    func testValidateRegularFileRejectsDirectory() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        XCTAssertThrowsError(try WorkerTransferContract.validateRegularFile(at: dir)) { error in
+            guard case PixelDesktopError.invalidInput(let message) = error else {
+                return XCTFail("got \(error)")
+            }
+            XCTAssertTrue(message.contains("directory"), "got: \(message)")
+        }
+    }
+
+    func testValidateRegularFileRejectsOversizedFile() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let big = dir.appendingPathComponent("big.txt")
+        let data = Data(repeating: 0x41, count: WorkerTransferContract.maximumPayloadBytes + 1)
+        try data.write(to: big)
+
+        XCTAssertThrowsError(try WorkerTransferContract.validateRegularFile(at: big)) { error in
+            guard case PixelDesktopError.invalidInput = error else { return XCTFail("got \(error)") }
+        }
+    }
+
+    // MARK: Size verification (D3)
+
+    func testVerifySizeMatch() {
+        let v = WorkerTransferContract.verifySize(expected: 11, actual: 11)
+        XCTAssertTrue(v.isVerified)
+        XCTAssertEqual(v, .match(expected: 11, actual: 11))
+    }
+
+    func testVerifySizeMismatch() {
+        let v = WorkerTransferContract.verifySize(expected: 11, actual: 5)
+        XCTAssertFalse(v.isVerified)
+        XCTAssertEqual(v, .mismatch(expected: 11, actual: 5))
+    }
+
+    func testParseRemoteSize() {
+        XCTAssertEqual(WorkerTransferContract.parseRemoteSize("11"), 11)
+        XCTAssertEqual(WorkerTransferContract.parseRemoteSize("  11\n"), 11)
+        XCTAssertEqual(WorkerTransferContract.parseRemoteSize("0"), 0)
+    }
+
+    func testParseRemoteSizeReturnsNilForMissingOrGarbage() {
+        XCTAssertNil(WorkerTransferContract.parseRemoteSize(""))
+        XCTAssertNil(WorkerTransferContract.parseRemoteSize("   "))
+        XCTAssertNil(WorkerTransferContract.parseRemoteSize("stat: No such file or directory"))
+    }
+
+    // MARK: Helpers
+
+    private func makeTempDir() throws -> URL {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("pd_test_\(UUID())", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }
+
+    private func makeTempFile(contents: String) throws -> URL {
+        let dir = try makeTempDir()
+        let url = dir.appendingPathComponent("payload.txt")
+        try contents.write(to: url, atomically: true, encoding: .utf8)
+        return url
+    }
+}
+
+// MARK: - Phase 5: Worker Operations Tests
+
+final class WorkerOperationsTests: XCTestCase {
+
+    private func stagingCleanup() {
+        let dir = WorkerTransferContract.stagingDirectory
+        try? FileManager.default.removeItem(at: dir)
+    }
+
+    override func tearDown() {
+        stagingCleanup()
+        super.tearDown()
+    }
+
+    // MARK: Workspace
+
+    func testPrepareRemoteWorkspaceUsesFixedRoot() async throws {
+        let transport = MockTransport()
+        let ops = ADBWorkerOperations(transport: transport)
+
+        try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.count, 1)
+        // chmod 700 is required: mkdir -p alone produced a world-readable 777 directory on
+        // the real device, contradicting the rationale for choosing this root (ADR-010).
+        XCTAssertEqual(invocations[0].arguments,
+                       ["S", "shell", "mkdir -p /data/local/tmp/pixeldesktop && chmod 700 /data/local/tmp/pixeldesktop"])
+    }
+
+    /// Regression: the created workspace directory must be restricted. On the real device
+    /// `mkdir -p` produced mode 777 (world-readable), contradicting ADR-010's stated reason
+    /// for choosing /data/local/tmp over /sdcard.
+    func testPrepareRemoteWorkspaceRestrictsPermissions() async throws {
+        let transport = MockTransport()
+        let ops = ADBWorkerOperations(transport: transport)
+
+        try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
+
+        let invocations = await transport.invocations
+        let command = invocations.first?.arguments.last ?? ""
+        XCTAssertTrue(command.contains("chmod 700"),
+                      "the workspace must be restricted, got: \(command)")
+    }
+
+    func testPrepareRemoteWorkspaceSurfacesFailure() async {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: "mkdir: permission denied"))
+        let ops = ADBWorkerOperations(transport: transport)
+
+        do {
+            try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
+            XCTFail("Expected adbCommandFailed")
+        } catch let error as PixelDesktopError {
+            guard case .adbCommandFailed = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+
+    // MARK: Submit input
+
+    func testSubmitInputPushesToFixedRemotePath() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: "", stderr: ""))
+        // stat reports the same size we sent.
+        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/input.txt",
+            TransportResult(exitCode: 0, stdout: "5\n", stderr: ""))
+
+        let ops = ADBWorkerOperations(transport: transport)
+        let verification = try await ops.submitInput(deviceSerial: "S", text: "hello", timeout: 5)
+
+        XCTAssertTrue(verification.isVerified)
+
+        let invocations = await transport.invocations
+        let push = invocations.first { $0.arguments.contains("push") }
+        XCTAssertNotNil(push)
+        XCTAssertEqual(push?.arguments[0], "S")
+        XCTAssertEqual(push?.arguments[1], "push")
+        XCTAssertEqual(push?.arguments[2], WorkerTransferContract.localInputPath.path)
+        XCTAssertEqual(push?.arguments[3], "/data/local/tmp/pixeldesktop/input.txt")
+    }
+
+    /// The DTCA-1 limits are enforced before anything reaches the device.
+    func testSubmitInputRejectsOversizedTextBeforeTouchingDevice() async {
+        let transport = MockTransport()
+        let ops = ADBWorkerOperations(transport: transport)
+
+        do {
+            _ = try await ops.submitInput(deviceSerial: "S", text: String(repeating: "a", count: 10_001), timeout: 5)
+            XCTFail("Expected invalidInput")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+
+        let invocations = await transport.invocations
+        XCTAssertTrue(invocations.isEmpty, "Oversized input must not reach the device")
+    }
+
+    func testSubmitInputRejectsNullBytesBeforeTouchingDevice() async {
+        let transport = MockTransport()
+        let ops = ADBWorkerOperations(transport: transport)
+
+        do {
+            _ = try await ops.submitInput(deviceSerial: "S", text: "bad\0input", timeout: 5)
+            XCTFail("Expected invalidInput")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+
+        let invocations = await transport.invocations
+        XCTAssertTrue(invocations.isEmpty)
+    }
+
+    func testSubmitInputSurfacesTransportFailure() async {
+        let transport = MockTransport()
+        await transport.setPushResult(TransportResult(exitCode: 1, stdout: "", stderr: "adb: error: failed to copy"))
+        let ops = ADBWorkerOperations(transport: transport)
+
+        do {
+            _ = try await ops.submitInput(deviceSerial: "S", text: "hello", timeout: 5)
+            XCTFail("Expected adbCommandFailed")
+        } catch let error as PixelDesktopError {
+            guard case .adbCommandFailed = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+
+    /// D3: a size mismatch means a partial transfer and must be reported as a mismatch.
+    func testSubmitInputDetectsSizeMismatch() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: "", stderr: ""))
+        // Device reports fewer bytes than we sent.
+        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/input.txt",
+            TransportResult(exitCode: 0, stdout: "2\n", stderr: ""))
+
+        let ops = ADBWorkerOperations(transport: transport)
+        let verification = try await ops.submitInput(deviceSerial: "S", text: "hello", timeout: 5)
+
+        XCTAssertFalse(verification.isVerified, "a partial transfer must not verify")
+        XCTAssertEqual(verification, .mismatch(expected: 5, actual: 2))
+    }
+
+    // MARK: Retrieve result
+
+    func testRetrieveResultPullsAndDecodes() async throws {
+        let transport = MockTransport()
+        let json = #"{"status":"COMPLETED","input_characters":5,"total_words":1,"unique_words":1,"top_words":[{"word":"hello","count":1}],"classification":"NATURAL_LANGUAGE","confidence":0.5,"execution_timestamp_ms":1,"execution_duration_ms":2}"#
+        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/result.json",
+            TransportResult(exitCode: 0, stdout: "\(json.utf8.count)\n", stderr: ""))
+        await transport.setPullContent(json)
+
+        let ops = ADBWorkerOperations(transport: transport)
+        let retrieved = try await ops.retrieveResult(deviceSerial: "S", timeout: 5)
+
+        XCTAssertEqual(retrieved.result.status, "COMPLETED")
+        XCTAssertEqual(retrieved.result.inputCharacters, 5)
+        XCTAssertTrue(retrieved.sizeVerification.isVerified)
+
+        let invocations = await transport.invocations
+        let pull = invocations.first { $0.arguments.contains("pull") }
+        XCTAssertEqual(pull?.arguments[2], "/data/local/tmp/pixeldesktop/result.json")
+        XCTAssertEqual(pull?.arguments[3], WorkerTransferContract.localResultPath.path)
+    }
+
+    /// The worker produced nothing: `adb pull` exits non-zero. That is a worker failure.
+    func testRetrieveResultMissingPayloadIsWorkerError() async {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(
+            TransportResult(exitCode: 1, stdout: "", stderr: "adb: error: failed to stat remote object"))
+        let ops = ADBWorkerOperations(transport: transport)
+
+        do {
+            _ = try await ops.retrieveResult(deviceSerial: "S", timeout: 5)
+            XCTFail("Expected workerError")
+        } catch let error as PixelDesktopError {
+            guard case .workerError = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+
+    /// A result that cannot be parsed is never trusted (ADR-004).
+    func testRetrieveResultMalformedJSONIsVerificationFailure() async {
+        let transport = MockTransport()
+        let garbage = "not json at all"
+        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/result.json",
+            TransportResult(exitCode: 0, stdout: "\(garbage.utf8.count)\n", stderr: ""))
+        await transport.setPullContent(garbage)
+
+        let ops = ADBWorkerOperations(transport: transport)
+        do {
+            _ = try await ops.retrieveResult(deviceSerial: "S", timeout: 5)
+            XCTFail("Expected verificationFailed")
+        } catch let error as PixelDesktopError {
+            guard case .verificationFailed = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+
+    /// A partial result transfer must fail rather than hand back truncated JSON.
+    func testRetrieveResultPartialTransferIsWorkerError() async {
+        let transport = MockTransport()
+        // Device claims 500 bytes; the pulled file will be much smaller.
+        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/result.json",
+            TransportResult(exitCode: 0, stdout: "500\n", stderr: ""))
+        await transport.setPullContent("{}")
+
+        let ops = ADBWorkerOperations(transport: transport)
+        do {
+            _ = try await ops.retrieveResult(deviceSerial: "S", timeout: 5)
+            XCTFail("Expected workerError for partial transfer")
+        } catch let error as PixelDesktopError {
+            guard case .workerError = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+
+    /// A stale result from a previous run must not be mistaken for a fresh one.
+    func testRetrieveResultRemovesStaleLocalResultFirst() async throws {
+        try WorkerTransferContract.prepareStagingDirectory()
+        try "STALE".write(to: WorkerTransferContract.localResultPath, atomically: true, encoding: .utf8)
+
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: "no such file"))
+        let ops = ADBWorkerOperations(transport: transport)
+
+        do {
+            _ = try await ops.retrieveResult(deviceSerial: "S", timeout: 5)
+            XCTFail("Expected workerError")
+        } catch { /* expected */ }
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: WorkerTransferContract.localResultPath.path),
+                       "the stale result must have been removed")
+    }
+}
+
 // MARK: - Test Doubles
 
 /// Records invocations and returns canned responses, so enrichment can be tested
@@ -1429,6 +1800,13 @@ actor MockTransport: TransportProtocol {
     private var batchedResult: TransportResult?
     private var shellResponses: [String: TransportResult] = [:]
     private var defaultShellResult = TransportResult(exitCode: 0, stdout: "", stderr: "")
+    private var pushResult: TransportResult?
+    private var pullResult: TransportResult?
+    private var pullContent: String?
+
+    func setPushResult(_ result: TransportResult) { pushResult = result }
+    func setPullResult(_ result: TransportResult) { pullResult = result }
+    func setPullContent(_ content: String) { pullContent = content }
 
     /// Canned response for an exact shell command string.
     func setShellResponse(_ command: String, _ result: TransportResult) {
@@ -1476,6 +1854,22 @@ actor MockTransport: TransportProtocol {
 
     func listDevices() async throws -> [AndroidDevice] {
         deviceList
+    }
+
+    func push(deviceSerial: String, localPath: String, remotePath: String, timeout: TimeInterval) async throws -> TransportResult {
+        invocations.append(Invocation(command: "-s", arguments: [deviceSerial, "push", localPath, remotePath]))
+        if let result = pushResult { return result }
+        return defaultShellResult
+    }
+
+    func pull(deviceSerial: String, remotePath: String, localPath: String, timeout: TimeInterval) async throws -> TransportResult {
+        invocations.append(Invocation(command: "-s", arguments: [deviceSerial, "pull", remotePath, localPath]))
+        if let result = pullResult { return result }
+        // Simulate a successful pull by copying canned content into the destination.
+        if let content = pullContent {
+            try? content.write(toFile: localPath, atomically: true, encoding: .utf8)
+        }
+        return defaultShellResult
     }
 
     func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {

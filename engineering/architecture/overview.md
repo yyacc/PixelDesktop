@@ -54,6 +54,10 @@ PixelDesktop (macOS app)
 │   ├── AppOperationsProtocol.swift    the operations seam (mockable)
 │   └── ADBAppOperations.swift         templates, validation, containment, parsers
 │
+├── Worker/                       Payload transfer contract (Phase 5)
+│   ├── WorkerTransferContract.swift   fixed paths, validation, size verification
+│   └── WorkerOperationsProtocol.swift named operations — NO path parameters
+│
 ├── Compute/                      DTCA-1 workload (local reference implementation)
 │   └── DTCA1Worker.swift         DTCA1Result, WordCount, DTCA1Classification
 │
@@ -220,6 +224,47 @@ anything that is not a bare package identifier, so no caller value containing sp
 
 ---
 
+## 5c. Worker Transfer Contract (Phase 5)
+
+```
+caller                supplies CONTENT, never a path
+   ↓
+WorkerOperationsProtocol      prepareRemoteWorkspace · submitInput · retrieveResult
+   ↓
+WorkerTransferContract        fixed paths · regular-file validation · size verification
+   ↓
+TransportProtocol.push/pull   narrow primitives; no path policy
+```
+
+**There is no path parameter anywhere in this contract.** Two fixed filenames in two fixed
+directories, one file each way:
+
+| | Path |
+|---|---|
+| Remote root | `/data/local/tmp/pixeldesktop` (**chmod 700**) |
+| Remote payloads | `input.txt`, `result.json` |
+| Local staging | `<container>/Application Support/PixelDesktop/Staging/` |
+
+**Why narrowness rather than validation:** `adb` does **not** sanitize paths. Measured on the
+real device — `../` is resolved by the filesystem rather than rejected (the failures that
+occurred were *permission* denials, not a control), absolute paths escape any staging root,
+a local `pull` destination with `../` escaped staging, **symlinks are followed** (pushing a
+symlink to `/etc/hosts` pushed its contents), and directory operands **recurse**.
+
+Because there is no path input, every one of those cases is unreachable by construction. This
+is the mechanism; regular-file validation is the fallback.
+
+**Limits (ADR-010):** the contract is safe because it is *narrow*, not because paths are
+validated. It provides no general path-safety mechanism. **Any future variable-path contract
+requires ADR-010 to be revisited and a real path validator written first.**
+
+**Size verification is not cryptographic integrity verification** — it detects size mismatch
+only, not same-length corruption. Result correctness comes from ADR-004 re-computation.
+
+`DeviceOperation` is **not** extended: transfer is a payload mechanism, not a device operation.
+
+---
+
 ## 6. Error Model
 
 `PixelDesktopError` — typed, `Equatable`, `CustomStringConvertible`:
@@ -285,7 +330,9 @@ Listed so this document cannot be mistaken for a description of delivered functi
 | `shell()` — ADB shell execution primitive | **4** | Implemented. Transport-only; not exposed upward (ADR-009). |
 | Application operations (discover, launch, query, stop) | **4** | Implemented (ADR-009). |
 | Connection lifecycle / guard-first state checks | **4** | Implemented; `ps -A` process inventory deferred. |
-| `push()` / `pull()` — file transfer | **5** (Pixel Compute Worker) | Not implemented. Deferred in Phase 2. |
+| `push()` / `pull()` — transfer primitives | **5** | Implemented as narrow primitives (ADR-010). |
+| Worker payload transfer contract | **5** | Implemented — fixed paths, no caller paths (ADR-010). |
+| Worker APK, worker lifecycle, compute execution | **5** | **Not implemented** — deferred per D8. |
 | connect / disconnect / reconnect lifecycle | **4**, hardened in **10** | Not implemented. Deferred in Phase 2. |
 | Android device operations (launch/stop apps, process queries) | **4** | Not implemented |
 | Device capabilities / available services / supported operations model | **3** | Subject of the Phase 3 proposal |

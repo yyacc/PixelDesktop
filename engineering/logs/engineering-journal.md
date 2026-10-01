@@ -466,3 +466,52 @@ wrong on the first attempt). Containment by *narrowness* — having no path para
 **Next action:** Await review of D1–D8 and the ADR-010 recommendation.
 
 **Artifacts:** `phases/phase-05-transfer-contract-proposal.md`.
+
+---
+
+## 2026-10-01 — Phase 5 (Part 1): Worker Transfer Contract
+
+**Phase:** 5 (transfer contract scope; worker APK deferred per D8)
+**Task:** Implement the fixed transfer contract for the Pixel Compute Worker per D1–D8.
+
+**Action:**
+Probed two mechanisms before depending on them: `stat -c %s` on the device (works; exits 1 for
+a missing path) and Swift's `attributesOfItem` symlink reporting (confirmed it reports
+`.typeSymbolicLink` **without following**, so the check cannot be bypassed).
+
+Implemented narrow `push()`/`pull()` primitives on `TransportProtocol` with no path policy, and
+a `Worker/` layer — `WorkerTransferContract` (fixed paths, regular-file validation, size
+verification) plus `WorkerOperationsProtocol`/`ADBWorkerOperations` with **no path parameter
+anywhere**. Wrote 25 tests covering each case the user named.
+
+**Result:**
+The first real-device run **failed one check**: `mkdir -p` created the workspace with mode
+**777**, world-readable. ADR-010 chose `/data/local/tmp` *because* it is not world-readable —
+true of the parent (771), false of the directory the contract creates.
+
+Diagnosed as an over-permissive default and fixed by **tightening** the contract
+(`mkdir -p … && chmod 700 …`), pinned with `testPrepareRemoteWorkspaceRestrictsPermissions`,
+and recorded as FAIL-003. A second, separate harness bug produced a false FAIL (the cleanup
+check read only stdout while `ls` writes "No such file" to stderr).
+
+Final: BUILD SUCCEEDED; 131 tests executed, 0 failures. Real-device verification **PASS** on
+the exact fixed contract — workspace mode 700, size-verified push (69 = 69), payload
+byte-identical on device, deliberate overwrite confirmed, size-verified pull (226 = 226),
+local result byte-identical, missing payload → `workerError`, oversized input rejected, unknown
+serial fails cleanly, workspace removed, device healthy. Cross-checked against raw `adb`.
+
+**Decision:**
+Phase 5 transfer contract COMPLETE. The worker APK, worker lifecycle and compute execution
+remain deferred (D8).
+
+**Reason:**
+The verification failed because the *contract* did not achieve its own stated property, not
+because the check was too strict. Tightening was the correct response; relaxing would have
+left a world-readable workspace while claiming otherwise.
+
+**Next action:** The worker APK is its own step (D8) — APK build, installation, compute
+execution. `DeviceOperation` was deliberately not extended.
+
+**Artifacts:** `phases/phase-05-transfer-contract.md`, ADR-010,
+`testing/phase-05-test-report.md`, `failures/FAIL-003-workspace-world-readable.md`,
+`architecture/overview.md` updated.

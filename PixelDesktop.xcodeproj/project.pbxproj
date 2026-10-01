@@ -15,6 +15,7 @@
 		336E7BB5E988EE0A004A6E45 /* AndroidDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */; };
 		5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D453AF971B8227981443968 /* DTCA1Worker.swift */; };
 		619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560A663C5EAF42792941431A /* PixelDesktopTests.swift */; };
+		63513752CAEF4DE76113A7BE /* WorkerTransferContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */; };
 		6588C60ED7417106754355CB /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832112C57257637193F8B80A /* Transport.swift */; };
 		809AB5880C38024AC93D96AC /* ADBAppOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */; };
 		88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */; };
@@ -25,6 +26,7 @@
 		C998025A044192904CC5E11D /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59495D8B39B4270FE682515C /* AppLogger.swift */; };
 		DF4A926E2DC22B26ACE3ADBA /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EEE5EA3E8F6933113FA516 /* AppState.swift */; };
 		E72D168C6E8BEE4FCD149163 /* ADBTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */; };
+		ECA8FE38ADF8E7F5FCC57FE6 /* WorkerOperationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,12 +55,14 @@
 		8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledApp.swift; sourceTree = "<group>"; };
 		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
+		BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerOperationsProtocol.swift; sourceTree = "<group>"; };
 		C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBAppOperations.swift; sourceTree = "<group>"; };
 		D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopApp.swift; sourceTree = "<group>"; };
 		DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEnricher.swift; sourceTree = "<group>"; };
 		DEECEB33C31DAB1BF023236B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E7C2D83AFA87754C63612A30 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		EE1C96AAA82CA14C8156167C /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
+		FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerTransferContract.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -91,6 +95,7 @@
 				EC5B83872D0FD302834606B2 /* Operations */,
 				D052E11B69A45A0FE1265DF4 /* Transport */,
 				297CB6D35AA23D96C557A278 /* Verification */,
+				C2749E920DE022F549DCCED6 /* Worker */,
 			);
 			path = PixelDesktop;
 			sourceTree = "<group>";
@@ -165,6 +170,15 @@
 				EE1C96AAA82CA14C8156167C /* DeviceManager.swift */,
 			);
 			path = Device;
+			sourceTree = "<group>";
+		};
+		C2749E920DE022F549DCCED6 /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */,
+				FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */,
+			);
+			path = Worker;
 			sourceTree = "<group>";
 		};
 		D052E11B69A45A0FE1265DF4 /* Transport */ = {
@@ -311,6 +325,8 @@
 				16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */,
 				A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */,
 				6588C60ED7417106754355CB /* Transport.swift in Sources */,
+				ECA8FE38ADF8E7F5FCC57FE6 /* WorkerOperationsProtocol.swift in Sources */,
+				63513752CAEF4DE76113A7BE /* WorkerTransferContract.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
