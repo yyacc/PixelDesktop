@@ -573,3 +573,63 @@ may shape the execution mechanism.
 **Next action:** Await review of D-1..D-10 and the ADR recommendations.
 
 **Artifacts:** `phases/phase-05-d8-worker-reconnaissance.md`.
+
+---
+
+## 2026-10-02 — D8 decision review + locked/idle execution experiment
+
+**Phase:** 5 (D8 review)
+**Task:** Resolve the locked/idle Activity question with the smallest real-device experiment, and
+produce the D-1..D-10 decision table. No implementation.
+
+**Action:**
+Checked safety first: `deviceLocked=0`, `strongAuthRequired=0x0`, `lockscreen.password_type=null`
+— **no lock credential is set**, so locking could not strand anyone behind a PIN.
+
+Used the **already-installed `com.pixeldesktop.metadata`** app as the experiment subject — built
+by this project, single-Activity, and it logs `METADATA_READY` on completion. This required **no
+build and no install**. Six conditions were tested, each verified against real device state
+(`dumpsys power`, `dumpsys display`, `dumpsys window` `mShowingLockscreen`, `dumpsys deviceidle`).
+
+**Result — the Activity proposal is CONFIRMED, not contradicted:**
+
+| Condition | am start | Process | Work done |
+|---|---|---|---|
+| unlocked + active | exit 0, 0.27s | 0.25s | yes |
+| **locked / screen off** (`mShowingLockscreen=true`) | exit 0, 0.26s | 0.25s | yes |
+| already running + duplicate invocation | exit 0 | **same PID**, no duplicate | yes |
+| repeated x5 | — | — | **5/5** |
+| **deep doze** (`mState=IDLE`) | exit 0 | pid 7411 | yes |
+| **adb server killed mid-invocation** | (no adb) | — | **yes — completed with no adb connected** |
+
+The display stayed **OFF** during the locked test: `am start` did not wake the screen or dismiss
+the keyguard. And the workload completed with the adb server dead, which is a genuinely useful
+property — the worker does not need a live connection to finish, only to receive the job and
+return the result.
+
+Also revised **ADR-010** (Revision 1) to record the identity boundary: `/data/local/tmp` is mode
+771 owned by `shell`, so adb can write it but an Android worker process **cannot**. The new root
+is the worker's own external files dir, reachable by both identities for different reasons. The
+containment mechanism is unchanged — still two fixed filenames, no caller paths, regular files
+only. The revision adds the principle that **a path's suitability is a property of the pair
+(path, identity), not of the path alone.**
+
+Recorded the observable/measurable/**attributable** distinction for resource evidence:
+`/proc/<pid>/stat` CPU time is attributable to the worker; `dumpsys thermalservice` temperatures
+are **system-wide and NOT attributable** to it. Stated as a limitation rather than smoothed over.
+
+**Incidental:** killing the adb server left the device briefly `unauthorized` on restart —
+transient key re-negotiation, not a revocation. It recovered with no user action and
+`~/.android/adbkey` was untouched. Recorded so a future agent does not misread it.
+
+**Decision:**
+Await approval of the D-1..D-10 table before implementation.
+
+**Reason:**
+The experiment was required to be run before the execution mechanism could be treated as proven.
+It was run on the real device, with a work-completion signal rather than merely a process check.
+
+**Next action:** On approval, begin the implementation sequence at step 3 (create the Android
+project) — step 1 (the execution experiment) is now complete.
+
+**Artifacts:** `phases/phase-05-d8-decision-review.md`, ADR-010 Revision 1.

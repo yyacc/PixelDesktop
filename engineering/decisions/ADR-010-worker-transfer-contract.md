@@ -2,9 +2,98 @@
 
 ## Status
 
-Accepted
+**Accepted — REVISED 2026-10-02 (Revision 1).** The containment mechanism is unchanged. The
+remote root was found to be unusable for worker output; see Revision 1 below.
 
 ## Date
+
+2026-10-01 (original) · 2026-10-02 (Revision 1)
+
+---
+
+## REVISION 1 — The transfer root reflects the actual identity boundary
+
+**Date:** 2026-10-02
+**Trigger:** D8 reconnaissance (commit `cc11bea`)
+
+### What was found
+
+`/data/local/tmp` is **mode 771, owned by `shell`**:
+
+```
+drwxrwx--x 2 shell shell /data/local/tmp
+```
+
+`others` receive `--x` — traverse only, **no write**. An Android application runs under its own
+UID, is not in group `shell`, and no privilege escalation exists (`su` is absent;
+`ro.debuggable=0`, established in ADR-009).
+
+> **An Android worker process cannot write `/data/local/tmp`.** The original contract's root is
+> writable **only by adb**.
+
+The original decision was correct about the *parent directory's* properties and never tested
+whether the identity that would write worker output could actually reach it. That is the same
+class of error as FAIL-003.
+
+### The identity boundary, stated plainly
+
+| Writer | Identity | Can write `/data/local/tmp`? | Can write app external files dir? |
+|---|---|---|---|
+| `adb push` / `adb shell` | `uid=2000(shell)`, group `ext_data_rw` | **Yes** | **Yes** (via `ext_data_rw`) |
+| Android worker process | own app UID | **No** | **Yes** (it owns the directory) |
+
+**`adb` and the Android application do NOT have equivalent filesystem privileges.** They are
+different identities with different group memberships. A path that is convenient for one is not
+automatically reachable by the other. This must be checked per identity, not per path.
+
+### The revised root
+
+```
+/sdcard/Android/data/com.pixeldesktop.worker/files/
+```
+
+| Property | Value | Why |
+|---|---|---|
+| Directory mode | `drwxrws---` (owner + `ext_data_rw`) | **Not readable by other applications** |
+| adb access | **Read and write** — verified by writing and reading back | adb holds `ext_data_rw` |
+| Worker access | **Read and write** — it is the owner | Standard app-private external storage |
+| Permission required | **None** | App-specific external storage needs no permission on API 19+ |
+
+Chosen over `/sdcard` root (world-readable to any installed app) and over
+`/data/data/<pkg>` (unreachable by adb without root — verified `Permission denied`).
+
+### What did NOT change
+
+**Containment is by narrowness, not by trusting arbitrary paths.** The revision moves a
+constant; it does not weaken the mechanism.
+
+- Still **two fixed filenames**, one file each way
+- Still **no caller-supplied paths** anywhere
+- Still **regular-files-only**, with symlink and directory rejection
+- Still **size caps and post-transfer size verification**
+- Still **no path parameter on the worker-facing surface**
+
+The `chmod 700` requirement from the original decision becomes unnecessary for the new root,
+because the app-private external directory is already owner-scoped by the platform
+(`drwxrws---`). It is **not** removed as a principle — it is recorded as no longer applicable
+to this root.
+
+### The standing requirement is unchanged and still binding
+
+**Before any future variable-path contract, this ADR must be revisited and a real path
+validator written.** The revision does not relax that. If anything it strengthens the case:
+the failure mode discovered here was not a traversal attack but an *identity mismatch*, which a
+path validator would not have caught either. Both checks are needed.
+
+---
+
+## Original Decision (2026-10-01)
+
+## Status (original)
+
+Accepted
+
+## Date (original)
 
 2026-10-01
 
@@ -105,11 +194,16 @@ two fixed directories, one file each way.
 
 | Item | Path |
 |---|---|
-| Remote root | `/data/local/tmp/pixeldesktop` |
-| Remote input | `/data/local/tmp/pixeldesktop/input.txt` |
-| Remote result | `/data/local/tmp/pixeldesktop/result.json` |
+| Remote root | `/data/local/tmp/pixeldesktop` — **SUPERSEDED by Revision 1 for worker output** |
+| Remote input | `/data/local/tmp/pixeldesktop/input.txt` — **SUPERSEDED** |
+| Remote result | `/data/local/tmp/pixeldesktop/result.json` — **SUPERSEDED** |
 | Local staging | `<container>/Application Support/PixelDesktop/Staging/` |
 | Local input / result | `…/Staging/input.txt`, `…/Staging/result.json` |
+
+> **See Revision 1.** The remote root above is reachable by adb but **not** by an Android
+> worker process. The worker's payloads move to
+> `/sdcard/Android/data/com.pixeldesktop.worker/files/{input.txt,result.json}`. The local
+> staging paths are unaffected.
 
 Every case in the evidence above is therefore **unreachable by construction** rather than
 merely blocked: there is no path input to attack.
@@ -118,6 +212,8 @@ Validation still exists as a **second layer** — regular-file check, symlink re
 directory rejection, size cap — but it is the fallback, not the mechanism.
 
 ### Remote root ownership and permissions
+
+> **Superseded by Revision 1.** Retained as the original reasoning.
 
 `/data/local/tmp/pixeldesktop`, created by `mkdir -p … && chmod 700 …`.
 
@@ -237,6 +333,10 @@ case in §1–§5.
 ## Future Reconsideration Conditions
 
 - **Any variable-path contract** → revisit this ADR and write a real path validator first.
+- **Any change of writer identity** (a different app, a service, a different UID) → re-check
+  that the new identity can actually reach every path in the contract. Revision 1 exists
+  because this check was not performed the first time. **A path's suitability is a property of
+  the pair (path, identity), not of the path alone.**
 - If payloads grow beyond ~1 MB, revisit the size cap and consider streaming.
 - If `/data/local/tmp` proves unsuitable (e.g. it is cleared mid-run by an aggressive
   cleaner), revisit the root.
