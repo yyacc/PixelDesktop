@@ -1418,9 +1418,9 @@ final class WorkerTransferContractTests: XCTestCase {
     // MARK: The contract has no path parameter
 
     func testContractPathsAreFixedConstants() {
-        XCTAssertEqual(WorkerTransferContract.remoteRoot, "/data/local/tmp/pixeldesktop")
-        XCTAssertEqual(WorkerTransferContract.remoteInputPath, "/data/local/tmp/pixeldesktop/input.txt")
-        XCTAssertEqual(WorkerTransferContract.remoteResultPath, "/data/local/tmp/pixeldesktop/result.json")
+        XCTAssertEqual(WorkerTransferContract.remoteRoot, "/sdcard/Android/data/com.pixeldesktop.worker/files")
+        XCTAssertEqual(WorkerTransferContract.remoteInputPath, "/sdcard/Android/data/com.pixeldesktop.worker/files/job.json")
+        XCTAssertEqual(WorkerTransferContract.remoteResultPath, "/sdcard/Android/data/com.pixeldesktop.worker/files/result.json")
         // Both payload files live under the single root; neither escapes it.
         XCTAssertTrue(WorkerTransferContract.remoteInputPath.hasPrefix(WorkerTransferContract.remoteRoot + "/"))
         XCTAssertTrue(WorkerTransferContract.remoteResultPath.hasPrefix(WorkerTransferContract.remoteRoot + "/"))
@@ -1432,7 +1432,7 @@ final class WorkerTransferContractTests: XCTestCase {
                       "staging must live in the container, got \(staging.path)")
         XCTAssertTrue(staging.path.hasSuffix("PixelDesktop/Staging"))
         // Fixed filenames under staging.
-        XCTAssertEqual(WorkerTransferContract.localInputPath.lastPathComponent, "input.txt")
+        XCTAssertEqual(WorkerTransferContract.localInputPath.lastPathComponent, "job.json")
         XCTAssertEqual(WorkerTransferContract.localResultPath.lastPathComponent, "result.json")
     }
 
@@ -1568,45 +1568,98 @@ final class WorkerOperationsTests: XCTestCase {
 
     // MARK: Workspace
 
-    func testPrepareRemoteWorkspaceUsesFixedRoot() async throws {
+    func testPrepareRemoteWorkspaceChecksExistenceWithoutCreating() async throws {
         let transport = MockTransport()
+        await transport.setDefaultShellResult(
+            TransportResult(exitCode: 0, stdout: "EXISTS\n", stderr: ""))
         let ops = ADBWorkerOperations(transport: transport)
 
         try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
 
         let invocations = await transport.invocations
         XCTAssertEqual(invocations.count, 1)
-        // chmod 700 is required: mkdir -p alone produced a world-readable 777 directory on
-        // the real device, contradicting the rationale for choosing this root (ADR-010).
         XCTAssertEqual(invocations[0].arguments,
-                       ["S", "shell", "mkdir -p /data/local/tmp/pixeldesktop && chmod 700 /data/local/tmp/pixeldesktop"])
+                       ["S", "shell", WorkerTransferContract.remoteWorkspaceExistsCommand])
+
+        // adb must NOT create the directory: an adb-created directory is owned by
+        // shell:ext_data_rw and the worker cannot write it. Measured on the real device.
+        let command = invocations[0].arguments.last ?? ""
+        XCTAssertFalse(command.contains("mkdir"),
+                       "adb must not create the exchange directory, got: \(command)")
     }
 
-    /// Regression: the created workspace directory must be restricted. On the real device
-    /// `mkdir -p` produced mode 777 (world-readable), contradicting ADR-010's stated reason
-    /// for choosing /data/local/tmp over /sdcard.
-    func testPrepareRemoteWorkspaceRestrictsPermissions() async throws {
+    /// The worker must be the directory's creator. Absence is a reported condition, not a
+    /// silent no-op.
+    func testPrepareRemoteWorkspaceReportsMissingDirectory() async {
         let transport = MockTransport()
-        let ops = ADBWorkerOperations(transport: transport)
-
-        try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
-
-        let invocations = await transport.invocations
-        let command = invocations.first?.arguments.last ?? ""
-        XCTAssertTrue(command.contains("chmod 700"),
-                      "the workspace must be restricted, got: \(command)")
-    }
-
-    func testPrepareRemoteWorkspaceSurfacesFailure() async {
-        let transport = MockTransport()
-        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: "mkdir: permission denied"))
+        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: ""))
         let ops = ADBWorkerOperations(transport: transport)
 
         do {
             try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
-            XCTFail("Expected adbCommandFailed")
+            XCTFail("Expected workerError when the exchange directory is absent")
         } catch let error as PixelDesktopError {
-            guard case .adbCommandFailed = error else { return XCTFail("got \(error)") }
+            guard case .workerError = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+
+    /// Regression, re-expressed for ADR-010 Revision 1.
+    ///
+    /// **FAIL-003** was: `mkdir -p` on `/data/local/tmp/pixeldesktop` produced mode **777**
+    /// (world-readable), contradicting the stated reason for choosing that root. The fix then
+    /// was an explicit `chmod 700`.
+    ///
+    /// The transfer root has since moved to the worker application's **own external files
+    /// directory**, which the platform already creates owner-scoped (`drwxrws---`). The
+    /// *property* FAIL-003 demanded — "the exchange directory must not be world-readable" — is
+    /// therefore now enforced by the platform rather than by our chmod, and applying `chmod`
+    /// here could break the worker's own access to its directory.
+    ///
+    /// So this test asserts the **property** rather than the mechanism it used to require:
+    ///
+    /// 1. the root is inside the worker's app-private external directory, where the platform
+    ///    enforces owner-scoping; and
+    /// 2. no `chmod` is issued that could interfere with the worker's ownership.
+    ///
+    /// The property itself is verified on the **real device** during the compute proof, where the
+    /// actual mode is read back — see the phase log. A unit test cannot observe a mode.
+    func testRemoteWorkspaceIsInsideAppPrivateExternalStorage() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(
+            TransportResult(exitCode: 0, stdout: "EXISTS\n", stderr: ""))
+        let ops = ADBWorkerOperations(transport: transport)
+
+        try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
+
+        // 1. The root must be the app's own external files dir — that is what makes the platform
+        //    enforce owner-only access.
+        XCTAssertTrue(
+            WorkerTransferContract.remoteRoot.hasPrefix(
+                "/sdcard/Android/data/\(WorkerTransferContract.workerPackageName)/files"),
+            "root must be app-private external storage, got \(WorkerTransferContract.remoteRoot)")
+
+        // 2. Must NOT be /data/local/tmp: an Android app cannot write there (ADR-010 Rev 1).
+        XCTAssertFalse(WorkerTransferContract.remoteRoot.hasPrefix("/data/local/tmp"))
+
+        let invocations = await transport.invocations
+        let command = invocations.first?.arguments.last ?? ""
+        XCTAssertFalse(command.contains("mkdir"), "adb must NOT create the exchange directory - it would own it and break the worker's access")
+        XCTAssertFalse(command.contains("chmod"),
+                       "chmod must not be applied to the worker's own directory, got: \(command)")
+    }
+
+    /// The workspace check must also survive a device-side error without pretending success.
+    func testPrepareRemoteWorkspaceSurfacesDeviceError() async {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(
+            TransportResult(exitCode: 0, stdout: "", stderr: "ls: permission denied"))
+        let ops = ADBWorkerOperations(transport: transport)
+
+        do {
+            try await ops.prepareRemoteWorkspace(deviceSerial: "S", timeout: 5)
+            XCTFail("Expected workerError")
+        } catch let error as PixelDesktopError {
+            guard case .workerError = error else { return XCTFail("got \(error)") }
         } catch { XCTFail("got \(error)") }
     }
 
@@ -1616,7 +1669,7 @@ final class WorkerOperationsTests: XCTestCase {
         let transport = MockTransport()
         await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: "", stderr: ""))
         // stat reports the same size we sent.
-        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/input.txt",
+        await transport.setShellResponse("stat -c %s \(WorkerTransferContract.remoteInputPath)",
             TransportResult(exitCode: 0, stdout: "5\n", stderr: ""))
 
         let ops = ADBWorkerOperations(transport: transport)
@@ -1630,7 +1683,7 @@ final class WorkerOperationsTests: XCTestCase {
         XCTAssertEqual(push?.arguments[0], "S")
         XCTAssertEqual(push?.arguments[1], "push")
         XCTAssertEqual(push?.arguments[2], WorkerTransferContract.localInputPath.path)
-        XCTAssertEqual(push?.arguments[3], "/data/local/tmp/pixeldesktop/input.txt")
+        XCTAssertEqual(push?.arguments[3], WorkerTransferContract.remoteInputPath)
     }
 
     /// The DTCA-1 limits are enforced before anything reaches the device.
@@ -1682,7 +1735,7 @@ final class WorkerOperationsTests: XCTestCase {
         let transport = MockTransport()
         await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: "", stderr: ""))
         // Device reports fewer bytes than we sent.
-        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/input.txt",
+        await transport.setShellResponse("stat -c %s \(WorkerTransferContract.remoteInputPath)",
             TransportResult(exitCode: 0, stdout: "2\n", stderr: ""))
 
         let ops = ADBWorkerOperations(transport: transport)
@@ -1697,7 +1750,7 @@ final class WorkerOperationsTests: XCTestCase {
     func testRetrieveResultPullsAndDecodes() async throws {
         let transport = MockTransport()
         let json = #"{"status":"COMPLETED","input_characters":5,"total_words":1,"unique_words":1,"top_words":[{"word":"hello","count":1}],"classification":"NATURAL_LANGUAGE","confidence":0.5,"execution_timestamp_ms":1,"execution_duration_ms":2}"#
-        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/result.json",
+        await transport.setShellResponse("stat -c %s \(WorkerTransferContract.remoteResultPath)",
             TransportResult(exitCode: 0, stdout: "\(json.utf8.count)\n", stderr: ""))
         await transport.setPullContent(json)
 
@@ -1710,7 +1763,7 @@ final class WorkerOperationsTests: XCTestCase {
 
         let invocations = await transport.invocations
         let pull = invocations.first { $0.arguments.contains("pull") }
-        XCTAssertEqual(pull?.arguments[2], "/data/local/tmp/pixeldesktop/result.json")
+        XCTAssertEqual(pull?.arguments[2], WorkerTransferContract.remoteResultPath)
         XCTAssertEqual(pull?.arguments[3], WorkerTransferContract.localResultPath.path)
     }
 
@@ -1733,7 +1786,7 @@ final class WorkerOperationsTests: XCTestCase {
     func testRetrieveResultMalformedJSONIsVerificationFailure() async {
         let transport = MockTransport()
         let garbage = "not json at all"
-        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/result.json",
+        await transport.setShellResponse("stat -c %s \(WorkerTransferContract.remoteResultPath)",
             TransportResult(exitCode: 0, stdout: "\(garbage.utf8.count)\n", stderr: ""))
         await transport.setPullContent(garbage)
 
@@ -1750,7 +1803,7 @@ final class WorkerOperationsTests: XCTestCase {
     func testRetrieveResultPartialTransferIsWorkerError() async {
         let transport = MockTransport()
         // Device claims 500 bytes; the pulled file will be much smaller.
-        await transport.setShellResponse("stat -c %s /data/local/tmp/pixeldesktop/result.json",
+        await transport.setShellResponse("stat -c %s \(WorkerTransferContract.remoteResultPath)",
             TransportResult(exitCode: 0, stdout: "500\n", stderr: ""))
         await transport.setPullContent("{}")
 
@@ -1782,6 +1835,256 @@ final class WorkerOperationsTests: XCTestCase {
     }
 }
 
+// MARK: - Phase 5 D8: Worker Installer / Lifecycle / Compute-Proof Tests
+
+final class WorkerInstallerTests: XCTestCase {
+
+    func testParseVersionCode() {
+        let output = "    versionCode=1 minSdk=31 targetSdk=36\n    versionName=1.0"
+        XCTAssertEqual(WorkerInstaller.parseVersionCode(output), 1)
+    }
+
+    func testParseVersionCodeAbsent() {
+        XCTAssertNil(WorkerInstaller.parseVersionCode("Unable to find package com.x"))
+        XCTAssertNil(WorkerInstaller.parseVersionCode(""))
+    }
+
+    func testInstalledStateNotInstalledWhenDumpsysFails() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: "Unable to find package"))
+        let installer = WorkerInstaller(transport: transport)
+
+        let state = try await installer.installedState(deviceSerial: "S")
+        XCTAssertEqual(state, .notInstalled)
+        XCTAssertFalse(state.isInstalled)
+    }
+
+    func testInstalledStateReadsVersion() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse(
+            "dumpsys package \(WorkerTransferContract.workerPackageName)",
+            TransportResult(exitCode: 0, stdout: "    versionCode=1 minSdk=31", stderr: ""))
+        let installer = WorkerInstaller(transport: transport)
+
+        let state = try await installer.installedState(deviceSerial: "S")
+        XCTAssertEqual(state.versionCode, 1)
+        XCTAssertTrue(state.isInstalled)
+    }
+
+    func testInstallUsesReplaceFlagAndFixedPackage() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse(
+            "dumpsys package \(WorkerTransferContract.workerPackageName)",
+            TransportResult(exitCode: 0, stdout: "    versionCode=1 minSdk=31", stderr: ""))
+        let installer = WorkerInstaller(transport: transport)
+
+        let apk = try makeTempFile(contents: "not a real apk")
+        defer { try? FileManager.default.removeItem(at: apk) }
+
+        _ = try await installer.installWorker(deviceSerial: "S", apkPath: apk.path)
+
+        let invocations = await transport.invocations
+        let install = invocations.first { $0.arguments.contains("install") }
+        XCTAssertNotNil(install)
+        XCTAssertTrue(install!.arguments.contains("-r"), "install must use -r to replace")
+        XCTAssertEqual(install!.arguments.last, apk.path)
+    }
+
+    /// Installation is state-changing, so a refused APK must never reach the device.
+    func testInstallRefusesSymlinkApkBeforeTouchingDevice() async throws {
+        let transport = MockTransport()
+        let installer = WorkerInstaller(transport: transport)
+
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("pd_inst_\(UUID())", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let real = dir.appendingPathComponent("real.apk")
+        try "x".write(to: real, atomically: true, encoding: .utf8)
+        let link = dir.appendingPathComponent("link.apk")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: real)
+
+        do {
+            _ = try await installer.installWorker(deviceSerial: "S", apkPath: link.path)
+            XCTFail("Expected refusal of a symlink APK")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+
+        let invocations = await transport.invocations
+        XCTAssertTrue(invocations.isEmpty, "a refused APK must not reach the device")
+    }
+
+    func testInstallSurfacesFailure() async throws {
+        let transport = MockTransport()
+        await transport.setInstallResult(TransportResult(exitCode: 1, stdout: "Failure [INSTALL_FAILED_ALREADY_EXISTS]", stderr: ""))
+        let installer = WorkerInstaller(transport: transport)
+        let apk = try makeTempFile(contents: "x")
+        defer { try? FileManager.default.removeItem(at: apk) }
+
+        do {
+            _ = try await installer.installWorker(deviceSerial: "S", apkPath: apk.path)
+            XCTFail("Expected adbCommandFailed")
+        } catch let error as PixelDesktopError {
+            guard case .adbCommandFailed = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+
+    /// Idempotence: an already-correct version must not trigger a reinstall.
+    func testEnsureInstalledSkipsWhenVersionMatches() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse(
+            "dumpsys package \(WorkerTransferContract.workerPackageName)",
+            TransportResult(exitCode: 0, stdout: "    versionCode=1 minSdk=31", stderr: ""))
+        let installer = WorkerInstaller(transport: transport)
+
+        _ = try await installer.ensureInstalled(deviceSerial: "S", apkPath: "/nonexistent.apk", expectedVersionCode: 1)
+
+        let invocations = await transport.invocations
+        XCTAssertFalse(invocations.contains { $0.arguments.contains("install") },
+                       "no install should occur when the version already matches")
+    }
+
+    private func makeTempFile(contents: String) throws -> URL {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("pd_apk_\(UUID())", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let url = dir.appendingPathComponent("worker.apk")
+        try contents.write(to: url, atomically: true, encoding: .utf8)
+        return url
+    }
+}
+
+final class WorkerLifecycleTests: XCTestCase {
+
+    func testStateNotRunningWhenPidofEmpty() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: ""))
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        let state = try await lifecycle.state(deviceSerial: "S")
+        XCTAssertEqual(state, .notRunning)
+        XCTAssertFalse(state.isRunning)
+    }
+
+    func testStateRunningWithPID() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse(
+            "pidof \(WorkerTransferContract.workerPackageName)",
+            TransportResult(exitCode: 0, stdout: "12345\n", stderr: ""))
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        let state = try await lifecycle.state(deviceSerial: "S")
+        XCTAssertEqual(state.pid, 12345)
+    }
+
+    func testParsePID() {
+        XCTAssertEqual(WorkerLifecycle.parsePID("12345"), 12345)
+        XCTAssertEqual(WorkerLifecycle.parsePID("12345 67890"), 12345)
+        XCTAssertNil(WorkerLifecycle.parsePID(""))
+    }
+
+    func testStopIfRunningNoOpWhenNotRunning() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: ""))
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        try await lifecycle.stopIfRunning(deviceSerial: "S")
+
+        let invocations = await transport.invocations
+        XCTAssertFalse(invocations.contains { $0.arguments.last?.contains("force-stop") == true },
+                       "must not force-stop a process that is not running")
+    }
+
+    func testLaunchUsesFixedComponent() async throws {
+        let transport = MockTransport()
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        try await lifecycle.launch(deviceSerial: "S")
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.last?.arguments,
+                       ["S", "shell", "am start -n \(WorkerTransferContract.workerActivityComponent)"])
+    }
+
+    func testLaunchSurfacesFailure() async {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 1, stdout: "", stderr: "Error: Activity not found"))
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        do {
+            try await lifecycle.launch(deviceSerial: "S")
+            XCTFail("Expected workerError")
+        } catch let error as PixelDesktopError {
+            guard case .workerError = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+    }
+}
+
+final class WorkerComputeProofParsingTests: XCTestCase {
+
+    /// `/proc/<pid>/stat` parsing must survive a process name containing spaces or parentheses.
+    func testParseCPUTicks() {
+        // utime=100 (field 14), stime=50 (field 15) -> 150
+        let line = "1234 (worker) S 1 1234 0 0 -1 4194624 100 0 0 0 100 50 0 0 20 0 10 0 12345 0 0"
+        XCTAssertEqual(WorkerComputeProof.parseCPUTicks(line), 150)
+    }
+
+    func testParseCPUTicksWithSpacesInProcessName() {
+        // Process name contains a space and parentheses; parsing must split after the LAST ')'.
+        let line = "1234 (my worker (v2)) S 1 1234 0 0 -1 4194624 7 0 0 0 300 40 0 0 20 0 10 0 12345 0 0"
+        XCTAssertEqual(WorkerComputeProof.parseCPUTicks(line), 340)
+    }
+
+    func testParseCPUTicksRejectsMalformed() {
+        XCTAssertNil(WorkerComputeProof.parseCPUTicks(""))
+        XCTAssertNil(WorkerComputeProof.parseCPUTicks("no parens here"))
+        XCTAssertNil(WorkerComputeProof.parseCPUTicks("1234 (w) S 1 2"))
+    }
+
+    func testJobEncodesWithExpectedWireFieldNames() throws {
+        let job = DTCA1Job(jobId: "abc-123", input: "hello world")
+        let encoded = try job.encoded()
+
+        XCTAssertTrue(encoded.contains("\"job_id\":\"abc-123\""), "got: \(encoded)")
+        XCTAssertTrue(encoded.contains("\"workload\":\"DTCA-1\""), "got: \(encoded)")
+        XCTAssertTrue(encoded.contains("\"input\":\"hello world\""), "got: \(encoded)")
+    }
+
+    func testJobIdDiffersBetweenCalls() {
+        XCTAssertNotEqual(DTCA1Job.newJobId(), DTCA1Job.newJobId())
+    }
+
+    func testResultEnvelopeDecodesCompleted() throws {
+        let json = #"{"status":"COMPLETED","job_id":"j1","input_characters":5,"total_words":1,"unique_words":1,"top_words":[{"word":"hello","count":1}],"classification":"NATURAL_LANGUAGE","confidence":0.5,"execution_timestamp_ms":1,"execution_duration_ms":2}"#
+        let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
+
+        XCTAssertTrue(envelope.isCompleted)
+        XCTAssertEqual(envelope.jobId, "j1")
+        let result = try envelope.asDTCA1Result()
+        XCTAssertEqual(result.totalWords, 1)
+        XCTAssertEqual(result.classification, "NATURAL_LANGUAGE")
+    }
+
+    func testResultEnvelopeFailedStatusIsWorkerError() throws {
+        let json = #"{"status":"FAILED","job_id":"j1","error_type":"INVALID_INPUT","error_message":"unsupported workload"}"#
+        let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
+
+        XCTAssertFalse(envelope.isCompleted)
+        XCTAssertThrowsError(try envelope.asDTCA1Result()) { error in
+            guard case PixelDesktopError.workerError = error else { return XCTFail("got \(error)") }
+        }
+    }
+
+    /// A COMPLETED result missing fields must not be coerced into a plausible one.
+    func testResultEnvelopeMissingFieldsIsVerificationFailure() throws {
+        let json = #"{"status":"COMPLETED","job_id":"j1","input_characters":5}"#
+        let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
+
+        XCTAssertThrowsError(try envelope.asDTCA1Result()) { error in
+            guard case PixelDesktopError.verificationFailed = error else { return XCTFail("got \(error)") }
+        }
+    }
+}
+
 // MARK: - Test Doubles
 
 /// Records invocations and returns canned responses, so enrichment can be tested
@@ -1803,6 +2106,9 @@ actor MockTransport: TransportProtocol {
     private var pushResult: TransportResult?
     private var pullResult: TransportResult?
     private var pullContent: String?
+    private var installResult: TransportResult?
+
+    func setInstallResult(_ result: TransportResult) { installResult = result }
 
     func setPushResult(_ result: TransportResult) { pushResult = result }
     func setPullResult(_ result: TransportResult) { pullResult = result }
@@ -1870,6 +2176,14 @@ actor MockTransport: TransportProtocol {
             try? content.write(toFile: localPath, atomically: true, encoding: .utf8)
         }
         return defaultShellResult
+    }
+
+    func install(deviceSerial: String, apkPath: String, replace: Bool, timeout: TimeInterval) async throws -> TransportResult {
+        var args = [deviceSerial, "install"]
+        if replace { args.append("-r") }
+        args.append(apkPath)
+        invocations.append(Invocation(command: "-s", arguments: args))
+        return installResult ?? TransportResult(exitCode: 0, stdout: "Success", stderr: "")
     }
 
     func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {

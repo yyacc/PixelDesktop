@@ -58,26 +58,27 @@ struct ADBWorkerOperations: WorkerOperationsProtocol {
 
     // MARK: - Workspace
 
+    /// Checks that the worker's exchange directory exists.
+    ///
+    /// **This deliberately does not create the directory.** adb creating it would make it owned by
+    /// `shell:ext_data_rw`, which the worker (its own UID, not in `ext_data_rw`) cannot write —
+    /// measured on the real device. The worker creates its own directory via
+    /// `getExternalFilesDir(null)`; the correct way to ensure it exists is to launch the worker,
+    /// which `WorkerComputeProof.ensureWorkspaceExists` does.
+    ///
+    /// - Throws: `workerError` when the directory is absent, because that means the worker has
+    ///   never run and the caller must warm it up first.
     func prepareRemoteWorkspace(deviceSerial: String, timeout: TimeInterval) async throws {
-        // The directory path is a contract constant, never caller-supplied.
-        //
-        // `chmod 700` is not optional. `mkdir -p` inherits a permissive mode: the parent
-        // `/data/local/tmp` is 771, but the directory created inside it came out **777**
-        // (world-readable) on the real device. ADR-010 chose this root precisely because it
-        // is not world-readable to other applications, so the created directory must be
-        // restricted to match that rationale. Tightening the contract, not broadening it.
-        let command = "mkdir -p \(WorkerTransferContract.remoteRoot) && chmod 700 \(WorkerTransferContract.remoteRoot)"
         let result = try await transport.shell(
             deviceSerial: deviceSerial,
-            command: command,
+            command: WorkerTransferContract.remoteWorkspaceExistsCommand,
             timeout: timeout
         )
 
-        guard result.isSuccess else {
-            throw PixelDesktopError.adbCommandFailed(
-                command: command,
-                exitCode: Int(result.exitCode),
-                stderr: result.stderr
+        guard result.stdout.contains("EXISTS") else {
+            throw PixelDesktopError.workerError(
+                "Worker exchange directory does not exist at \(WorkerTransferContract.remoteRoot); "
+                + "the worker must be launched once to create it"
             )
         }
     }
@@ -99,7 +100,7 @@ struct ADBWorkerOperations: WorkerOperationsProtocol {
             try text.write(to: inputURL, atomically: true, encoding: .utf8)
         } catch {
             throw PixelDesktopError.invalidInput(
-                "Could not write staged input: \(error.localizedDescription)"
+                "Could not write staged job payload: \(error.localizedDescription)"
             )
         }
 

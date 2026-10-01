@@ -22,7 +22,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 2 — Device Discovery and ADB Transport:** COMPLETE
 **Phase 3 — Android Device Model:** COMPLETE
 **Phase 4 — Android Application / Process Control:** COMPLETE
-**Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) decisions awaiting review
+**Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) IMPLEMENTED and verified on device
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md). Legacy documents use
@@ -46,6 +46,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 5 Test Report](testing/phase-05-test-report.md) — build, test and real-device evidence
 - [Phase 5 D8 Reconnaissance — Minimum Compute Worker](phases/phase-05-d8-worker-reconnaissance.md) — reconnaissance and proposal
 - [Phase 5 D8 Decision Review — D-1..D-10](phases/phase-05-d8-decision-review.md) — decisions with evidence; locked/idle experiment resolved
+- [Phase 5 D8 Implementation — Compute Worker](phases/phase-05-d8-worker-implementation.md) — worker APK, compute proof, real-device evidence
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements
@@ -61,6 +62,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [ADR-008: Android Device Representation Model](decisions/ADR-008-android-device-model.md)
 - [ADR-009: Application Operations, Shell Containment, and Lifecycle Invalidation](decisions/ADR-009-application-operations-and-shell-containment.md)
 - [ADR-010: Worker Transfer Contract and Path Containment](decisions/ADR-010-worker-transfer-contract.md) — **revised 2026-10-02**: transfer root corrected for the identity boundary
+- [ADR-011: Pixel Compute Worker Contract](decisions/ADR-011-pixel-compute-worker-contract.md)
 
 ### Records
 - [Engineering Journal](logs/engineering-journal.md) — Chronological build history
@@ -71,6 +73,8 @@ This directory contains all engineering documentation for the PixelDesktop proje
 ### Failures
 - [FAIL-001: Non-English Output](failures/FAIL-001-non-english-output.md)
 - [FAIL-002: Runaway Field Duplication in Transport.swift](failures/FAIL-002-transport-swift-runaway-fields.md)
+- [FAIL-003: Worker Workspace Created World-Readable](failures/FAIL-003-workspace-world-readable.md)
+- [FAIL-004: Three Android Assumptions Falsified by Real-Device Execution](failures/FAIL-004-android-assumptions-falsified.md)
 
 ## Device
 

@@ -49,6 +49,16 @@ protocol TransportProtocol: AnyObject, Sendable {
     /// directory, because `adb` does not sanitize it. See ADR-010.
     func pull(deviceSerial: String, remotePath: String, localPath: String, timeout: TimeInterval) async throws -> TransportResult
 
+    /// Installs an APK via `adb -s <serial> install [-r] <apkPath>`.
+    ///
+    /// **Transport primitive.** It takes an already-validated absolute APK path and performs no
+    /// policy of its own. Installation is **state-changing**, unlike `push`/`pull`, so this must
+    /// be called only from `WorkerInstaller` and must never be exposed to the UI or to Hermes.
+    ///
+    /// - Parameter replace: when `true`, passes `-r` so an existing install is replaced. This
+    ///   makes install and reinstall the same operation.
+    func install(deviceSerial: String, apkPath: String, replace: Bool, timeout: TimeInterval) async throws -> TransportResult
+
     /// Reads every system property in a single `adb shell getprop` invocation.
     ///
     /// Prefer this over repeated `getprop` calls when several properties are needed:

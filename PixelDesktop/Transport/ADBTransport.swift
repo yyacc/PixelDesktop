@@ -190,6 +190,16 @@ actor ADBTransport: TransportProtocol {
         )
     }
 
+    func install(deviceSerial: String, apkPath: String, replace: Bool, timeout: TimeInterval) async throws -> TransportResult {
+        var arguments = [deviceSerial, "install"]
+        if replace {
+            arguments.append("-r")
+        }
+        arguments.append(apkPath)
+
+        return try await execute(command: "-s", arguments: arguments, timeout: timeout)
+    }
+
     func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {
         try await execute(
             command: "-s",

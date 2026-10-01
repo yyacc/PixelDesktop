@@ -21,4 +21,18 @@ DerivedData/
 .netrc
 
 # Engineering
-engineering/created-resources.json
+# NOTE: engineering/created-resources.json was previously ignored here by mistake. The master
+# engineering prompt (section 28) requires it to be present in the repository as the
+# created-resource manifest, so it is tracked. Un-ignored 2026-10-02.
+!engineering/created-resources.json
+
+# Android (DTCA1Worker)
+.gradle/
+local.properties
+*.apk
+*.ap_
+*.dex
+*.class
+captures/
+DTCA1Worker/build/
+DTCA1Worker/app/build/

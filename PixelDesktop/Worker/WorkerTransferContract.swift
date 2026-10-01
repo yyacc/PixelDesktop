@@ -36,18 +36,37 @@ enum WorkerTransferContract {
 
     // MARK: - Remote (device) paths — fixed
 
-    /// The only device directory this project writes to.
-    ///
-    /// Chosen over `/sdcard` because `/data/local/tmp` is writable by the `shell` user that
-    /// ADB runs as, and is **not world-readable** (mode 771), whereas `/sdcard` is
-    /// world-readable to any installed application.
-    static let remoteRoot = "/data/local/tmp/pixeldesktop"
+    /// The Android worker's package identifier.
+    static let workerPackageName = "com.pixeldesktop.worker"
 
-    /// The one input payload. Filename is fixed; no caller may influence it.
-    static let remoteInputPath = "/data/local/tmp/pixeldesktop/input.txt"
+    /// The worker's launchable Activity component, in `am start -n` form.
+    static let workerActivityComponent = "com.pixeldesktop.worker/.WorkerActivity"
+
+    /// The only device directory this project exchanges worker payloads through.
+    ///
+    /// **This is the worker application's own external files directory** — see ADR-010
+    /// Revision 1.
+    ///
+    /// It replaced `/data/local/tmp/pixeldesktop` because that path is **mode 771 owned by
+    /// `shell`**: adb can write it, but the Android worker process cannot, because it runs
+    /// under its own UID and is not in group `shell`. The two identities do not have
+    /// equivalent filesystem privileges, and the transfer root must be reachable by **both**:
+    ///
+    /// | Stage | Identity | Access basis |
+    /// |---|---|---|
+    /// | write job  | `shell` (adb) | `ext_data_rw` group membership |
+    /// | read job / write result | app UID | **ownership** of the directory |
+    /// | read result | `shell` (adb) | `ext_data_rw` group membership |
+    ///
+    /// The directory is `drwxrws---` (owner + `ext_data_rw`), so it is **not readable by other
+    /// applications**, and the worker needs **no permission** to use its own directory.
+    static let remoteRoot = "/sdcard/Android/data/com.pixeldesktop.worker/files"
+
+    /// The one job payload. Filename is fixed; no caller may influence it.
+    static let remoteInputPath = "/sdcard/Android/data/com.pixeldesktop.worker/files/job.json"
 
     /// The one result payload. Filename is fixed; no caller may influence it.
-    static let remoteResultPath = "/data/local/tmp/pixeldesktop/result.json"
+    static let remoteResultPath = "/sdcard/Android/data/com.pixeldesktop.worker/files/result.json"
 
     // MARK: - Local paths — fixed
 
@@ -64,9 +83,9 @@ enum WorkerTransferContract {
             .appendingPathComponent("Staging", isDirectory: true)
     }
 
-    /// The staged input file. Filename fixed.
+    /// The staged job file. Filename fixed.
     static var localInputPath: URL {
-        stagingDirectory.appendingPathComponent("input.txt", isDirectory: false)
+        stagingDirectory.appendingPathComponent("job.json", isDirectory: false)
     }
 
     /// The retrieved result file. Filename fixed.
@@ -140,6 +159,28 @@ enum WorkerTransferContract {
         }
 
         return ValidatedLocalFile(url: url, byteCount: byteCount)
+    }
+
+    /// Reports whether the exchange directory exists on the device.
+    ///
+    /// **The directory must be created by the worker application, not by adb.**
+    ///
+    /// Measured on the real device: if adb creates it with `mkdir -p`, the directory is owned by
+    /// `shell:ext_data_rw` with mode `drwxrws---`. The worker runs under its own UID, is not in
+    /// `ext_data_rw`, and is therefore **unable to write its own output directory**. An adb-created
+    /// workspace silently breaks the worker.
+    ///
+    /// The worker calls `getExternalFilesDir(null)` on launch, which creates the directory owned by
+    /// the app — the only correct owner. So the correct sequence is:
+    ///
+    /// 1. launch the worker once so it creates its directory (it exits immediately, having found no job)
+    /// 2. push the job
+    /// 3. launch the worker again to compute
+    ///
+    /// This is an existence check only. `chmod` is deliberately never applied: the directory is
+    /// already owner-scoped by the platform, and changing its mode would break the worker's access.
+    static var remoteWorkspaceExistsCommand: String {
+        "test -d \(remoteRoot) && echo EXISTS"
     }
 
     /// Ensures the staging directory exists. Creates it if needed.

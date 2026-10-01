@@ -1,0 +1,488 @@
+{
+  "manifest_version": 1,
+  "description": "Machine-readable record of resources created by the autonomous engineering process. Per the filesystem safety policy, only resources listed here may be deleted by the agent. Resources absent from this manifest are PRE-EXISTING and protected.",
+  "project_root": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop",
+  "protected_pre_existing": [
+    {
+      "path": "/Users/rhenzrobertbumanglag/Documents/PixelDesktop/",
+      "note": "Legacy implementation. Source of engineering evidence. MUST NOT BE DELETED. Not modified by this rebuild.",
+      "created_by": "pre-existing"
+    }
+  ],
+  "resources": [
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00",
+      "purpose": "Engineering documentation structure",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-00-clean-start-audit.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00",
+      "purpose": "Clean-start engineering audit of existing PixelDesktop project",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/README.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00",
+      "purpose": "Engineering documentation index",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-001-project-structure.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00",
+      "purpose": "ADR: Clean project structure for PixelDesktop rebuild",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-002-adb-transport.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00",
+      "purpose": "ADR: ADB as sole transport for Phase 1",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-003-dtca1-worker-apk.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00",
+      "purpose": "ADR: Minimal Android APK for DTCA-1 computation",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-004-verification.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00",
+      "purpose": "ADR: Independent verification via local re-computation",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-01-engineering-foundation.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 1,
+      "task_id": "phase-01",
+      "purpose": "Phase 1 engineering log",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/ai-development/ai-development-log.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 1,
+      "task_id": "phase-01",
+      "purpose": "AI development log \u2014 how AI participated in the build",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-02-device-discovery.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Phase 2 engineering log \u2014 device discovery and ADB transport",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-005-device-property-enrichment.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "ADR: Device property enrichment separated from discovery parsing",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-006-test-isolation.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "ADR: Test isolation strategy for device-dependent code",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-02-test-report.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Phase 2 build, test and real-device verification evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/logs/engineering-journal.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Chronological engineering journal covering phases 0-2",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/best-practices/techniques.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Reusable technique memory with supporting evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-001-non-english-output.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Failure record: non-English output in project and user-facing text",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-002-transport-swift-runaway-fields.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Failure record: runaway field duplication in Transport.swift",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Device/DeviceEnricher.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Device property enrichment, depending on TransportProtocol",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-007-authoritative-phase-sequence.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "ADR: master prompt \u00a716 is the authoritative phase sequence",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/architecture/overview.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Architecture as delivered (not aspirational)",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-03-android-device-model-proposal.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 3,
+      "task_id": "phase-03-proposal",
+      "purpose": "Phase 3 proposal \u2014 awaiting review",
+      "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-008-android-device-model.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 3,
+      "task_id": "phase-03",
+      "purpose": "ADR: Android device representation model",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-03-android-device-model.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 3,
+      "task_id": "phase-03",
+      "purpose": "Phase 3 engineering log",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-03-test-report.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 3,
+      "task_id": "phase-03",
+      "purpose": "Phase 3 build, test and real-device evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Core/Models/AndroidDevice.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 3,
+      "task_id": "phase-03",
+      "purpose": "Android device representation",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-04-application-process-control-proposal.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 4,
+      "task_id": "phase-04-proposal",
+      "purpose": "Phase 4 proposal \u2014 awaiting review",
+      "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-009-application-operations-and-shell-containment.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 4,
+      "task_id": "phase-04",
+      "purpose": "ADR: operations layer, shell containment, lifecycle invalidation",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-04-application-process-control.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 4,
+      "task_id": "phase-04",
+      "purpose": "Phase 4 engineering log",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-04-test-report.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 4,
+      "task_id": "phase-04",
+      "purpose": "Phase 4 build, test and real-device evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Operations/AppOperationsProtocol.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 4,
+      "task_id": "phase-04",
+      "purpose": "Application operations seam",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Operations/ADBAppOperations.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 4,
+      "task_id": "phase-04",
+      "purpose": "Application operations implementation",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Core/Models/InstalledApp.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 4,
+      "task_id": "phase-04",
+      "purpose": "Installed application representation",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-transfer-contract-proposal.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-proposal",
+      "purpose": "Phase 5 transfer contract proposal \u2014 awaiting review",
+      "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-010-worker-transfer-contract.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05",
+      "purpose": "ADR: fixed-path transfer contract and containment limits",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-transfer-contract.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05",
+      "purpose": "Phase 5 transfer contract engineering log",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-05-test-report.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05",
+      "purpose": "Phase 5 build, test and real-device evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-003-workspace-world-readable.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05",
+      "purpose": "Failure record: workspace created world-readable",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerTransferContract.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05",
+      "purpose": "Fixed transfer contract, validation, size verification",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerOperationsProtocol.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05",
+      "purpose": "Worker operations with no path parameters",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-d8-worker-reconnaissance.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8-recon",
+      "purpose": "D8 worker reconnaissance and proposal \u2014 awaiting review",
+      "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-d8-decision-review.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8-review",
+      "purpose": "D8 decision review with evidence; locked/idle experiment",
+      "status": "review"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-011-pixel-compute-worker-contract.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "ADR: pixel compute worker contract",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-d8-worker-implementation.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "D8 implementation report and compute proof",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-004-android-assumptions-falsified.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "Failure record: three Android assumptions falsified",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerInstaller.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "Narrow APK installation and identity",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerLifecycle.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "Worker start/stop/observe",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/DTCA1Job.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "Job encoding and result envelope",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerComputeProof.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "Compute-proof orchestration and evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 5,
+      "task_id": "phase-05-d8",
+      "purpose": "Android worker APK project (sources)",
+      "status": "active"
+    }
+  ],
+  "evidence_artifacts_outside_repo": [
+    {
+      "path": "/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-evidence/Transport.swift.corrupted",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "Preserved corrupted Transport.swift (105,413 bytes) \u2014 direct evidence for FAIL-002",
+      "sha256": "3d9b46ee6df02a50689bac77c0e624a5e7bdd83b89407cb8918b4fced5b810a8",
+      "status": "preserved",
+      "note": "Lives outside the repository. Scratch cache entries are pruned after 24h idle; the SHA-256 and full diagnosis are recorded in FAIL-002 so the finding survives."
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-verify/",
+      "created_by": "Hermes",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 2,
+      "task_id": "RNZM-20",
+      "purpose": "CLI harness compiling production sources for real-device verification",
+      "status": "preserved"
+    }
+  ],
+  "removed_resources": [
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Core/Models/PixelDevice.swift",
+      "removed_by": "Hermes",
+      "removed_at": "2026-10-01T00:00:00Z",
+      "phase": 3,
+      "reason": "Superseded by AndroidDevice (ADR-008). Removed with git rm; recoverable from git history at commit c65b404.",
+      "created_by_agent": true,
+      "status": "removed"
+    }
+  ]
+}

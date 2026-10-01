@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.pixeldesktop.worker'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.pixeldesktop.worker'
+        minSdk 31
+        targetSdk 36
+        versionCode 1
+        versionName '1.0'
+    }
+
+    buildTypes {
+        debug {
+            // Debug builds are signed with the standard debug keystore, which is NOT a trust
+            // anchor. Sufficient for D8; a release keystore is out of scope and must never be
+            // committed.
+            minifyEnabled false
+        }
+    }
+
+    // No dependencies beyond the Android SDK. JSON comes from org.json, which is in the
+    // platform. The worker declares ZERO permissions.
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

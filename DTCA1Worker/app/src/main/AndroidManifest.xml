@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      ZERO PERMISSIONS. Deliberate, per D5.
+
+      The worker reads one file from, and writes one file to, its own app-specific external
+      files directory. Android requires no permission for that on API 19+.
+
+      Explicitly NOT declared, each rejected for a concrete reason:
+        INTERNET                    - the channel is file-based over ADB; no network is used
+        POST_NOTIFICATIONS          - there is no Service and no notification
+        FOREGROUND_SERVICE          - there is no Service
+        READ/WRITE_EXTERNAL_STORAGE - not needed for the app's OWN external directory
+        MANAGE_EXTERNAL_STORAGE     - would grant whole-storage access; unnecessary and dangerous
+        WAKE_LOCK                   - the workload is bounded and runs while the Activity is up
+        REQUEST_INSTALL_PACKAGES    - the worker installs nothing
+
+      No <service>, no <receiver>, no <provider>. One Activity.
+    -->
+
+    <application
+        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:label="PixelDesktop DTCA-1 Worker"
+        android:allowBackup="false"
+        android:supportsRtl="true">
+
+        <!--
+          exported="true" IS REQUIRED, and was discovered by real-device failure, not assumed.
+
+          The first build used exported="false" on the assumption that adb (uid=2000 shell) holds a
+          privileged permission to start non-exported components. It does not. Launching produced:
+
+            java.lang.SecurityException: Permission Denial: starting Intent
+            { cmp=com.pixeldesktop.worker/.WorkerActivity } from null (pid=..., uid=2000)
+            not exported from uid 10004
+
+          So the Activity must be exported for ADB to start it.
+
+          CONTAINMENT, given that it is exported:
+            - There is NO intent-filter. Only an explicit component start
+              (`am start -n com.pixeldesktop.worker/.WorkerActivity`) can reach it. No other app
+              can start it implicitly via MAIN/LAUNCHER.
+            - The Activity accepts NO Intent extras. It takes no input from its caller.
+            - WorkerActivity additionally verifies the launching UID at runtime and refuses to run
+              for any launcher other than adb shell or root. See getLaunchedFromUid there.
+
+          The residual exposure is therefore: another app may trigger a re-run of whatever job file
+          is already present. It cannot supply input, read the result, or alter behaviour.
+        -->
+        <activity
+            android:name=".WorkerActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
+    </application>
+
+</manifest>

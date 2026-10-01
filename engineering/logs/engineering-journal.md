@@ -633,3 +633,60 @@ It was run on the real device, with a work-completion signal rather than merely 
 project) — step 1 (the execution experiment) is now complete.
 
 **Artifacts:** `phases/phase-05-d8-decision-review.md`, ADR-010 Revision 1.
+
+---
+
+## 2026-10-02 — Phase 5 D8: Pixel Compute Worker implemented and verified on device
+
+**Phase:** 5 (D8 implementation)
+**Task:** Build the worker APK, install it, run DTCA-1 on the physical Pixel, verify the result,
+and capture evidence distinguishing "the Mac computed the answer" from "the Pixel worker computed
+the answer".
+
+**Action:**
+Created `DTCA1Worker/` — Gradle 8.13 / AGP 8.13.0 / Java 17 / minSdk 31 / targetSdk 36, mirroring
+the proven `AndroidMetadataHelper` template. Two Java files (`WorkerActivity`, `Dtca1`) plus a
+manifest with **zero permissions**. `Dtca1.java` is a faithful port of `DTCA1Worker.swift`, with
+three divergence traps handled explicitly (tokenizer must split on `isLetterOrDigit`, not `\W`;
+Swift's `String.count` counts graphemes, so surrogate pairs are subtracted; the top-word comparator
+reproduces count-desc-then-key-asc).
+
+On the Mac side: added `install()` to `TransportProtocol`, and new `WorkerInstaller`,
+`WorkerLifecycle`, `DTCA1Job`/`WorkerResultEnvelope`, and `WorkerComputeProof`.
+
+**Result:**
+BUILD SUCCESSFUL (APK), BUILD SUCCEEDED (macOS), **154 tests, 0 failures**. Real-device compute
+proof **PASS**: DTCA-1 executed on the Pixel, result **VERIFIED** by independent local
+re-computation, 3/3 repeated runs verified, ~250–360 ms wall clock, **20 CPU ticks attributable to
+the worker's PID**, zero permissions verified on the device, exchange directory mode `2770` owned by
+the app's UID.
+
+**Three Android assumptions were falsified by real-device execution** — all three compiled cleanly
+and passed all 154 tests:
+
+1. `exported="false"` does **not** let adb start the Activity: `SecurityException: not exported
+   from uid 10004`. Export is required; contained by no intent-filter plus a runtime launcher check.
+2. `getLaunchedFromUid()` returns **`-1`**, not `2000`, for an adb launch — the launcher check
+   refused every legitimate run until corrected.
+3. adb **must not** create the exchange directory: an adb-created directory is owned by
+   `shell:ext_data_rw`, which the app cannot write. The worker now creates its own directory, and
+   `remoteWorkspaceCreateCommand` was removed so adb cannot create it even by accident.
+
+Also: a stale harness binary produced a **false PASS** after a compile error — recognised and
+rejected, then re-run on a fully clean device. And `created-resources.json` was found to be
+gitignored, contrary to master prompt §28; un-ignored.
+
+**Decision:**
+D8 first checkpoint COMPLETE. No approved decision was contradicted — the corrections were to
+implementation assumptions about the platform, not to the architecture.
+
+**Reason:**
+Three of the six platform assumptions in this project's history were falsified in this phase alone.
+The pattern is consistent and now recorded as a technique: a mock asserts what the code *sends*; it
+cannot reproduce what the platform *does*.
+
+**Next action:** STOPPED as instructed. Not proceeding to model inference, resource-aware routing,
+or Hermes integration.
+
+**Artifacts:** `phases/phase-05-d8-worker-implementation.md`, ADR-011,
+`failures/FAIL-004-android-assumptions-falsified.md`, `DTCA1Worker/`.

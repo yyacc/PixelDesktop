@@ -203,6 +203,61 @@ names.
 
 ---
 
+## T-015 — A mock asserts what the code sends, not what the platform does
+
+**Technique:**
+For any platform behaviour that gates execution, assume the unit tests prove **nothing** about it.
+Probe the device, and log the observed value next to the decision that depends on it.
+
+**Worked:**
+No — it was violated three times in one phase, and each cost a failed run.
+
+**Evidence:**
+Phase 5 D8. Three assumptions, all defensible in review, all wrong, all passing 154 unit tests:
+
+1. `exported="false"` blocks adb from starting the Activity — **false**; adb cannot start a
+   non-exported Activity at all (`SecurityException`).
+2. `getLaunchedFromUid()` returns `2000` for an adb launch — **false**; it returns `-1`.
+3. adb may create a directory the app must write — **false**; the directory is owned by
+   `shell:ext_data_rw` and the app cannot write it.
+
+Instance 2 was diagnosed in one line only because the code **logged** `WORKER_LAUNCHER uid=-1`
+before acting on it. Had it refused silently, the cause would have been invisible.
+
+**Recommended use:**
+Android framework behaviour (exported flags, launcher identity, permissions, storage ownership),
+and any external system whose behaviour gates whether code runs at all.
+
+**Avoid when:**
+The behaviour is already pinned by a real-device test that runs in CI.
+
+---
+
+## T-016 — Never accept a PASS from a binary you did not intend to run
+
+**Technique:**
+After a compile error, delete the output artifact before recompiling. Verify the artifact was
+rebuilt before trusting its result.
+
+**Worked:**
+Yes — it caught a false PASS.
+
+**Evidence:**
+Phase 5 D8. A harness edit left a stale reference, so `swiftc` failed. The **previous** binary was
+still on disk and executed successfully, printing a full PASS. The PASS was real for the *old* code
+and meaningless for the current source.
+
+Recognised because the compile output and the run output disagreed. Deleted the binary, recompiled
+clean, re-ran on a fully clean device (package uninstalled, directory absent).
+
+**Recommended use:**
+Any evidence-producing harness compiled outside the normal build system.
+
+**Avoid when:**
+The build system already guarantees a fresh artifact.
+
+---
+
 ## T-013 — Separate "the tool refused" from "the OS refused"
 
 **Technique:**
