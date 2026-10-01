@@ -22,7 +22,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 2 — Device Discovery and ADB Transport:** COMPLETE
 **Phase 3 — Android Device Model:** COMPLETE
 **Phase 4 — Android Application / Process Control:** COMPLETE
-**Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK deferred (D8)
+**Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) PROPOSAL awaiting review
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md). Legacy documents use
@@ -44,6 +44,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 5 Transfer Contract](phases/phase-05-transfer-contract.md) — fixed-path contract, containment, real-device proof
 - [Phase 5 Proposal (approved)](phases/phase-05-transfer-contract-proposal.md) — the approved proposal
 - [Phase 5 Test Report](testing/phase-05-test-report.md) — build, test and real-device evidence
+- [Phase 5 D8 Reconnaissance — Minimum Compute Worker](phases/phase-05-d8-worker-reconnaissance.md) — proposal only, awaiting review
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements

@@ -515,3 +515,61 @@ execution. `DeviceOperation` was deliberately not extended.
 **Artifacts:** `phases/phase-05-transfer-contract.md`, ADR-010,
 `testing/phase-05-test-report.md`, `failures/FAIL-003-workspace-world-readable.md`,
 `architecture/overview.md` updated.
+
+---
+
+## 2026-10-02 — Phase 5 D8 reconnaissance: minimum compute worker (no code changed)
+
+**Phase:** 5 (D8 proposal)
+**Task:** Establish the smallest real, measurable, safe compute boundary between PixelDesktop
+and the Pixel. Reconnaissance and proposal only — no APK built or installed, no source
+modified.
+
+**Action:**
+Read the authoritative Phase 5/6 requirements and §5.2, §5.3, §20, §22. Inspected ADR-003,
+ADR-010, the Part 1 implementation (`WorkerTransferContract`, `WorkerOperationsProtocol`,
+`ADBWorkerOperations`, `TransportProtocol`, `ADBTransport`) and the **existing Android
+project** (`AndroidMetadataHelper`). Then ran 22 read-only probes on the Pixel 7a — **no
+install, no uninstall, no launch, no state change**.
+
+**Result — findings that determine the design:**
+
+1. **adb runs as `uid=2000(shell)`** with `sdcard_rw`, **`ext_data_rw`** and **`readproc`**
+   in its supplementary groups.
+2. **adb can read, write, push and pull inside an app's external files dir** — verified by
+   writing a file into an existing app's directory and reading it back. The dir is
+   `drwxrws---` (owner + `ext_data_rw` only), so it is **not readable by other apps**, but
+   adb is in that group. This is the channel.
+3. **`/data/local/tmp` is mode 771 owned by `shell` — an Android app CANNOT write it.** No
+   `su` exists. Part 1's remote root is writable only by adb, so it **cannot host worker
+   output**. This is a required ADR-010 revision, not a passing note.
+4. `/data/data/<pkg>` is **Permission denied** without root; `run-as` is not a production channel.
+5. **`com.pixeldesktop.metadata` is already installed** (minSdk 31, targetSdk 36) — the full
+   Android chain build→install→run is proven end-to-end on this device.
+6. **`/proc/<pid>/stat` IS readable for another UID's process** (via `readproc`) — so CPU-time
+   measurement works without root. RSS via `/proc/<pid>/status`; `dumpsys meminfo` for PSS.
+7. **Thermal IS observable without root** via `dumpsys thermalservice` (LITTLE 67.0 °C,
+   neutral_therm 38.895 °C), even though direct `/sys/class/thermal` is denied. The master
+   prompt asks for thermal "if observable" — it is.
+
+**Decision:**
+Propose a **one-shot Activity** worker (no service, no daemon, no protocol, no socket, no
+HTTP), **file-based exchange over ADB** as the communication boundary, **zero Android
+permissions**, a minimal four-state lifecycle, and `install` as a new narrow transport
+primitive behind a `WorkerInstaller`. Reuse DTCA-1 (already specified in ADR-003/004 with an
+existing local implementation and verifier) as the first workload. Ten decision points raised,
+plus **ADR-011** (worker contract) and a **required ADR-010 revision** for the channel root.
+
+**Reason:**
+A service would add a lifecycle, a `POST_NOTIFICATIONS` runtime permission (verified
+`prot=dangerous` on this device) and background-execution restrictions for no benefit — the
+workload is bounded and takes seconds. The file channel needs no permission because adb
+already has the group membership to reach the app's own external dir.
+
+**Flagged as the top unknown (R2):** whether `am start` reliably launches the worker while the
+device is locked or idle. Per FAIL-003's lesson, this must be **measured, not assumed**, and it
+may shape the execution mechanism.
+
+**Next action:** Await review of D-1..D-10 and the ADR recommendations.
+
+**Artifacts:** `phases/phase-05-d8-worker-reconnaissance.md`.
