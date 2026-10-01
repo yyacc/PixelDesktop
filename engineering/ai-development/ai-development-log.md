@@ -387,6 +387,100 @@ verification, and re-run live afterwards — not to report a pass.
 
 ---
 
+## Event 5 — Phase 4: Android Application / Process Control
+
+**Date:** 2026-10-01
+**Phase:** 4
+
+### Agent
+Hermes (probe, implementation, review, verification)
+
+### Model
+`meituan/longcat-2.5-preview:free` (Nous Portal)
+
+### Task
+Implement controlled Android application operations with `shell()` contained below a new
+operations layer, plus connection lifecycle handling, verified against the real Pixel 7a.
+
+### Context
+Approved with one modification to D2: containment must not treat package naming as a
+sufficient security boundary, and the protection model **and its limitations** must be
+documented. D7 fixed the verification sequence: discover → resolve launcher → launch
+Settings → verify running → stop Settings → verify stopped.
+
+### Tools Used
+- `terminal` (`adb` probes, `xcodegen`, `xcodebuild`, `swiftc`)
+- `patch` (all source and test edits)
+- `write_file` (new files only)
+- `read_file`, `execute_code`
+
+### Approach
+1. Ran a **read-only** capability probe before writing code — nothing launched or stopped.
+   Established that `dumpsys package` costs 49 KB/app, that `pidof` exit codes are meaningful
+   (unlike `getprop`), and that the device is neither rooted nor debuggable.
+2. Implemented `shell()` on the transport only; built `Operations/` with a protocol that
+   accepts no shell strings; added `validatePackageName` as the injection boundary.
+3. Implemented lifecycle guard-first, with wholesale list replacement so disconnect
+   invalidates enriched properties.
+4. Built, ran the suite (105 tests), then ran the approved real-device sequence.
+5. **The live run failed at step 7**: `stopApplication("com.android.settings")` was refused
+   because Settings was on the protected list.
+6. Diagnosed the entry as over-broad against the list's own criterion, removed it, pinned the
+   criterion with a test, and re-ran — full PASS.
+
+### Result
+Phase 4 complete. BUILD SUCCEEDED; 106 tests, 0 failures. Real-device verification PASS on
+the exact approved sequence, cross-checked against raw `adb`.
+
+### Errors
+1. **Over-broad containment entry** — `com.android.settings` was protected by reflex on
+   package name, violating the list's own stated criterion. Caught by real-device
+   verification, not by 105 passing unit tests. Fixed and pinned with a test.
+2. **`testDeviceOperationsMatchImplementedCapabilities` failed** — correctly; it asserted 2
+   operations and Phase 4 added 4. Expected staleness; updated.
+3. **`AppOperationsProtocol: AnyObject` required a class conformer** but `ADBAppOperations`
+   is a struct. `Sendable` was the correct constraint; caught at build time.
+
+### Recovery
+- Over-broad entry → removed, criterion documented inline, pinned by test, recorded in ADR-009.
+- Stale operation test → updated to the new set.
+- Protocol constraint → dropped `AnyObject`.
+
+### Human Intervention
+Required for: approving D1–D7 (with the D2 modification). No physical device action needed
+this phase; the device stayed attached.
+
+### Efficiency
+- ~30 tool calls
+- ~20 minutes
+- 6 files created, 8 modified
+- 33 tests added or updated
+- 1 probe session, 2 builds, 3 test runs, 2 real-device verification runs
+
+### Quality
+- Correctly probed read-only before implementing; F1 avoided ~2 MB per discovery cycle.
+- Correctly refused to loosen containment to make verification pass; fixed the rule instead.
+- Correctly pinned the containment criterion with an executable test.
+- Correctly documented what the protection does **not** guarantee (the D2 requirement).
+- Did **not** anticipate that the approved verification target would collide with the
+  protected list; found it by running the approved sequence.
+
+### Lesson
+**Unit tests share the author's assumptions; reality does not.** The over-broad denylist
+entry passed all 105 tests because the denylist and the test package names were chosen by the
+same author from the same mental model. Only executing against the real device, with a target
+the user had independently approved, exposed it. This is the second time in this project that
+a defect compiled cleanly and passed the full suite while being wrong (the first was
+`manufacturer` holding the codename in Phase 3). **Both were caught by comparing against
+reality, not by the suite.**
+
+**When a rule has a stated criterion, make the criterion executable.** The protected list had
+a clear criterion and an entry that violated it. A test per questionable entry
+(`testSettingsIsNotProtectedBecauseItIsNotDeviceCritical`) converts the criterion from prose
+into a guard.
+
+---
+
 ## Successful Techniques
 
 1. **xcodegen for project generation** — Eliminates pbxproj debugging

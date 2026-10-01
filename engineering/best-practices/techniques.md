@@ -203,6 +203,61 @@ names.
 
 ---
 
+## T-011 — Make a rule's stated criterion executable
+
+**Technique:**
+When a rule has a written criterion, add a test that checks each questionable entry against
+that criterion — not just that the rule's code runs.
+
+**Worked:**
+Yes, after failing once.
+
+**Evidence:**
+Phase 4. `protectedPackages` had the criterion "stopping this disrupts the device itself",
+and `com.android.settings` was on the list anyway — added by reflex on package name. All 105
+unit tests passed. The failure surfaced only on the real device, because the approved
+verification sequence stops Settings.
+
+`testSettingsIsNotProtectedBecauseItIsNotDeviceCritical` makes the criterion executable, so
+the entry cannot silently return.
+
+**Recommended use:**
+Denylists, allowlists, classification rules, and any heuristic where entries are added
+judgement-by-judgement.
+
+**Avoid when:**
+The rule is a genuine constant with no judgement involved (e.g. an approved `getprop` key
+name). Asserting a criterion there is ceremony.
+
+---
+
+## T-012 — Specify the verification sequence before designing the constraint
+
+**Technique:**
+When a phase both restricts an operation and must demonstrate it working, fix the
+verification sequence first. Then check the constraint does not forbid the demonstration.
+
+**Worked:**
+Yes.
+
+**Evidence:**
+Phase 4. D7 named Settings as the verification target; D2 constrained `stopApplication`. The
+constraint as first written forbade the target. Because the sequence was approved up front,
+the collision was unambiguous and the fix was obviously "the rule is wrong", not "verification
+is too strict".
+
+Had the sequence been invented after implementation, the likely outcome would have been to
+weaken verification to make it pass — losing the check rather than fixing the rule.
+
+**Recommended use:**
+Any phase that both restricts an operation and must show it working: permissions, rate limits,
+allowlists, destructive-operation guards.
+
+**Avoid when:**
+Read-only phases, where there is nothing to restrict.
+
+---
+
 ## T-009 — Assert field relationships, not just field presence
 
 **Technique:**

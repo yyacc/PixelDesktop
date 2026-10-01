@@ -174,6 +174,14 @@ actor ADBTransport: TransportProtocol {
         return value
     }
 
+    func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {
+        try await execute(
+            command: "-s",
+            arguments: [deviceSerial, "shell", command],
+            timeout: timeout
+        )
+    }
+
     func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {
         let result = try await execute(
             command: "-s",

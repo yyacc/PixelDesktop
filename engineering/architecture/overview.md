@@ -37,7 +37,8 @@ PixelDesktop (macOS app)
 │   ├── Logging/
 │   │   └── AppLogger.swift            @MainActor, OSLog-backed, 500-entry ring buffer
 │   └── Models/
-│       └── PixelDevice.swift          Device identity + state
+│       ├── AndroidDevice.swift        Device identity + state
+│       └── InstalledApp.swift         Installed application identity
 │
 ├── Transport/                    ADB communication (transport only)
 │   ├── Transport.swift           TransportProtocol, TransportResult,
@@ -48,6 +49,10 @@ PixelDesktop (macOS app)
 │   ├── DeviceDiscovery.swift     DeviceDiscoveryProtocol
 │   ├── DeviceManager.swift       @MainActor; owns device list; enrichDevice(serial:)
 │   └── DeviceEnricher.swift      Reads stable properties; returns enriched PixelDevice
+│
+├── Operations/                   Application/process operations (Phase 4)
+│   ├── AppOperationsProtocol.swift    the operations seam (mockable)
+│   └── ADBAppOperations.swift         templates, validation, containment, parsers
 │
 ├── Compute/                      DTCA-1 workload (local reference implementation)
 │   └── DTCA1Worker.swift         DTCA1Result, WordCount, DTCA1Classification
@@ -182,6 +187,39 @@ the marketing name was not modelled at all.
 
 ---
 
+## 5b. Application Operations (Phase 4)
+
+```
+AppState                     guard-first wrappers; never accepts a shell string
+   ↓
+AppOperationsProtocol        named operations, explicit typed arguments
+   ↓
+ADBAppOperations             fixed command templates + one validated argument
+   ↓
+TransportProtocol.shell()    transport primitive — NOT exposed upward
+```
+
+**`shell()` containment (ADR-009):** `shell()` is a general-purpose escape hatch and lives
+only on `TransportProtocol`. `AppOperationsProtocol` never accepts a command string. Raw
+`shell()` must not be exposed to the UI (Phase 8) or Hermes (Phase 9) without a separate
+review.
+
+**The protection model is defence-in-depth, not a security boundary.** The
+`stopApplication` denylist cannot be complete — a vendor system package with an unexpected
+name will not match, and an app can legitimately be named `com.android.*`. The actual
+boundaries are: the device is not rooted and not debuggable (`su` absent,
+`ro.debuggable=0`), `shell()` is not reachable from above, and the blast radius is bounded
+by the device itself. See ADR-009.
+
+**Command-injection prevention** is an input-shape check: `validatePackageName` rejects
+anything that is not a bare package identifier, so no caller value containing spaces, `;`,
+`|`, `&&`, quotes, backticks or redirects can reach a command template.
+
+**`DeviceOperation`** now lists `.discover`, `.readSystemProperties`, `.listApplications`,
+`.launchApplication`, `.queryApplicationState`, `.stopApplication` — only what exists.
+
+---
+
 ## 6. Error Model
 
 `PixelDesktopError` — typed, `Equatable`, `CustomStringConvertible`:
@@ -244,7 +282,9 @@ Listed so this document cannot be mistaken for a description of delivered functi
 
 | Capability | Owning phase | Status |
 |---|---|---|
-| `shell()` — arbitrary ADB shell execution | **4** (Android Application / Process Control) | Not implemented. Deferred in Phase 2. |
+| `shell()` — ADB shell execution primitive | **4** | Implemented. Transport-only; not exposed upward (ADR-009). |
+| Application operations (discover, launch, query, stop) | **4** | Implemented (ADR-009). |
+| Connection lifecycle / guard-first state checks | **4** | Implemented; `ps -A` process inventory deferred. |
 | `push()` / `pull()` — file transfer | **5** (Pixel Compute Worker) | Not implemented. Deferred in Phase 2. |
 | connect / disconnect / reconnect lifecycle | **4**, hardened in **10** | Not implemented. Deferred in Phase 2. |
 | Android device operations (launch/stop apps, process queries) | **4** | Not implemented |

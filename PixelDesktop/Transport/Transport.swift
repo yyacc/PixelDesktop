@@ -12,6 +12,22 @@ protocol TransportProtocol: AnyObject, Sendable {
     ///   (getprop exits 0 with empty output for a missing key).
     func getprop(deviceSerial: String, key: String, timeout: TimeInterval) async throws -> String
 
+    /// Runs a command in the device shell via `adb -s <serial> shell <command>`.
+    ///
+    /// **This is a transport primitive, not an application-facing capability.** It is a
+    /// general-purpose escape hatch: any string handed to it runs on the device. It must
+    /// stay below the operations layer, and must never be exposed to the UI or to Hermes.
+    /// Higher layers call named operations with explicit arguments instead of composing
+    /// shell strings.
+    ///
+    /// The device this project targets is not rooted and not debuggable (`su` absent,
+    /// `ro.debuggable=0`), so no privilege escalation is reachable through ADB. That bounds
+    /// the blast radius but is not a substitute for containment.
+    ///
+    /// - Returns: the raw `TransportResult`. A non-zero exit code is returned rather than
+    ///   thrown, because some callers (e.g. `pidof`) treat non-zero as a valid answer.
+    func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult
+
     /// Reads every system property in a single `adb shell getprop` invocation.
     ///
     /// Prefer this over repeated `getprop` calls when several properties are needed:
@@ -177,10 +193,26 @@ enum DeviceOperation: String, CaseIterable {
     /// Read stable system properties. Implemented in Phase 2.
     case readSystemProperties = "readSystemProperties"
 
+    /// Enumerate installed applications. Implemented in Phase 4.
+    case listApplications = "listApplications"
+
+    /// Start an application's launcher activity. Implemented in Phase 4.
+    case launchApplication = "launchApplication"
+
+    /// Query whether an application currently has a running process. Implemented in Phase 4.
+    case queryApplicationState = "queryApplicationState"
+
+    /// Stop an application. Implemented in Phase 4.
+    case stopApplication = "stopApplication"
+
     var description: String {
         switch self {
         case .discover: return "Discover attached devices"
         case .readSystemProperties: return "Read system properties"
+        case .listApplications: return "List installed applications"
+        case .launchApplication: return "Launch an application"
+        case .queryApplicationState: return "Query application running state"
+        case .stopApplication: return "Stop an application"
         }
     }
 }

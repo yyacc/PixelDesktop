@@ -42,6 +42,14 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
         logger.info("Stopped device discovery", source: "DeviceManager.stopDiscovery")
     }
 
+    /// Re-reads the attached device list and replaces the published state wholesale.
+    ///
+    /// **Disconnect invalidation:** assigning the fresh list discards any previously enriched
+    /// values. A device that disappears is dropped, and one that reappears comes back with
+    /// its properties empty until it is enriched again. Enriched properties are therefore
+    /// never cached across a disconnect or reconnect, which is the decision recorded in
+    /// ADR-009. The properties are constant for a boot session but can change across a
+    /// reboot or OS update, and a reconnect is exactly when that becomes possible.
     func refreshDevices() async {
         do {
             let deviceList = try await transport.listDevices()
@@ -59,6 +67,24 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
 
     func getDevice(bySerialNumber serial: String) -> AndroidDevice? {
         devices.first { $0.serialNumber == serial }
+    }
+
+    /// Returns the device only when it is currently connected, otherwise throws.
+    ///
+    /// Every operation must call this **before** issuing a command, so a stale device fails
+    /// predictably instead of hanging or acting on a device that has gone away. This is the
+    /// guard-first rule for Phase 4 lifecycle handling.
+    ///
+    /// - Throws: `deviceNotFound` when the serial is unknown, `deviceOffline` when it is
+    ///   known but not in the `device` state.
+    func requireConnectedDevice(serial: String) throws -> AndroidDevice {
+        guard let device = getDevice(bySerialNumber: serial) else {
+            throw PixelDesktopError.deviceNotFound
+        }
+        guard device.state == .device else {
+            throw PixelDesktopError.deviceOffline
+        }
+        return device
     }
 
     /// Reads the stable system properties for the selected device and republishes it.

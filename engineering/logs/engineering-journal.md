@@ -359,3 +359,57 @@ implementation.
 **Next action:** Await review of the seven decision points.
 
 **Artifacts:** `phases/phase-04-application-process-control-proposal.md`.
+
+---
+
+## 2026-10-01 — Phase 4: Android Application / Process Control
+
+**Phase:** 4
+**Task:** Implement controlled Android application operations with `shell()` contained below a
+new operations layer, plus connection lifecycle handling.
+
+**Action:**
+Ran a **read-only** capability probe before writing any code — nothing was launched, stopped
+or modified. Established: `dumpsys package` costs 49,893 bytes per app (so per-app launch
+resolution is unusable); `pidof` exits 1 for a non-running package while `getprop` exits 0 for
+an unset key (so they must not share error handling); `resolve-activity` exits 0 even when it
+finds nothing; and the device is **not rooted and not debuggable** (`su` absent,
+`ro.debuggable=0`).
+
+Implemented `shell()` on `TransportProtocol` only; a new `Operations/` layer
+(`AppOperationsProtocol` + `ADBAppOperations`) that accepts no shell strings; an
+`InstalledApp` model; four new `DeviceOperation` cases; guard-first lifecycle handling with
+wholesale list replacement so disconnect invalidates enriched properties; and
+`validatePackageName` as the command-injection boundary.
+
+**Result:**
+The first live verification run **FAILED at step 7** — `stopApplication("com.android.settings")`
+was refused because Settings had been placed on the protected list. The entry was added by
+reflex on package name and violated the list's own stated criterion. All 105 unit tests had
+passed; only real-device verification, using the user-approved target, exposed it.
+
+Fixed by removing the entry, documenting the criterion inline, pinning it with
+`testSettingsIsNotProtectedBecauseItIsNotDeviceCritical`, and recording the episode in ADR-009.
+
+Final: BUILD SUCCEEDED; 106 tests executed, 0 failures. Real-device verification **PASS** on
+the exact approved sequence — discover → resolve launcher → launch Settings → verify running
+→ stop Settings → verify stopped — with containment checks and a raw-`adb` cross-check
+(third-party count 41 = 41).
+
+**Decision:**
+Phase 4 COMPLETE. `shell()` is a transport-only primitive, not exposed upward. The protection
+model is documented **with its limitations**: the denylist is defence-in-depth, not a security
+boundary; the real boundaries are the device's privilege posture, the absence of upward shell
+exposure, and the bounded blast radius.
+
+**Reason:**
+D2 was approved with the modification that package naming must not be treated as a sufficient
+security boundary. Documenting the limitations is what made the over-broad entry recognisable
+as a heuristic error rather than a mystery.
+
+**Next action:** Phase 5 (Pixel Compute Worker) — RNZM-23 `push()`/`pull()`. File transfer
+introduces path handling, a new input-validation surface that package-name validation does
+not cover; it needs its own review and ADR.
+
+**Artifacts:** `phases/phase-04-application-process-control.md`, ADR-009,
+`testing/phase-04-test-report.md`, `architecture/overview.md` updated.

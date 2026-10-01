@@ -352,8 +352,17 @@ final class PixelDesktopTests: XCTestCase {
     // MARK: - DeviceOperation Tests
 
     func testDeviceOperationsMatchImplementedCapabilities() {
-        // Only operations that actually exist may appear. Phase 4 adds more.
-        XCTAssertEqual(Set(DeviceOperation.allCases), [.discover, .readSystemProperties])
+        // Only operations that actually exist may appear. This list must be extended in the
+        // same commit that implements a new operation, never ahead of it.
+        // Phase 2: discover, readSystemProperties. Phase 4: the four application operations.
+        XCTAssertEqual(Set(DeviceOperation.allCases), [
+            .discover,
+            .readSystemProperties,
+            .listApplications,
+            .launchApplication,
+            .queryApplicationState,
+            .stopApplication
+        ])
     }
 
     func testDeviceOperationDescriptions() {
@@ -1008,6 +1017,400 @@ final class PixelDesktopTests: XCTestCase {
     }
 }
 
+// MARK: - Phase 4: Application Operation Tests
+
+final class AppOperationsTests: XCTestCase {
+
+    // MARK: Package name validation (the injection boundary)
+
+    func testValidatePackageNameAcceptsValidIdentifiers() throws {
+        for name in ["com.android.settings", "com.mojang.minecraftpe", "a.b", "com.a_b.c1"] {
+            XCTAssertEqual(try ADBAppOperations.validatePackageName(name), name)
+        }
+    }
+
+    func testValidatePackageNameRejectsEmpty() {
+        XCTAssertThrowsError(try ADBAppOperations.validatePackageName("   "))
+    }
+
+    /// The mechanism that prevents command injection through the operations layer.
+    func testValidatePackageNameRejectsShellMetacharacters() {
+        let hostile = [
+            "com.example; rm -rf /",
+            "com.example && reboot",
+            "com.example | sh",
+            "com.example`id`",
+            "com.example$(whoami)",
+            "com.example > /sdcard/x",
+            "com.example\nreboot",
+            "com.example --user 0",
+            "'com.example'",
+            "com.example/../other"
+        ]
+        for name in hostile {
+            XCTAssertThrowsError(
+                try ADBAppOperations.validatePackageName(name),
+                "Expected rejection of '\(name)'"
+            ) { error in
+                guard case PixelDesktopError.invalidInput = error else {
+                    return XCTFail("Expected invalidInput for '\(name)', got \(error)")
+                }
+            }
+        }
+    }
+
+    // MARK: Stop containment
+
+    func testStopRejectsProtectedPackages() {
+        for name in ["com.android.systemui", "com.google.android.gms", "android", "com.android.phone"] {
+            XCTAssertThrowsError(try ADBAppOperations.assertStoppable(name), "Expected refusal for \(name)")
+        }
+    }
+
+    /// Settings is an ordinary user application, not a device-critical one. It was initially
+    /// protected by reflex on package name alone; real-device verification surfaced that the
+    /// entry was over-broad, because the approved verification sequence stops Settings.
+    /// This test pins the criterion so the entry cannot silently return.
+    func testSettingsIsNotProtectedBecauseItIsNotDeviceCritical() throws {
+        XCTAssertNoThrow(try ADBAppOperations.assertStoppable("com.android.settings"))
+    }
+
+    func testStopRejectsProtectedPrefixes() {
+        XCTAssertThrowsError(try ADBAppOperations.assertStoppable("com.android.providers.contacts"))
+        XCTAssertThrowsError(try ADBAppOperations.assertStoppable("com.android.server.telecom"))
+    }
+
+    func testStopRejectsWorkerPackage() {
+        XCTAssertThrowsError(try ADBAppOperations.assertStoppable(ADBAppOperations.workerPackageName))
+    }
+
+    func testStopAllowsOrdinaryThirdPartyPackage() throws {
+        XCTAssertNoThrow(try ADBAppOperations.assertStoppable("com.mojang.minecraftpe"))
+    }
+
+    /// The containment is a denylist, not a boundary. Documented as such in ADR-009.
+    func testContainmentIsDenylistNotBoundary() throws {
+        // A third-party package can impersonate a system-looking name and is NOT protected.
+        XCTAssertNoThrow(try ADBAppOperations.assertStoppable("com.android.impostor"))
+    }
+
+    // MARK: Parsers
+
+    func testParsePackageList() {
+        let output = """
+        package:com.klim.dbdesigner
+        package:com.fiio.control
+        package:com.smart.consumer.app
+        """
+        XCTAssertEqual(
+            ADBAppOperations.parsePackageList(output),
+            ["com.klim.dbdesigner", "com.fiio.control", "com.smart.consumer.app"]
+        )
+    }
+
+    func testParsePackageListIgnoresMalformedLines() {
+        let output = "package:\nnot a package line\npackage:com.valid.app\npackage:   \n"
+        XCTAssertEqual(ADBAppOperations.parsePackageList(output), ["com.valid.app"])
+    }
+
+    func testParseLaunchableActivitiesFromRealShape() {
+        // Shape captured from the real Pixel 7a.
+        let output = """
+        58 activities found:
+          Activity #0:
+            priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+            com.android.chrome/com.google.android.apps.chrome.Main
+          Activity #1:
+            priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+            com.android.settings/.Settings
+        """
+        let parsed = ADBAppOperations.parseLaunchableActivities(output)
+
+        XCTAssertEqual(parsed.count, 2)
+        XCTAssertEqual(parsed["com.android.chrome"], "com.android.chrome/com.google.android.apps.chrome.Main")
+        XCTAssertEqual(parsed["com.android.settings"], "com.android.settings/.Settings")
+        XCTAssertNil(parsed["58 activities found"])
+    }
+
+    func testParseLaunchableActivitiesEmptyOutput() {
+        XCTAssertTrue(ADBAppOperations.parseLaunchableActivities("").isEmpty)
+        XCTAssertTrue(ADBAppOperations.parseLaunchableActivities("No activities found").isEmpty)
+    }
+
+    func testParsePID() {
+        XCTAssertEqual(ADBAppOperations.parsePID("2615"), 2615)
+        XCTAssertEqual(ADBAppOperations.parsePID("2615 2616"), 2615)
+        XCTAssertEqual(ADBAppOperations.parsePID("  42  \n"), 42)
+    }
+
+    func testParsePIDReturnsNilWhenNotRunning() {
+        // pidof prints nothing and exits 1 when no process matches.
+        XCTAssertNil(ADBAppOperations.parsePID(""))
+        XCTAssertNil(ADBAppOperations.parsePID("   \n"))
+        XCTAssertNil(ADBAppOperations.parsePID("not a pid"))
+    }
+
+    func testComponentActivityExtraction() {
+        XCTAssertEqual(
+            ADBAppOperations.componentActivity(from: "com.android.settings/.Settings", packageName: "com.android.settings"),
+            ".Settings"
+        )
+        XCTAssertEqual(
+            ADBAppOperations.componentActivity(from: "com.android.chrome/com.google.android.apps.chrome.Main", packageName: "com.android.chrome"),
+            "com.google.android.apps.chrome.Main"
+        )
+    }
+
+    // MARK: Operations over a mock transport
+
+    func testInstalledApplicationsThirdPartyByDefault() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse("pm list packages -3",
+            TransportResult(exitCode: 0, stdout: "package:com.a.one\npackage:com.b.two\n", stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        let apps = try await ops.installedApplications(deviceSerial: "S", includeSystem: false, timeout: 5)
+
+        XCTAssertEqual(apps.map(\.packageName), ["com.a.one", "com.b.two"])
+        XCTAssertTrue(apps.allSatisfy { !$0.isLaunchable })
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.count, 1)
+        XCTAssertEqual(invocations[0].arguments, ["S", "shell", "pm list packages -3"])
+    }
+
+    func testInstalledApplicationsIncludeSystemUsesDifferentCommand() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse("pm list packages",
+            TransportResult(exitCode: 0, stdout: "package:com.a.one\n", stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        _ = try await ops.installedApplications(deviceSerial: "S", includeSystem: true, timeout: 5)
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations[0].arguments, ["S", "shell", "pm list packages"])
+    }
+
+    func testLaunchableApplicationsResolvedInOneCall() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: """
+        2 activities found:
+            com.android.settings/.Settings
+            com.android.chrome/com.google.android.apps.chrome.Main
+        """, stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        let apps = try await ops.launchableApplications(deviceSerial: "S", timeout: 5)
+
+        XCTAssertEqual(apps.count, 2)
+        XCTAssertTrue(apps.allSatisfy { $0.isLaunchable })
+
+        // One device call, not one per package.
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.count, 1)
+    }
+
+    func testLaunchApplicationBuildsExactCommand() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: """
+        1 activities found:
+            com.android.settings/.Settings
+        """, stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        _ = try await ops.launchApplication(deviceSerial: "S", packageName: "com.android.settings", timeout: 5)
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.last?.arguments, ["S", "shell", "am start -n com.android.settings/.Settings"])
+    }
+
+    func testLaunchApplicationRejectsNonLaunchableBeforeCommand() async {
+        let transport = MockTransport()
+        // Package exists but exposes no launcher activity.
+        await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: "No activities found", stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        do {
+            _ = try await ops.launchApplication(deviceSerial: "S", packageName: "com.library.only", timeout: 5)
+            XCTFail("Expected invalidInput")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+
+        // No `am start` was issued.
+        let invocations = await transport.invocations
+        XCTAssertFalse(invocations.contains { $0.arguments.last?.contains("am start") == true })
+    }
+
+    func testIsApplicationRunningTrue() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse("pidof com.android.settings", TransportResult(exitCode: 0, stdout: "2615\n", stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        let running = try await ops.isApplicationRunning(deviceSerial: "S", packageName: "com.android.settings", timeout: 5)
+
+        XCTAssertTrue(running)
+    }
+
+    /// `pidof` exits 1 when not running. That is a valid answer, not an error.
+    func testIsApplicationRunningFalseIsNotAnError() async throws {
+        let transport = MockTransport()
+        await transport.setShellResponse("pidof com.mojang.minecraftpe", TransportResult(exitCode: 1, stdout: "", stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        let running = try await ops.isApplicationRunning(deviceSerial: "S", packageName: "com.mojang.minecraftpe", timeout: 5)
+
+        XCTAssertFalse(running)
+    }
+
+    func testStopApplicationBuildsExactCommand() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 0, stdout: "", stderr: ""))
+
+        let ops = ADBAppOperations(transport: transport)
+        _ = try await ops.stopApplication(deviceSerial: "S", packageName: "com.mojang.minecraftpe", timeout: 5)
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.last?.arguments, ["S", "shell", "am force-stop com.mojang.minecraftpe"])
+    }
+
+    func testStopApplicationRefusesProtectedPackageBeforeCommand() async {
+        let transport = MockTransport()
+        let ops = ADBAppOperations(transport: transport)
+
+        do {
+            _ = try await ops.stopApplication(deviceSerial: "S", packageName: "com.android.systemui", timeout: 5)
+            XCTFail("Expected refusal")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else { return XCTFail("got \(error)") }
+        } catch { XCTFail("got \(error)") }
+
+        let invocations = await transport.invocations
+        XCTAssertTrue(invocations.isEmpty, "A refused stop must not touch the device")
+    }
+
+    func testShellNonZeroExitSurfacesAdbError() async {
+        let transport = MockTransport()
+        await transport.setDefaultShellResult(TransportResult(exitCode: 255, stdout: "", stderr: "java.lang.IllegalArgumentException"))
+
+        let ops = ADBAppOperations(transport: transport)
+        do {
+            _ = try await ops.installedApplications(deviceSerial: "S", includeSystem: false, timeout: 5)
+            XCTFail("Expected adbCommandFailed")
+        } catch let error as PixelDesktopError {
+            guard case .adbCommandFailed(_, let code, _) = error else { return XCTFail("got \(error)") }
+            XCTAssertEqual(code, 255)
+        } catch { XCTFail("got \(error)") }
+    }
+
+    // MARK: InstalledApp model
+
+    func testInstalledAppIsLaunchable() {
+        XCTAssertTrue(InstalledApp(packageName: "com.a.b", launchActivity: "com.a.b/.Main").isLaunchable)
+        XCTAssertFalse(InstalledApp(packageName: "com.a.b", launchActivity: nil).isLaunchable)
+    }
+
+    func testInstalledAppDisplayLabelIsLastSegment() {
+        XCTAssertEqual(InstalledApp(packageName: "com.android.settings", launchActivity: nil).displayLabel, "settings")
+        XCTAssertEqual(InstalledApp(packageName: "single", launchActivity: nil).displayLabel, "single")
+    }
+
+    func testInstalledAppSystemHeuristicIsNotAuthoritative() {
+        XCTAssertTrue(InstalledApp(packageName: "com.android.settings", launchActivity: nil).isLikelySystemPackage)
+        XCTAssertFalse(InstalledApp(packageName: "com.mojang.minecraftpe", launchActivity: nil).isLikelySystemPackage)
+    }
+}
+
+// MARK: - Phase 4: Lifecycle Tests
+
+final class DeviceLifecycleTests: XCTestCase {
+
+    func testRequireConnectedDeviceReturnsConnectedDevice() async throws {
+        let transport = MockTransport()
+        await transport.setDeviceList([
+            AndroidDevice(id: "S", serialNumber: "S", deviceCodename: "lynx", marketingName: "",
+                          manufacturer: "", androidVersion: "", apiLevel: 0, architecture: "",
+                          supportedABIs: [], state: .device)
+        ])
+        let manager = await DeviceManager(transport: transport)
+        await manager.refreshDevices()
+
+        let device = try await manager.requireConnectedDevice(serial: "S")
+        XCTAssertEqual(device.serialNumber, "S")
+    }
+
+    func testRequireConnectedDeviceThrowsForUnknownSerial() async {
+        let transport = MockTransport()
+        let manager = await DeviceManager(transport: transport)
+        await manager.refreshDevices()
+
+        do {
+            _ = try await manager.requireConnectedDevice(serial: "NOPE")
+            XCTFail("Expected deviceNotFound")
+        } catch let error as PixelDesktopError {
+            XCTAssertEqual(error, PixelDesktopError.deviceNotFound)
+        } catch { XCTFail("got \(error)") }
+    }
+
+    func testRequireConnectedDeviceThrowsForOfflineDevice() async {
+        let transport = MockTransport()
+        await transport.setDeviceList([
+            AndroidDevice(id: "S", serialNumber: "S", deviceCodename: "lynx", marketingName: "",
+                          manufacturer: "", androidVersion: "", apiLevel: 0, architecture: "",
+                          supportedABIs: [], state: .offline)
+        ])
+        let manager = await DeviceManager(transport: transport)
+        await manager.refreshDevices()
+
+        do {
+            _ = try await manager.requireConnectedDevice(serial: "S")
+            XCTFail("Expected deviceOffline")
+        } catch let error as PixelDesktopError {
+            XCTAssertEqual(error, PixelDesktopError.deviceOffline)
+        } catch { XCTFail("got \(error)") }
+    }
+
+    /// ADR-009: enriched properties must not survive a disconnect/reconnect.
+    func testDisconnectInvalidatesEnrichedProperties() async throws {
+        let transport = MockTransport()
+        await transport.setProperties([
+            DevicePropertyKey.androidVersion: "16",
+            DevicePropertyKey.apiLevel: "36",
+            DevicePropertyKey.architecture: "arm64-v8a",
+            DevicePropertyKey.marketingName: "Pixel 7a",
+            DevicePropertyKey.manufacturer: "Google",
+            DevicePropertyKey.supportedABIs: "arm64-v8a"
+        ])
+        let device = AndroidDevice(id: "S", serialNumber: "S", deviceCodename: "lynx",
+                                   marketingName: "", manufacturer: "", androidVersion: "",
+                                   apiLevel: 0, architecture: "", supportedABIs: [], state: .device)
+        await transport.setDeviceList([device])
+
+        let manager = await DeviceManager(transport: transport)
+        await manager.refreshDevices()
+        _ = try await manager.enrichDevice(serial: "S")
+
+        var published = await manager.devices
+        XCTAssertEqual(published[0].androidVersion, "16", "precondition: enriched")
+
+        // Device disconnects.
+        await transport.setDeviceList([])
+        await manager.refreshDevices()
+        published = await manager.devices
+        XCTAssertTrue(published.isEmpty)
+
+        // Device reconnects: properties must be empty again, not the stale cached values.
+        await transport.setDeviceList([device])
+        await manager.refreshDevices()
+        published = await manager.devices
+        XCTAssertEqual(published.count, 1)
+        XCTAssertEqual(published[0].androidVersion, "", "reconnect must not resurrect stale properties")
+        XCTAssertEqual(published[0].apiLevel, 0)
+        XCTAssertEqual(published[0].marketingName, "")
+        XCTAssertTrue(published[0].supportedABIs.isEmpty)
+    }
+}
+
 // MARK: - Test Doubles
 
 /// Records invocations and returns canned responses, so enrichment can be tested
@@ -1024,6 +1427,17 @@ actor MockTransport: TransportProtocol {
     private var deviceList: [AndroidDevice] = []
     private var properties: [String: String] = [:]
     private var batchedResult: TransportResult?
+    private var shellResponses: [String: TransportResult] = [:]
+    private var defaultShellResult = TransportResult(exitCode: 0, stdout: "", stderr: "")
+
+    /// Canned response for an exact shell command string.
+    func setShellResponse(_ command: String, _ result: TransportResult) {
+        shellResponses[command] = result
+    }
+
+    func setDefaultShellResult(_ result: TransportResult) {
+        defaultShellResult = result
+    }
 
     func setResponse(forKey key: String, result: TransportResult) {
         responses[key] = result
@@ -1062,6 +1476,15 @@ actor MockTransport: TransportProtocol {
 
     func listDevices() async throws -> [AndroidDevice] {
         deviceList
+    }
+
+    func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {
+        invocations.append(Invocation(command: "-s", arguments: [deviceSerial, "shell", command]))
+
+        if let result = shellResponses[command] {
+            return result
+        }
+        return defaultShellResult
     }
 
     func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {
