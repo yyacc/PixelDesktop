@@ -21,6 +21,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 1 — Engineering Foundation:** COMPLETE
 **Phase 2 — Device Discovery and ADB Transport:** COMPLETE
 **Phase 3 — Android Device Model:** COMPLETE
+**Phase 4 — Android Application / Process Control:** PROPOSAL (awaiting review)
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md). Legacy documents use
@@ -36,6 +37,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 3 Android Device Model](phases/phase-03-android-device-model.md) — corrected identity model, capabilities, batched getprop
 - [Phase 3 Proposal (approved)](phases/phase-03-android-device-model-proposal.md) — the approved proposal
 - [Phase 3 Test Report](testing/phase-03-test-report.md) — build, test and real-device evidence
+- [Phase 4 Proposal — Android Application / Process Control](phases/phase-04-application-process-control-proposal.md) — proposal only, awaiting review
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements

@@ -312,3 +312,50 @@ invalidates cached properties.
 
 **Artifacts:** `phases/phase-03-android-device-model.md`, ADR-008,
 `testing/phase-03-test-report.md`, `architecture/overview.md` updated.
+
+---
+
+## 2026-10-01 — Phase 4 proposal produced (no code changed)
+
+**Phase:** 4 (proposal)
+**Task:** Produce a Phase 4 implementation proposal for Android Application / Process Control.
+
+**Action:**
+Ran a read-only capability probe against the Pixel 7a — **no application was launched,
+stopped or modified**. Probed `pm list packages`, `pm list packages -3`,
+`cmd package query-activities`, `pidof` (running and not-running), `ps -A`,
+`dumpsys activity`, `dumpsys package`, `resolve-activity`, `which monkey`, and the
+device's privilege posture.
+
+**Result:**
+Proposal produced with seven decision points. Five probe findings shaped the design:
+
+1. **`dumpsys package` costs 49,893 bytes per app** — resolving 41 packages that way would
+   be ~2 MB. The single `query-activities` call already returns all 58 launchable
+   activities, so per-app resolution is unnecessary. Largest efficiency decision in the phase.
+2. **`pidof` exit codes are meaningful** (exit 1 for not-running) — unlike `getprop`, which
+   exits 0 for an unset key. The two must not share error handling.
+3. **`resolve-activity` exits 0 even when it finds nothing** — detection must be
+   output-based.
+4. **The device is not rooted and not debuggable** (`which su` empty, `ro.debuggable=0`).
+   No privilege escalation is available through ADB, which bounds the blast radius of
+   `shell()` and is direct evidence for the security review.
+5. `--brief` does not shorten `query-activities`, but its output parses cleanly into 58
+   package/activity pairs with no duplicates.
+
+**Decision:**
+Recommend adding `shell()` as a transport-only primitive contained by an operations layer
+that exposes named operations only; adding a new `Operations/` layer
+(`AppOperationsProtocol` + `ADBAppOperations`); containing `stopApplication` to explicit
+packages with system-package refusal; not caching enriched properties across reconnect; and
+deferring `ps -A` parsing since `pidof` covers the actual need. **No source file modified.**
+
+**Reason:**
+Phase 4 is the most security-sensitive phase so far — Phases 2 and 3 only read from the
+device, while Phase 4 acts on it. `shell()` is a general-purpose escape hatch and
+`am force-stop` is destructive-capable, so both need explicit containment and review before
+implementation.
+
+**Next action:** Await review of the seven decision points.
+
+**Artifacts:** `phases/phase-04-application-process-control-proposal.md`.
