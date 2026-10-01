@@ -18,15 +18,38 @@ This directory contains all engineering documentation for the PixelDesktop proje
 ## Project Status
 
 **Phase 0 — Clean-Start Audit:** COMPLETE
-**Phase 1 — Engineering Foundation:** NOT STARTED
+**Phase 1 — Engineering Foundation:** COMPLETE
+**Phase 2 — Device Discovery and ADB Transport:** COMPLETE
 
 ## Key Documents
 
-- [Phase 0 Clean-Start Audit](phases/phase-00-clean-start-audit.md) — Complete audit of existing project
+### Phase logs
+- [Phase 0 Clean-Start Audit](phases/phase-00-clean-start-audit.md) — Audit of the previous implementation
+- [Phase 1 Engineering Foundation](phases/phase-01-engineering-foundation.md) — Clean project, build and tests
+- [Phase 2 Device Discovery and ADB Transport](phases/phase-02-device-discovery.md) — `getprop` transport, device enrichment, real-device verification
+
+### Architecture decisions
 - [ADR-001: Project Structure](decisions/ADR-001-project-structure.md)
 - [ADR-002: ADB Transport](decisions/ADR-002-adb-transport.md)
 - [ADR-003: DTCA-1 Worker APK](decisions/ADR-003-dtca1-worker-apk.md)
 - [ADR-004: Verification by Re-computation](decisions/ADR-004-verification.md)
+- [ADR-005: Device Property Enrichment Is Separate From Discovery](decisions/ADR-005-device-property-enrichment.md)
+- [ADR-006: Test Isolation Strategy for Device-Dependent Code](decisions/ADR-006-test-isolation.md)
+
+### Records
+- [Engineering Journal](logs/engineering-journal.md) — Chronological build history
+- [AI Development Log](ai-development/ai-development-log.md) — How the AI participated in the build
+- [Technique Memory](best-practices/techniques.md) — Reusable techniques with evidence
+- [Phase 2 Test Report](testing/phase-02-test-report.md) — Build, test and real-device evidence
+
+### Failures
+- [FAIL-001: Non-English Output](failures/FAIL-001-non-english-output.md)
+- [FAIL-002: Runaway Field Duplication in Transport.swift](failures/FAIL-002-transport-swift-runaway-fields.md)
+
+## Device
+
+**Pixel 7a** — serial `3C261JEHN25632`
+Verified: Android `16`, API level `36`, ABI `arm64-v8a`
 
 ## External References
 

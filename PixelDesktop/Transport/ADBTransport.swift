@@ -143,4 +143,32 @@ actor ADBTransport: TransportProtocol {
 
         return devices
     }
+
+    // MARK: - Property retrieval
+
+    func getprop(deviceSerial: String, key: String, timeout: TimeInterval) async throws -> String {
+        let result = try await execute(
+            command: "-s",
+            arguments: [deviceSerial, "shell", "getprop", key],
+            timeout: timeout
+        )
+
+        guard result.isSuccess else {
+            throw PixelDesktopError.adbCommandFailed(
+                command: "getprop \(key)",
+                exitCode: Int(result.exitCode),
+                stderr: result.stderr
+            )
+        }
+
+        let value = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !value.isEmpty else {
+            throw PixelDesktopError.invalidInput(
+                "Property '\(key)' is unset on device \(deviceSerial)"
+            )
+        }
+
+        return value
+    }
 }

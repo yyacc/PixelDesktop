@@ -13,6 +13,7 @@
 		5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D453AF971B8227981443968 /* DTCA1Worker.swift */; };
 		619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560A663C5EAF42792941431A /* PixelDesktopTests.swift */; };
 		6588C60ED7417106754355CB /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832112C57257637193F8B80A /* Transport.swift */; };
+		88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */; };
 		91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */; };
 		A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */; };
 		A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */; };
@@ -48,6 +49,7 @@
 		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
 		D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopApp.swift; sourceTree = "<group>"; };
+		DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEnricher.swift; sourceTree = "<group>"; };
 		DEECEB33C31DAB1BF023236B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E7C2D83AFA87754C63612A30 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		EE1C96AAA82CA14C8156167C /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 			isa = PBXGroup;
 			children = (
 				B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */,
+				DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */,
 				EE1C96AAA82CA14C8156167C /* DeviceManager.swift */,
 			);
 			path = Device;
@@ -281,6 +284,7 @@
 				14AA9AD6480C917C03B9B4E3 /* ContentView.swift in Sources */,
 				5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */,
 				A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */,
+				88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */,
 				1B38F5862DED7D80E048E372 /* DeviceManager.swift in Sources */,
 				91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */,
 				16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */,

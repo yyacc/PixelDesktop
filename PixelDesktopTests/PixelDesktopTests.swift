@@ -337,4 +337,496 @@ final class PixelDesktopTests: XCTestCase {
         }
         XCTAssertEqual(logger.entries.count, 500)
     }
+
+    // MARK: - DeviceProperties Tests
+
+    func testDevicePropertiesMakeTrimsWhitespace() throws {
+        let properties = try DeviceProperties.make(
+            androidVersion: "  16\n",
+            apiLevelRaw: " 36 ",
+            architecture: "\tarm64-v8a\n"
+        )
+
+        XCTAssertEqual(properties.androidVersion, "16")
+        XCTAssertEqual(properties.apiLevel, 36)
+        XCTAssertEqual(properties.architecture, "arm64-v8a")
+    }
+
+    func testDevicePropertiesMakeRejectsEmptyVersion() {
+        XCTAssertThrowsError(
+            try DeviceProperties.make(androidVersion: "", apiLevelRaw: "36", architecture: "arm64-v8a")
+        ) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        }
+    }
+
+    func testDevicePropertiesMakeRejectsEmptyArchitecture() {
+        XCTAssertThrowsError(
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "36", architecture: "  ")
+        ) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        }
+    }
+
+    func testDevicePropertiesMakeRejectsNonNumericApiLevel() {
+        XCTAssertThrowsError(
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "thirty-six", architecture: "arm64-v8a")
+        ) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        }
+    }
+
+    func testDevicePropertiesMakeRejectsZeroApiLevel() {
+        XCTAssertThrowsError(
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "0", architecture: "arm64-v8a")
+        ) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        }
+    }
+
+    func testDevicePropertyKeysMatchApprovedAcquisitionSources() {
+        XCTAssertEqual(DevicePropertyKey.androidVersion, "ro.build.version.release")
+        XCTAssertEqual(DevicePropertyKey.apiLevel, "ro.build.version.sdk")
+        XCTAssertEqual(DevicePropertyKey.architecture, "ro.product.cpu.abi")
+    }
+
+    // MARK: - ADBTransport.getprop Tests
+
+    func testGetpropSuccess() async throws {
+        let transport = MockTransport()
+        await transport.setResponse(
+            forKey: DevicePropertyKey.androidVersion,
+            result: TransportResult(exitCode: 0, stdout: "16\n", stderr: "")
+        )
+
+        let value = try await transport.getprop(
+            deviceSerial: "TEST123",
+            key: DevicePropertyKey.androidVersion,
+            timeout: 5
+        )
+
+        XCTAssertEqual(value, "16")
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.count, 1)
+        XCTAssertEqual(invocations[0].command, "-s")
+        XCTAssertEqual(invocations[0].arguments, ["TEST123", "shell", "getprop", "ro.build.version.release"])
+    }
+
+    func testGetpropFailureSurfacesAdbError() async {
+        let transport = MockTransport()
+        await transport.setResponse(
+            forKey: DevicePropertyKey.apiLevel,
+            result: TransportResult(exitCode: 1, stdout: "", stderr: "error: device offline")
+        )
+
+        do {
+            _ = try await transport.getprop(
+                deviceSerial: "TEST123",
+                key: DevicePropertyKey.apiLevel,
+                timeout: 5
+            )
+            XCTFail("Expected adbCommandFailed")
+        } catch let error as PixelDesktopError {
+            guard case .adbCommandFailed(let command, let exitCode, _) = error else {
+                return XCTFail("Expected adbCommandFailed, got \(error)")
+            }
+            XCTAssertEqual(command, "getprop ro.build.version.sdk")
+            XCTAssertEqual(exitCode, 1)
+        } catch {
+            XCTFail("Expected PixelDesktopError, got \(error)")
+        }
+    }
+
+    func testGetpropUnsetPropertyIsRejected() async {
+        let transport = MockTransport()
+        await transport.setResponse(
+            forKey: "ro.unset.key",
+            result: TransportResult(exitCode: 0, stdout: "\n", stderr: "")
+        )
+
+        do {
+            _ = try await transport.getprop(deviceSerial: "TEST123", key: "ro.unset.key", timeout: 5)
+            XCTFail("Expected invalidInput for unset property")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        } catch {
+            XCTFail("Expected PixelDesktopError, got \(error)")
+        }
+    }
+
+    // MARK: - DeviceEnricher Tests
+
+    func testEnrichDevicePopulatesProperties() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultResult(TransportResult(exitCode: 0, stdout: "16\n", stderr: ""))
+        await transport.setResponse(
+            forKey: DevicePropertyKey.apiLevel,
+            result: TransportResult(exitCode: 0, stdout: "36\n", stderr: "")
+        )
+        await transport.setResponse(
+            forKey: DevicePropertyKey.architecture,
+            result: TransportResult(exitCode: 0, stdout: "arm64-v8a\n", stderr: "")
+        )
+
+        let discovered = PixelDevice(
+            id: "3C261JEHN25632",
+            serialNumber: "3C261JEHN25632",
+            model: "Pixel_7a",
+            manufacturer: "lynx",
+            androidVersion: "",
+            apiLevel: 0,
+            architecture: "",
+            state: .device
+        )
+
+        let enriched = try await DeviceEnricher(transport: transport).enrich(discovered)
+
+        XCTAssertEqual(enriched.androidVersion, "16")
+        XCTAssertEqual(enriched.apiLevel, 36)
+        XCTAssertEqual(enriched.architecture, "arm64-v8a")
+        XCTAssertEqual(enriched.model, "Pixel_7a")
+        XCTAssertEqual(enriched.manufacturer, "lynx")
+        XCTAssertEqual(enriched.serialNumber, "3C261JEHN25632")
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.count, 3)
+        XCTAssertEqual(invocations.map { $0.arguments.last }, [
+            DevicePropertyKey.androidVersion,
+            DevicePropertyKey.apiLevel,
+            DevicePropertyKey.architecture
+        ])
+    }
+
+    func testEnrichDeviceRejectsNonConnectedState() async {
+        let transport = MockTransport()
+        let offline = PixelDevice(
+            id: "TEST123",
+            serialNumber: "TEST123",
+            model: "Pixel_7a",
+            manufacturer: "lynx",
+            androidVersion: "",
+            apiLevel: 0,
+            architecture: "",
+            state: .offline
+        )
+
+        do {
+            _ = try await DeviceEnricher(transport: transport).enrich(offline)
+            XCTFail("Expected deviceOffline")
+        } catch let error as PixelDesktopError {
+            XCTAssertEqual(error, PixelDesktopError.deviceOffline)
+        } catch {
+            XCTFail("Expected PixelDesktopError, got \(error)")
+        }
+
+        let invocations = await transport.invocations
+        XCTAssertTrue(invocations.isEmpty, "Enrichment must not touch the device when it is not connected")
+    }
+
+    func testEnrichDevicePropagatesPropertyFailure() async {
+        let transport = MockTransport()
+        await transport.setDefaultResult(TransportResult(exitCode: 0, stdout: "16\n", stderr: ""))
+        await transport.setResponse(
+            forKey: DevicePropertyKey.apiLevel,
+            result: TransportResult(exitCode: 0, stdout: "", stderr: "")
+        )
+
+        let device = PixelDevice(
+            id: "TEST123",
+            serialNumber: "TEST123",
+            model: "Pixel_7a",
+            manufacturer: "lynx",
+            androidVersion: "",
+            apiLevel: 0,
+            architecture: "",
+            state: .device
+        )
+
+        do {
+            _ = try await DeviceEnricher(transport: transport).enrich(device)
+            XCTFail("Expected failure when a property is unset")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        } catch {
+            XCTFail("Expected PixelDesktopError, got \(error)")
+        }
+    }
+
+    // MARK: - DeviceManager Enrichment Tests
+
+    func testDeviceManagerEnrichUpdatesPublishedDevice() async throws {
+        let transport = MockTransport()
+        await transport.setDefaultResult(TransportResult(exitCode: 0, stdout: "16\n", stderr: ""))
+        await transport.setResponse(
+            forKey: DevicePropertyKey.apiLevel,
+            result: TransportResult(exitCode: 0, stdout: "36\n", stderr: "")
+        )
+        await transport.setResponse(
+            forKey: DevicePropertyKey.architecture,
+            result: TransportResult(exitCode: 0, stdout: "arm64-v8a\n", stderr: "")
+        )
+        await transport.setDeviceList([
+            PixelDevice(
+                id: "3C261JEHN25632",
+                serialNumber: "3C261JEHN25632",
+                model: "Pixel_7a",
+                manufacturer: "lynx",
+                androidVersion: "",
+                apiLevel: 0,
+                architecture: "",
+                state: .device
+            )
+        ])
+
+        let manager = await DeviceManager(transport: transport)
+        await manager.refreshDevices()
+
+        let discovered = await manager.devices
+        XCTAssertEqual(discovered.count, 1)
+        XCTAssertEqual(discovered[0].androidVersion, "")
+
+        let enriched = try await manager.enrichDevice(serial: "3C261JEHN25632")
+
+        XCTAssertEqual(enriched?.androidVersion, "16")
+        XCTAssertEqual(enriched?.apiLevel, 36)
+
+        let published = await manager.devices
+        XCTAssertEqual(published[0].androidVersion, "16")
+        XCTAssertEqual(published[0].apiLevel, 36)
+        XCTAssertEqual(published[0].architecture, "arm64-v8a")
+    }
+
+    func testDeviceManagerEnrichUnknownSerialReturnsNil() async throws {
+        let transport = MockTransport()
+        let manager = await DeviceManager(transport: transport)
+
+        let result = try await manager.enrichDevice(serial: "DOES_NOT_EXIST")
+
+        XCTAssertNil(result)
+        let invocations = await transport.invocations
+        XCTAssertTrue(invocations.isEmpty)
+    }
+
+    func testDiscoveryLeavesPropertiesUnpopulated() async {
+        let transport = MockTransport()
+        await transport.setDeviceList([
+            PixelDevice(
+                id: "TEST123",
+                serialNumber: "TEST123",
+                model: "Pixel_7a",
+                manufacturer: "lynx",
+                androidVersion: "",
+                apiLevel: 0,
+                architecture: "",
+                state: .device
+            )
+        ])
+
+        let manager = await DeviceManager(transport: transport)
+        await manager.refreshDevices()
+
+        let devices = await manager.devices
+        XCTAssertEqual(devices.count, 1)
+        XCTAssertEqual(devices[0].androidVersion, "")
+        XCTAssertEqual(devices[0].apiLevel, 0)
+        XCTAssertEqual(devices[0].architecture, "")
+
+        let invocations = await transport.invocations
+        XCTAssertTrue(
+            invocations.isEmpty,
+            "Discovery parsing must not issue getprop calls; enrichment is a separate responsibility"
+        )
+    }
+}
+
+// MARK: - Test Doubles
+
+/// Records invocations and returns canned responses, so enrichment can be tested
+/// without a physical device.
+actor MockTransport: TransportProtocol {
+    struct Invocation: Sendable, Equatable {
+        let command: String
+        let arguments: [String]
+    }
+
+    private(set) var invocations: [Invocation] = []
+    private var responses: [String: TransportResult] = [:]
+    private var defaultResult = TransportResult(exitCode: 0, stdout: "", stderr: "")
+    private var deviceList: [PixelDevice] = []
+
+    func setResponse(forKey key: String, result: TransportResult) {
+        responses[key] = result
+    }
+
+    func setDefaultResult(_ result: TransportResult) {
+        defaultResult = result
+    }
+
+    func setDeviceList(_ devices: [PixelDevice]) {
+        deviceList = devices
+    }
+
+    func execute(command: String, arguments: [String], timeout: TimeInterval) async throws -> TransportResult {
+        invocations.append(Invocation(command: command, arguments: arguments))
+
+        if let key = arguments.last, let response = responses[key] {
+            return response
+        }
+
+        return defaultResult
+    }
+
+    func listDevices() async throws -> [PixelDevice] {
+        deviceList
+    }
+
+    func getprop(deviceSerial: String, key: String, timeout: TimeInterval) async throws -> String {
+        let result = try await execute(
+            command: "-s",
+            arguments: [deviceSerial, "shell", "getprop", key],
+            timeout: timeout
+        )
+
+        guard result.isSuccess else {
+            throw PixelDesktopError.adbCommandFailed(
+                command: "getprop \(key)",
+                exitCode: Int(result.exitCode),
+                stderr: result.stderr
+            )
+        }
+
+        let value = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !value.isEmpty else {
+            throw PixelDesktopError.invalidInput("Property '\(key)' is unset on device \(deviceSerial)")
+        }
+
+        return value
+    }
+}
+
+// MARK: - Real Device Integration Tests
+
+/// Opt-in tests that talk to a physically attached Android device.
+///
+/// They are skipped unless `PIXELDESKTOP_DEVICE_SERIAL` is set, so the default
+/// suite stays hermetic and does not fail on a machine with no device attached.
+///
+/// Run explicitly:
+///
+///     xcodebuild -project PixelDesktop.xcodeproj -scheme PixelDesktop \
+///       -configuration Debug test \
+///       TEST_RUNNER_PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632
+///
+/// Assertions check only that values are present and well-formed. They
+/// deliberately do not pin an expected Android version or API level: the point
+/// is to verify the acquisition path, not to freeze the device's current build.
+final class PixelDeviceIntegrationTests: XCTestCase {
+    private var deviceSerial: String? {
+        let value = ProcessInfo.processInfo.environment["PIXELDESKTOP_DEVICE_SERIAL"]
+        return (value?.isEmpty ?? true) ? nil : value
+    }
+
+    func testRealDeviceDiscoveryAndEnrichment() async throws {
+        guard let serial = deviceSerial else {
+            throw XCTSkip("PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification")
+        }
+
+        let transport = ADBTransport()
+        let discovered = try await transport.listDevices()
+
+        guard let device = discovered.first(where: { $0.serialNumber == serial }) else {
+            XCTFail("Device \(serial) not attached. Attached: \(discovered.map(\.serialNumber))")
+            return
+        }
+
+        XCTAssertEqual(device.state, .device)
+
+        // Discovery alone must not populate these; enrichment owns them.
+        XCTAssertEqual(device.androidVersion, "")
+        XCTAssertEqual(device.apiLevel, 0)
+        XCTAssertEqual(device.architecture, "")
+
+        let enriched = try await DeviceEnricher(transport: transport).enrich(device)
+
+        print("""
+        REAL-DEVICE VERIFICATION
+          serial:     \(enriched.serialNumber)
+          model:      \(enriched.model)
+          android:    \(enriched.androidVersion)
+          api level:  \(enriched.apiLevel)
+          abi:        \(enriched.architecture)
+        """)
+
+        XCTAssertFalse(enriched.androidVersion.isEmpty)
+        XCTAssertGreaterThan(enriched.apiLevel, 0)
+        XCTAssertFalse(enriched.architecture.isEmpty)
+
+        // Identity from discovery must survive enrichment untouched.
+        XCTAssertEqual(enriched.serialNumber, device.serialNumber)
+        XCTAssertEqual(enriched.model, device.model)
+        XCTAssertEqual(enriched.state, .device)
+    }
+
+    func testRealDeviceUnsetPropertyIsRejected() async throws {
+        guard let serial = deviceSerial else {
+            throw XCTSkip("PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification")
+        }
+
+        let transport = ADBTransport()
+
+        do {
+            _ = try await transport.getprop(
+                deviceSerial: serial,
+                key: "ro.pixeldesktop.definitely.not.a.real.key",
+                timeout: 10
+            )
+            XCTFail("Expected an unset property to be rejected")
+        } catch let error as PixelDesktopError {
+            guard case .invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        } catch {
+            XCTFail("Expected PixelDesktopError, got \(error)")
+        }
+    }
+
+    func testRealDeviceUnknownSerialFails() async throws {
+        guard deviceSerial != nil else {
+            throw XCTSkip("PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification")
+        }
+
+        let transport = ADBTransport()
+
+        do {
+            _ = try await transport.getprop(
+                deviceSerial: "NOSUCHSERIAL0000",
+                key: DevicePropertyKey.androidVersion,
+                timeout: 10
+            )
+            XCTFail("Expected a command failure for an unknown serial")
+        } catch let error as PixelDesktopError {
+            switch error {
+            case .adbCommandFailed, .invalidInput:
+                break
+            default:
+                XCTFail("Expected adbCommandFailed or invalidInput, got \(error)")
+            }
+        } catch {
+            XCTFail("Expected PixelDesktopError, got \(error)")
+        }
+    }
 }

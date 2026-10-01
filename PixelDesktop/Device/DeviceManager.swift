@@ -8,12 +8,12 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
     @Published private(set) var lastError: PixelDesktopError?
     @Published private(set) var logMessages: [LogEntry] = []
 
-    private let transport: ADBTransport
+    private let transport: TransportProtocol
     private let logger: AppLogger
     private var discoveryTask: Task<Void, Never>?
     private var discoveryInterval: TimeInterval = 5.0
 
-    init(transport: ADBTransport? = nil, logger: AppLogger? = nil) {
+    init(transport: TransportProtocol? = nil, logger: AppLogger? = nil) {
         self.transport = transport ?? ADBTransport()
         self.logger = logger ?? AppLogger()
     }
@@ -59,5 +59,32 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
 
     func getDevice(bySerialNumber serial: String) -> PixelDevice? {
         devices.first { $0.serialNumber == serial }
+    }
+
+    /// Reads the stable system properties for the selected device and republishes it.
+    ///
+    /// Kept off the discovery polling path on purpose: these properties do not
+    /// change while the device stays booted, so enriching on every poll would add
+    /// three ADB round trips per interval for information that cannot change.
+    ///
+    /// - Returns: the enriched device, or `nil` if the serial is unknown.
+    func enrichDevice(serial: String, timeout: TimeInterval = 10) async throws -> PixelDevice? {
+        guard let device = getDevice(bySerialNumber: serial) else {
+            logger.warning("Enrich requested for unknown serial \(serial)", source: "DeviceManager.enrichDevice")
+            return nil
+        }
+
+        let enriched = try await DeviceEnricher(transport: transport).enrich(device, timeout: timeout)
+
+        if let index = devices.firstIndex(where: { $0.serialNumber == serial }) {
+            devices[index] = enriched
+        }
+
+        logger.info(
+            "Enriched \(serial): Android \(enriched.androidVersion), API \(enriched.apiLevel), \(enriched.architecture)",
+            source: "DeviceManager.enrichDevice"
+        )
+
+        return enriched
     }
 }
