@@ -22,6 +22,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 2 — Device Discovery and ADB Transport:** COMPLETE
 **Phase 3 — Android Device Model:** COMPLETE
 **Phase 4 — Android Application / Process Control:** COMPLETE
+**Phase 5 — Pixel Compute Worker:** PROPOSAL (transfer contract, awaiting review)
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md). Legacy documents use
@@ -40,6 +41,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 4 Android Application / Process Control](phases/phase-04-application-process-control.md) — shell containment, app operations, lifecycle
 - [Phase 4 Proposal (approved)](phases/phase-04-application-process-control-proposal.md) — the approved proposal
 - [Phase 4 Test Report](testing/phase-04-test-report.md) — build, test and real-device evidence
+- [Phase 5 Proposal — Transfer Contract](phases/phase-05-transfer-contract-proposal.md) — proposal only, awaiting review
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements

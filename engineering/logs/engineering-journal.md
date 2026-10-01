@@ -413,3 +413,56 @@ not cover; it needs its own review and ADR.
 
 **Artifacts:** `phases/phase-04-application-process-control.md`, ADR-009,
 `testing/phase-04-test-report.md`, `architecture/overview.md` updated.
+
+---
+
+## 2026-10-01 — Phase 5 proposal produced (no code changed)
+
+**Phase:** 5 (proposal)
+**Task:** Produce the smallest safe transfer contract for the Pixel Compute Worker
+(`push()`/`pull()`), reconnaissance and proposal only.
+
+**Action:**
+Read the Phase 5 requirements, ADR-003, ADR-004 and the DTCA-1 I/O contract. Inspected
+`TransportProtocol`/`ADBTransport` and confirmed **no path abstraction and no `push`/`pull`
+exist anywhere**. Then answered every security question **empirically on the real device**
+rather than from documentation: traversal, absolute paths, local-destination escape,
+symlinks, overwrite, nonexistent paths, directories, spaces, malformed paths, and command
+injection through path arguments. All probe files were removed and the remote root verified
+clean.
+
+**Result — four findings that determine the design:**
+
+1. **`adb` does NOT sanitize paths.** `../` is resolved by the *filesystem*, not rejected:
+   `/data/local/tmp/pdsub/../pd_trav.txt` succeeded and landed in `/data/local/tmp/`. The
+   earlier traversal failures were **permission denials** on `/data/local`, `/etc` and
+   `/system` — not a security control. This distinction is load-bearing.
+2. **Local destinations escape on `pull`.** Pulling to `<staging>/../../file` exited 0 and
+   wrote to `/Users/…/.hermes/cache/` — outside the staging directory. Artifact removed.
+3. **Symlinks are followed, not rejected.** Pushing a symlink to `/etc/hosts` pushed its
+   *content*. A symlink in staging is a full escape from it.
+4. **Directories recurse.** `pull` of a directory reported "2 files pulled" — a stray
+   directory operand transfers a tree.
+
+Also: overwrite is **silent with exit 0** (no warning, no protection); and path arguments are
+**not** a command-injection vector (they are argv elements, no shell involved) — unlike a path
+passed to `shell()`, which is a different risk class.
+
+**Decision:**
+Propose eliminating path input entirely rather than validating it — two fixed filenames in
+two fixed directories, one file each way, no directories, no symlinks, ≤1 MB. Every traversal
+case then becomes **unreachable by construction** rather than merely blocked. Remote root
+`/data/local/tmp/pixeldesktop/` (writable by `shell`, **not world-readable**, unlike
+`/sdcard`). `push`/`pull` as transport primitives with a new `Worker/` layer owning all path
+policy — the same split as ADR-009. Overwrite permitted deliberately for the two fixed paths.
+Interrupted transfers detected post-hoc by size. Eight decision points raised; **no source
+file modified**.
+
+**Reason:**
+Phase 4 showed that containment by validation is fragile (the protected-package list was
+wrong on the first attempt). Containment by *narrowness* — having no path parameter to attack
+— is stronger, and the payload is only ≤10 KB so nothing is lost by it.
+
+**Next action:** Await review of D1–D8 and the ADR-010 recommendation.
+
+**Artifacts:** `phases/phase-05-transfer-contract-proposal.md`.
