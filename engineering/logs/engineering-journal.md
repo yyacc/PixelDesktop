@@ -173,3 +173,94 @@ booted.
 **Artifacts:** `phases/phase-02-device-discovery.md`, ADR-005, ADR-006,
 `testing/phase-02-test-report.md`, `best-practices/techniques.md`,
 `failures/FAIL-001-non-english-output.md`, `failures/FAIL-002-transport-swift-runaway-fields.md`.
+
+---
+
+## 2026-10-01 — Phase 2 close-out: phase-numbering resolution
+
+**Phase:** 2 (close-out)
+**Task:** Resolve the phase-numbering ambiguity discovered when "proceed to Phase 3" proved
+to have four possible meanings.
+
+**Action:**
+Inspected all four documents that number phases: the master engineering prompt §16, the
+Phase 0 audit §9, the legacy compute-node course-of-action, and two legacy coding-agent
+documents. Built mapping tables between them. Verified that the Phase 0 audit's §9 table
+omits three master-prompt phases and misassigns Phase 4. Confirmed via grep that **no
+existing document recorded the mismatch** — the root cause of the ambiguity.
+
+**Result:**
+Four incompatible schemes identified on three unrelated axes (product, compute-workload,
+agent-tooling). The master prompt §16 is authoritative.
+
+**Decision:**
+Record as ADR-007. Annotate the Phase 0 audit §9 as superseded without rewriting its
+evidence. Preserve legacy documents' original numbering unmodified; translate references
+through the mapping tables. Create `engineering/architecture/` with the architecture
+**as delivered**, and annotate the audit's aspirational §6.1 diagram.
+
+**Reason:**
+The master prompt is the commissioning document, the only source with complete per-phase
+objectives, and its §17 gate is binding. Renumbering legacy documents would destroy their
+historical accuracy and internal cross-references.
+
+**Next action:** Phase 3 proposal.
+
+**Artifacts:** `decisions/ADR-007-authoritative-phase-sequence.md`,
+`architecture/overview.md`, audit §9 and §6.1 annotations, Multica RNZM-21/22/23.
+
+---
+
+## 2026-10-01 — Deferred Phase 2 work recorded as follow-up issues
+
+**Phase:** 2 (close-out)
+**Task:** Record the functionality deferred from Phase 2 as explicit follow-up work, not
+silently-dropped scope.
+
+**Action:**
+Created three Multica issues against the authoritative phase numbers and linked them from
+RNZM-20.
+
+**Result:**
+RNZM-21 (`shell()` → Phase 4), RNZM-22 (lifecycle → Phase 4, hardened in 10),
+RNZM-23 (`push()`/`pull()` → Phase 5). None marked completed.
+
+**Decision:**
+Target phases taken from ADR-007's mapping, not the stale audit table — which would have
+placed this work in the wrong phases.
+
+**Next action:** Phase 3 proposal.
+
+---
+
+## 2026-10-01 — Phase 3 proposal produced (no code changed)
+
+**Phase:** 3 (proposal)
+**Task:** Produce a Phase 3 implementation proposal for the Android Device Model.
+
+**Action:**
+Inspected `PixelDevice`, `DeviceManager`, `DeviceProperties`, `DeviceEnricher`,
+`TransportProtocol` and the master prompt's Phase 3 requirements. Attempted to probe three
+candidate properties on the real device; **the probe failed because the Pixel 7a is
+physically disconnected** (`adb devices` empty, absent from the USB bus). Traced the blast
+radius of the two defects found in the current model.
+
+**Result:**
+Proposal produced. Two model defects found: `manufacturer` holds the device *codename*
+(`lynx`), not a manufacturer — and `ContentView:110` renders it as "Manufacturer", so the
+UI currently displays a falsehood; and `model` holds the codename while the marketing name
+is absent.
+
+**Decision:**
+Propose growing `DeviceProperties` 3 → 6 fields, renaming `PixelDevice` → `AndroidDevice`,
+adding minimal `DeviceCapabilities`, and keeping representation free of operations. Six
+decision points raised for review. **No source file modified.**
+
+**Reason:**
+Master prompt §5.1 forbids implementing against assumed values. Three of the six proposed
+properties are unverified on real hardware, so implementation cannot be declared complete
+until the device is reattached.
+
+**Next action:** Await review of the proposal and reattachment of the Pixel 7a.
+
+**Artifacts:** `phases/phase-03-android-device-model-proposal.md`.

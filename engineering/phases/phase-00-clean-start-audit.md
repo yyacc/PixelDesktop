@@ -260,6 +260,27 @@ A working Java Android app that:
 
 ### 6.1 Clean-Start Architecture
 
+> **⚠️ PARTIALLY ASPIRATIONAL — annotated 2026-10-01 (Phase 2 close-out).**
+>
+> This diagram was written during Phase 0 as a *target* layout, not a description of
+> delivered code. The following entries in it **do not exist** in the source tree and were
+> never implemented:
+>
+> - `Core/Models/InstalledApp.swift` — never created. (An `InstalledApp` model belongs to
+>   **Phase 4** — Android Application / Process Control — if it is needed there.)
+> - `Compute/DTCA1Verifier.swift` — never created. Verification lives in
+>   `Verification/ResultVerifier.swift`.
+> - The entire `Video/` subsystem (`VideoTransport.swift`, `ScrcpyVideoTransport.swift`,
+>   `ScrcpyProcessService.swift`, `VideoSessionCoordinator.swift`) — never created.
+>
+> **On `Video/`:** it also conflicts with the master engineering prompt, which states that
+> the architecture "must not reduce PixelDesktop to 'a better scrcpy frontend'". scrcpy may
+> be used where appropriate for visual interaction and debugging, but it is not a
+> PixelDesktop subsystem. **Do not revive the legacy scrcpy/video architecture unless a
+> later phase explicitly requires it and records that requirement in an ADR.**
+>
+> For the architecture actually delivered, see `engineering/architecture/`.
+
 The clean rebuild starts from zero working code. The architecture is:
 
 ```
@@ -398,6 +419,46 @@ PixelDesktop/
 ---
 
 ## 9. MULTICA PHASE STRUCTURE
+
+> ### ⚠️ SUPERSEDED — see ADR-007
+>
+> **The table below is stale and must not be used to plan work.**
+>
+> This table was written during Phase 0 as a *proposal*, before the phase structure was
+> reconciled with the master engineering prompt. It is preserved unmodified as historical
+> Phase 0 evidence.
+>
+> It **agrees** with the authoritative sequence at Phases 0–3 and **diverges** from Phase 4
+> onward. It also omits three phases entirely.
+>
+> **Authoritative sequence — master engineering prompt §16 (11 phases):**
+>
+> | Phase | Title |
+> |---|---|
+> | 0 | Project Definition |
+> | 1 | Engineering Foundation |
+> | 2 | Device Discovery and ADB Transport |
+> | 3 | Android Device Model |
+> | 4 | Android Application / Process Control |
+> | 5 | Pixel Compute Worker |
+> | 6 | Local AI Worker |
+> | 7 | Resource-Aware Workload Routing |
+> | 8 | PixelDesktop UX |
+> | 9 | Hermes Integration |
+> | 10 | Production Hardening |
+>
+> **Corrections to the table below:**
+>
+> - "DTCA-1 worker APK" is **Phase 5** (Pixel Compute Worker), not Phase 4
+> - "DTCA-1 verification" is **Phase 5** as well — it is not a separate phase
+> - "PixelDesktop UX" is **Phase 8**, not Phase 6
+> - "Hermes integration" is **Phase 9**, not Phase 7
+> - "Production hardening" is **Phase 10**, not Phase 8
+> - **Phase 4 (Android Application / Process Control) is missing entirely**
+> - **Phase 6 (Local AI Worker) is missing entirely**
+> - **Phase 7 (Resource-Aware Workload Routing) is missing entirely**
+>
+> Full analysis: `decisions/ADR-007-authoritative-phase-sequence.md`
 
 ### Proposed Issues
 

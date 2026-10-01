@@ -20,6 +20,12 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 0 — Clean-Start Audit:** COMPLETE
 **Phase 1 — Engineering Foundation:** COMPLETE
 **Phase 2 — Device Discovery and ADB Transport:** COMPLETE
+**Phase 3 — Android Device Model:** PROPOSAL (awaiting review)
+
+> Phase numbering follows the master engineering prompt §16 — see
+> [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md). Legacy documents use
+> three different, incompatible phase numbering schemes; their numbers are **not**
+> PixelDesktop product phase numbers.
 
 ## Key Documents
 
@@ -27,6 +33,10 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 0 Clean-Start Audit](phases/phase-00-clean-start-audit.md) — Audit of the previous implementation
 - [Phase 1 Engineering Foundation](phases/phase-01-engineering-foundation.md) — Clean project, build and tests
 - [Phase 2 Device Discovery and ADB Transport](phases/phase-02-device-discovery.md) — `getprop` transport, device enrichment, real-device verification
+- [Phase 3 Proposal — Android Device Model](phases/phase-03-android-device-model-proposal.md) — proposal only, awaiting review
+
+### Architecture
+- [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements
 
 ### Architecture decisions
 - [ADR-001: Project Structure](decisions/ADR-001-project-structure.md)
@@ -35,6 +45,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [ADR-004: Verification by Re-computation](decisions/ADR-004-verification.md)
 - [ADR-005: Device Property Enrichment Is Separate From Discovery](decisions/ADR-005-device-property-enrichment.md)
 - [ADR-006: Test Isolation Strategy for Device-Dependent Code](decisions/ADR-006-test-isolation.md)
+- [ADR-007: Authoritative Phase Sequence](decisions/ADR-007-authoritative-phase-sequence.md)
 
 ### Records
 - [Engineering Journal](logs/engineering-journal.md) — Chronological build history
