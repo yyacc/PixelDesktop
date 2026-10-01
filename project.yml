@@ -1,0 +1,63 @@
+name: PixelDesktop
+options:
+  bundleIdPrefix: com.pixeldesktop
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGNING_ALLOWED: "NO"
+
+targets:
+  PixelDesktop:
+    type: application
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: PixelDesktop
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pixeldesktop.app
+        PRODUCT_NAME: PixelDesktop
+        INFOPLIST_FILE: PixelDesktop/Info.plist
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_PREVIEWS: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+        SWIFT_VERSION: "5.0"
+
+  PixelDesktopTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: PixelDesktopTests
+    dependencies:
+      - target: PixelDesktop
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pixeldesktop.app.tests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+
+schemes:
+  PixelDesktop:
+    build:
+      targets:
+        PixelDesktop: all
+        PixelDesktopTests: [test]
+    test:
+      targets:
+        - PixelDesktopTests
+      gatherCoverageData: false
+    run:
+      config: Debug
+    archive:
+      config: Release

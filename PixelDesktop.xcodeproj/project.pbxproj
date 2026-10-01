@@ -3,262 +3,362 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 90;
+	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		14AA9AD6480C917C03B9B4E3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C2D83AFA87754C63612A30 /* ContentView.swift */; };
+		16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045B4B73580F62547149ED08 /* PixelDesktopError.swift */; };
+		1B38F5862DED7D80E048E372 /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1C96AAA82CA14C8156167C /* DeviceManager.swift */; };
+		5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D453AF971B8227981443968 /* DTCA1Worker.swift */; };
+		619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560A663C5EAF42792941431A /* PixelDesktopTests.swift */; };
+		6588C60ED7417106754355CB /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832112C57257637193F8B80A /* Transport.swift */; };
+		91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */; };
+		A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */; };
+		A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */; };
+		B00693F03ADEF73B54EB40A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C52DFC447810455E987F16D /* Assets.xcassets */; };
+		C998025A044192904CC5E11D /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59495D8B39B4270FE682515C /* AppLogger.swift */; };
+		DE68D8A39D47DAF823DD7365 /* PixelDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097278F86F5CD42FE777F073 /* PixelDevice.swift */; };
+		DF4A926E2DC22B26ACE3ADBA /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EEE5EA3E8F6933113FA516 /* AppState.swift */; };
+		E72D168C6E8BEE4FCD149163 /* ADBTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E18D0989DFB3C9D5A4B6F1C0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 53D24CE556C5EB25233927CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8594CA8BA3CDF11BA225E84F;
+			remoteInfo = PixelDesktop;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* PixelDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PixelDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E0A1ADF030617316004B8CF7 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		045B4B73580F62547149ED08 /* PixelDesktopError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopError.swift; sourceTree = "<group>"; };
+		097278F86F5CD42FE777F073 /* PixelDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDevice.swift; sourceTree = "<group>"; };
+		29EEE5EA3E8F6933113FA516 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultVerifier.swift; sourceTree = "<group>"; };
+		560A663C5EAF42792941431A /* PixelDesktopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopTests.swift; sourceTree = "<group>"; };
+		59495D8B39B4270FE682515C /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		5C52DFC447810455E987F16D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBTransport.swift; sourceTree = "<group>"; };
+		7CBCAA7C2B6E79FE69212702 /* PixelDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PixelDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D453AF971B8227981443968 /* DTCA1Worker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTCA1Worker.swift; sourceTree = "<group>"; };
+		832112C57257637193F8B80A /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
+		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
+		D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopApp.swift; sourceTree = "<group>"; };
+		DEECEB33C31DAB1BF023236B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E7C2D83AFA87754C63612A30 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		EE1C96AAA82CA14C8156167C /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		000000000000000000000010 /* PixelDesktop */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
+/* Begin PBXGroup section */
+		00EDFDA5D942AAF5041D4B41 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				59495D8B39B4270FE682515C /* AppLogger.swift */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
+		09877C10C67BC1CB066C4E91 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				097278F86F5CD42FE777F073 /* PixelDevice.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1442FAAC6AD67B874A89538F /* PixelDesktop */ = {
+			isa = PBXGroup;
+			children = (
+				5C52DFC447810455E987F16D /* Assets.xcassets */,
+				DEECEB33C31DAB1BF023236B /* Info.plist */,
+				8BD41B949A36854C01BCF408 /* App */,
+				464295B08B2849859094B2BE /* Compute */,
+				7A34BB91CBC8A89E485F96B7 /* Core */,
+				B9D2EC1D7C2A00ED2D2BBABD /* Device */,
+				D052E11B69A45A0FE1265DF4 /* Transport */,
+				297CB6D35AA23D96C557A278 /* Verification */,
+			);
 			path = PixelDesktop;
 			sourceTree = "<group>";
 		};
-		E0A1ADF130617316004B8CF7 /* PixelDesktopTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PixelDesktopTests;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		000000000000000130000000 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
-		E0A1ADED30617316004B8CF7 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
-/* End PBXFrameworksBuildPhase section */
-
-/* Begin PBXGroup section */
-		000000000000000000000001 = {
+		205D5C559DD6FB7D72B84C5F = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000010 /* PixelDesktop */,
-				E0A1ADF130617316004B8CF7 /* PixelDesktopTests */,
-				000000000000000000000020 /* Products */,
+				1442FAAC6AD67B874A89538F /* PixelDesktop */,
+				FC2E3DC2516F7D52AF7895C8 /* PixelDesktopTests */,
+				362AA2AE9FC87DA0852C759A /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		000000000000000000000020 /* Products */ = {
+		297CB6D35AA23D96C557A278 /* Verification */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* PixelDesktop.app */,
-				E0A1ADF030617316004B8CF7 /* PixelDesktopTests.xctest */,
+				41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */,
+			);
+			path = Verification;
+			sourceTree = "<group>";
+		};
+		362AA2AE9FC87DA0852C759A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7CBCAA7C2B6E79FE69212702 /* PixelDesktop.app */,
+				96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		464295B08B2849859094B2BE /* Compute */ = {
+			isa = PBXGroup;
+			children = (
+				7D453AF971B8227981443968 /* DTCA1Worker.swift */,
+			);
+			path = Compute;
+			sourceTree = "<group>";
+		};
+		7A34BB91CBC8A89E485F96B7 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				921026CFEA5EDE3F6AE3A626 /* Errors */,
+				00EDFDA5D942AAF5041D4B41 /* Logging */,
+				09877C10C67BC1CB066C4E91 /* Models */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		8BD41B949A36854C01BCF408 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				29EEE5EA3E8F6933113FA516 /* AppState.swift */,
+				E7C2D83AFA87754C63612A30 /* ContentView.swift */,
+				D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		921026CFEA5EDE3F6AE3A626 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				045B4B73580F62547149ED08 /* PixelDesktopError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		B9D2EC1D7C2A00ED2D2BBABD /* Device */ = {
+			isa = PBXGroup;
+			children = (
+				B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */,
+				EE1C96AAA82CA14C8156167C /* DeviceManager.swift */,
+			);
+			path = Device;
+			sourceTree = "<group>";
+		};
+		D052E11B69A45A0FE1265DF4 /* Transport */ = {
+			isa = PBXGroup;
+			children = (
+				7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */,
+				832112C57257637193F8B80A /* Transport.swift */,
+			);
+			path = Transport;
+			sourceTree = "<group>";
+		};
+		FC2E3DC2516F7D52AF7895C8 /* PixelDesktopTests */ = {
+			isa = PBXGroup;
+			children = (
+				560A663C5EAF42792941431A /* PixelDesktopTests.swift */,
+			);
+			path = PixelDesktopTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* PixelDesktop */ = {
+		8594CA8BA3CDF11BA225E84F /* PixelDesktop */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "PixelDesktop" */;
+			buildConfigurationList = 750D92081F412F7B50766D23 /* Build configuration list for PBXNativeTarget "PixelDesktop" */;
 			buildPhases = (
-				000000000000000120000000 /* Sources */,
-				000000000000000130000000 /* Frameworks */,
-				000000000000000140000000 /* Resources */,
+				C17092F403EAB1A58DA36A37 /* Sources */,
+				A32946FEB0E22B24BFAA6C40 /* Resources */,
 			);
 			buildRules = (
 			);
-			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* PixelDesktop */,
+			dependencies = (
 			);
 			name = PixelDesktop;
+			packageProductDependencies = (
+			);
 			productName = PixelDesktop;
-			productReference = 000000000000000000000120 /* PixelDesktop.app */;
+			productReference = 7CBCAA7C2B6E79FE69212702 /* PixelDesktop.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E0A1ADEF30617316004B8CF7 /* PixelDesktopTests */ = {
+		CDC84E382246B0EF8859AD44 /* PixelDesktopTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E0A1ADF430617316004B8CF7 /* Build configuration list for PBXNativeTarget "PixelDesktopTests" */;
+			buildConfigurationList = 5A0CD9F307ED97B34198B359 /* Build configuration list for PBXNativeTarget "PixelDesktopTests" */;
 			buildPhases = (
-				E0A1ADEC30617316004B8CF7 /* Sources */,
-				E0A1ADED30617316004B8CF7 /* Frameworks */,
-				E0A1ADEE30617316004B8CF7 /* Resources */,
+				2E42DC92AB2BFE168EAD7D5E /* Sources */,
 			);
 			buildRules = (
 			);
-			fileSystemSynchronizedGroups = (
-				E0A1ADF130617316004B8CF7 /* PixelDesktopTests */,
+			dependencies = (
+				CE3B9D5971B2571155121D8E /* PBXTargetDependency */,
 			);
 			name = PixelDesktopTests;
+			packageProductDependencies = (
+			);
 			productName = PixelDesktopTests;
-			productReference = E0A1ADF030617316004B8CF7 /* PixelDesktopTests.xctest */;
+			productReference = 96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		000000000000000000000000 /* Project object */ = {
+		53D24CE556C5EB25233927CF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2700;
-				LastUpgradeCheck = 2700;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					000000000000000100000000 = {
-						CreatedOnToolsVersion = 27.0;
+					8594CA8BA3CDF11BA225E84F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
 					};
-					E0A1ADEF30617316004B8CF7 = {
-						CreatedOnToolsVersion = 27.0;
+					CDC84E382246B0EF8859AD44 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = 000000000000000150000000 /* Build configuration list for PBXProject */;
-			compatibilityVersion = "Xcode 16.0";
+			buildConfigurationList = 9701FBFE84F6E2A5DF2624B8 /* Build configuration list for PBXProject "PixelDesktop" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				en,
 			);
-			mainGroup = 000000000000000000000001;
-			productRefGroup = 000000000000000000000020 /* Products */;
+			mainGroup = 205D5C559DD6FB7D72B84C5F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 362AA2AE9FC87DA0852C759A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* PixelDesktop */,
-				E0A1ADEF30617316004B8CF7 /* PixelDesktopTests */,
+				8594CA8BA3CDF11BA225E84F /* PixelDesktop */,
+				CDC84E382246B0EF8859AD44 /* PixelDesktopTests */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin XCBuildConfiguration section */
-		000000000000000110000000 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
+/* Begin PBXResourcesBuildPhase section */
+		A32946FEB0E22B24BFAA6C40 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00693F03ADEF73B54EB40A7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
-		000000000000000110000001 /* Release */ = {
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2E42DC92AB2BFE168EAD7D5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C17092F403EAB1A58DA36A37 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E72D168C6E8BEE4FCD149163 /* ADBTransport.swift in Sources */,
+				C998025A044192904CC5E11D /* AppLogger.swift in Sources */,
+				DF4A926E2DC22B26ACE3ADBA /* AppState.swift in Sources */,
+				14AA9AD6480C917C03B9B4E3 /* ContentView.swift in Sources */,
+				5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */,
+				A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */,
+				1B38F5862DED7D80E048E372 /* DeviceManager.swift in Sources */,
+				91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */,
+				16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */,
+				DE68D8A39D47DAF823DD7365 /* PixelDevice.swift in Sources */,
+				A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */,
+				6588C60ED7417106754355CB /* Transport.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CE3B9D5971B2571155121D8E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8594CA8BA3CDF11BA225E84F /* PixelDesktop */;
+			targetProxy = E18D0989DFB3C9D5A4B6F1C0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0D1E503AD06C27E1584FA9F5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app.tests;
 				SDKROOT = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				VALIDATE_PRODUCT = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PixelDesktop.app/Contents/MacOS/PixelDesktop";
 			};
 			name = Release;
 		};
-		E0A1ADF430617316004B8CF7 /* Debug */ = {
+		4356EC386625BEF190A6263A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PixelDesktop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app;
+				PRODUCT_NAME = PixelDesktop;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		453DDA12F554047F4B866AF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -276,17 +376,21 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
 					"$(inherited)",
+					"DEBUG=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -298,22 +402,72 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
-		E0A1ADF430617316004B8CF8 /* Release */ = {
+		4DB40685BD2B7EE08B9E78D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app.tests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PixelDesktop.app/Contents/MacOS/PixelDesktop";
+			};
+			name = Debug;
+		};
+		BC309789F4C2474A329328F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PixelDesktop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app;
+				PRODUCT_NAME = PixelDesktop;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E78C4D597266F5ACEC4A7E3B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -331,11 +485,15 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -346,44 +504,45 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				VALIDATE_PRODUCT = YES;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "PixelDesktop" */ = {
+		5A0CD9F307ED97B34198B359 /* Build configuration list for PBXNativeTarget "PixelDesktopTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000110000000 /* Debug */,
-				000000000000000110000001 /* Release */,
+				4DB40685BD2B7EE08B9E78D2 /* Debug */,
+				0D1E503AD06C27E1584FA9F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		E0A1ADF430617316004B8CF7 /* Build configuration list for PBXNativeTarget "PixelDesktopTests" */ = {
+		750D92081F412F7B50766D23 /* Build configuration list for PBXNativeTarget "PixelDesktop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E0A1ADF430617316004B8CF7 /* Debug */,
-				E0A1ADF430617316004B8CF8 /* Release */,
+				4356EC386625BEF190A6263A /* Debug */,
+				BC309789F4C2474A329328F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
-		000000000000000150000000 /* Build configuration list for PBXProject */ = {
+		9701FBFE84F6E2A5DF2624B8 /* Build configuration list for PBXProject "PixelDesktop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000110000000 /* Debug */,
-				000000000000000110000001 /* Release */,
+				453DDA12F554047F4B866AF0 /* Debug */,
+				E78C4D597266F5ACEC4A7E3B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 000000000000000000000000 /* Project object */;
+	rootObject = 53D24CE556C5EB25233927CF /* Project object */;
 }

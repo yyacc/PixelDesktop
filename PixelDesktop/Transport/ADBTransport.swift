@@ -21,7 +21,7 @@ actor ADBTransport: TransportProtocol {
 
         let effectiveTimeout = timeout > 0 ? timeout : defaultTimeout
 
-        return try await withTaskGroup(of: TransportResult?.self) { group in
+        return try await withThrowingTaskGroup(of: TransportResult?.self) { group in
             group.addTask {
                 do {
                     try process.run()
@@ -61,10 +61,14 @@ actor ADBTransport: TransportProtocol {
                 return nil
             }
 
-            let result = await group.nextResult()
+            guard let result = try await group.next() else {
+                group.cancelAll()
+                throw PixelDesktopError.unknown("No result from ADB command")
+            }
+
             group.cancelAll()
 
-            guard let transportResult = result ?? nil else {
+            guard let transportResult = result else {
                 throw PixelDesktopError.unknown("No result from ADB command")
             }
 
@@ -86,7 +90,7 @@ actor ADBTransport: TransportProtocol {
         return parseDeviceList(result.stdout)
     }
 
-    private func parseDeviceList(_ output: String) -> [PixelDevice] {
+    nonisolated func parseDeviceList(_ output: String) -> [PixelDevice] {
         var devices: [PixelDevice] = []
         let lines = output.components(separatedBy: .newlines)
 
@@ -115,7 +119,7 @@ actor ADBTransport: TransportProtocol {
             var model = ""
             var manufacturer = ""
 
-            for (index, part) in parts.enumerated() {
+            for part in parts {
                 if part.hasPrefix("model:") {
                     model = String(part.dropFirst(6))
                 } else if part.hasPrefix("device:") {

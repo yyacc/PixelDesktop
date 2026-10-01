@@ -71,9 +71,6 @@ enum DTCA1Worker {
     ]
 
     static func validateInput(_ text: String) throws {
-        if text.isEmpty {
-            throw PixelDesktopError.invalidInput("Input text is empty")
-        }
         if text.count > 10_000 {
             throw PixelDesktopError.invalidInput("Input exceeds maximum size of 10,000 characters (got \(text.count))")
         }

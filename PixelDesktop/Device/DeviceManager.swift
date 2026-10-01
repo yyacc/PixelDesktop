@@ -13,9 +13,9 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
     private var discoveryTask: Task<Void, Never>?
     private var discoveryInterval: TimeInterval = 5.0
 
-    init(transport: ADBTransport = ADBTransport(), logger: AppLogger = AppLogger()) {
-        self.transport = transport
-        self.logger = logger
+    init(transport: ADBTransport? = nil, logger: AppLogger? = nil) {
+        self.transport = transport ?? ADBTransport()
+        self.logger = logger ?? AppLogger()
     }
 
     func startDiscovery() async {

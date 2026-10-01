@@ -11,8 +11,8 @@ final class AppState: ObservableObject {
     private let deviceManager: DeviceManager
     private var cancellables = Set<AnyCancellable>()
 
-    init(deviceManager: DeviceManager = DeviceManager()) {
-        self.deviceManager = deviceManager
+    init(deviceManager: DeviceManager? = nil) {
+        self.deviceManager = deviceManager ?? DeviceManager()
         setupBindings()
     }
 

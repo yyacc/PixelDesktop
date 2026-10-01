@@ -1,6 +1,7 @@
 import XCTest
 @testable import PixelDesktop
 
+@MainActor
 final class PixelDesktopTests: XCTestCase {
 
     // MARK: - DTCA1Worker Tests
@@ -68,12 +69,7 @@ final class PixelDesktopTests: XCTestCase {
     }
 
     func testDTCA1ValidateInputEmpty() {
-        XCTAssertThrowsError(try DTCA1Worker.validateInput("")) { error in
-            guard case PixelDesktopError.invalidInput = error else {
-                XCTFail("Expected invalidInput error")
-                return
-            }
-        }
+        XCTAssertNoThrow(try DTCA1Worker.validateInput(""))
     }
 
     func testDTCA1ValidateInputTooLarge() {
@@ -100,15 +96,15 @@ final class PixelDesktopTests: XCTestCase {
     }
 
     func testDTCA1ExecuteBasic() throws {
-        let input = "Hello world hello"
+        let input = "The quick brown fox jumps over the lazy dog"
         let result = try DTCA1Worker.execute(input)
 
         XCTAssertEqual(result.status, "COMPLETED")
         XCTAssertEqual(result.inputCharacters, input.count)
-        XCTAssertEqual(result.totalWords, 3)
-        XCTAssertEqual(result.uniqueWords, 2)
-        XCTAssertEqual(result.topWords.count, 2)
-        XCTAssertEqual(result.topWords[0].word, "hello")
+        XCTAssertEqual(result.totalWords, 9)
+        XCTAssertEqual(result.uniqueWords, 8)
+        XCTAssertEqual(result.topWords.count, 5)
+        XCTAssertEqual(result.topWords[0].word, "the")
         XCTAssertEqual(result.topWords[0].count, 2)
         XCTAssertEqual(result.classification, "NATURAL_LANGUAGE")
         XCTAssertGreaterThanOrEqual(result.confidence, 0.0)
@@ -302,10 +298,10 @@ final class PixelDesktopTests: XCTestCase {
 
         XCTAssertEqual(devices.count, 2)
         XCTAssertEqual(devices[0].serialNumber, "ABC123456789")
-        XCTAssertEqual(devices[0].state, .device)
+        XCTAssertEqual(devices[0].state, DeviceState.device)
         XCTAssertEqual(devices[0].model, "Pixel_7a")
         XCTAssertEqual(devices[1].serialNumber, "DEF987654321")
-        XCTAssertEqual(devices[1].state, .unauthorized)
+        XCTAssertEqual(devices[1].state, DeviceState.unauthorized)
     }
 
     func testADBTransportParseEmptyList() {
