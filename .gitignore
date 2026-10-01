@@ -1,0 +1,24 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+*.xcworkspace/xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Swift
+.swiftpm/
+.swiftpm/xcode/package.xcworkspace/xcshareddata/
+.netrc
+
+# Engineering
+engineering/created-resources.json
