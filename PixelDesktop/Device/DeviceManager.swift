@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
-    @Published private(set) var devices: [PixelDevice] = []
+    @Published private(set) var devices: [AndroidDevice] = []
     @Published private(set) var isDiscovering: Bool = false
     @Published private(set) var lastError: PixelDesktopError?
     @Published private(set) var logMessages: [LogEntry] = []
@@ -57,7 +57,7 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
         }
     }
 
-    func getDevice(bySerialNumber serial: String) -> PixelDevice? {
+    func getDevice(bySerialNumber serial: String) -> AndroidDevice? {
         devices.first { $0.serialNumber == serial }
     }
 
@@ -68,7 +68,7 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
     /// three ADB round trips per interval for information that cannot change.
     ///
     /// - Returns: the enriched device, or `nil` if the serial is unknown.
-    func enrichDevice(serial: String, timeout: TimeInterval = 10) async throws -> PixelDevice? {
+    func enrichDevice(serial: String, timeout: TimeInterval = 10) async throws -> AndroidDevice? {
         guard let device = getDevice(bySerialNumber: serial) else {
             logger.warning("Enrich requested for unknown serial \(serial)", source: "DeviceManager.enrichDevice")
             return nil

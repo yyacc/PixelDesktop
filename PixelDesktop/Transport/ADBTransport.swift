@@ -76,7 +76,7 @@ actor ADBTransport: TransportProtocol {
         }
     }
 
-    func listDevices() async throws -> [PixelDevice] {
+    func listDevices() async throws -> [AndroidDevice] {
         let result = try await execute(command: "devices", arguments: ["-l"], timeout: 10)
 
         guard result.isSuccess else {
@@ -90,8 +90,8 @@ actor ADBTransport: TransportProtocol {
         return parseDeviceList(result.stdout)
     }
 
-    nonisolated func parseDeviceList(_ output: String) -> [PixelDevice] {
-        var devices: [PixelDevice] = []
+    nonisolated func parseDeviceList(_ output: String) -> [AndroidDevice] {
+        var devices: [AndroidDevice] = []
         let lines = output.components(separatedBy: .newlines)
 
         for line in lines {
@@ -116,25 +116,27 @@ actor ADBTransport: TransportProtocol {
             default: state = .unknown
             }
 
-            var model = ""
-            var manufacturer = ""
+            // The `device:` token is the build codename (`lynx`), NOT the marketing name
+            // and NOT the manufacturer. Both of those come from `getprop` during
+            // enrichment; this call must not pretend to know them.
+            var codename = ""
 
             for part in parts {
-                if part.hasPrefix("model:") {
-                    model = String(part.dropFirst(6))
-                } else if part.hasPrefix("device:") {
-                    manufacturer = String(part.dropFirst(7))
+                if part.hasPrefix("device:") {
+                    codename = String(part.dropFirst(7))
                 }
             }
 
-            let device = PixelDevice(
+            let device = AndroidDevice(
                 id: serial,
                 serialNumber: serial,
-                model: model,
-                manufacturer: manufacturer,
+                deviceCodename: codename,
+                marketingName: "",
+                manufacturer: "",
                 androidVersion: "",
                 apiLevel: 0,
                 architecture: "",
+                supportedABIs: [],
                 state: state
             )
 
@@ -170,5 +172,60 @@ actor ADBTransport: TransportProtocol {
         }
 
         return value
+    }
+
+    func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {
+        let result = try await execute(
+            command: "-s",
+            arguments: [deviceSerial, "shell", "getprop"],
+            timeout: timeout
+        )
+
+        guard result.isSuccess else {
+            throw PixelDesktopError.adbCommandFailed(
+                command: "getprop",
+                exitCode: Int(result.exitCode),
+                stderr: result.stderr
+            )
+        }
+
+        return Self.parseSystemProperties(result.stdout)
+    }
+
+    /// Parses the output of a bare `adb shell getprop`.
+    ///
+    /// Each line has the form `[key]: [value]`, e.g.
+    /// `[ro.product.model]: [Pixel 7a]`. Values may contain `]`, spaces and commas,
+    /// so the value is taken as everything after the first `]: [` rather than by
+    /// splitting on brackets.
+    ///
+    /// Unset properties print as `[key]: []` and are omitted from the result, so
+    /// callers can distinguish "absent" from "present but empty".
+    nonisolated static func parseSystemProperties(_ output: String) -> [String: String] {
+        var properties: [String: String] = [:]
+
+        for line in output.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            guard trimmed.hasPrefix("["), let separator = trimmed.range(of: "]: [") else {
+                continue
+            }
+
+            let key = String(trimmed[trimmed.index(after: trimmed.startIndex)..<separator.lowerBound])
+            var value = String(trimmed[separator.upperBound...])
+
+            // Drop the single trailing `]` that closes the value.
+            if value.hasSuffix("]") {
+                value.removeLast()
+            }
+
+            let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !key.isEmpty, !trimmedValue.isEmpty else {
+                continue
+            }
+
+            properties[key] = trimmedValue
+        }
+
+        return properties
     }
 }

@@ -72,7 +72,7 @@ struct ContentView: View {
 }
 
 struct DeviceRow: View {
-    let device: PixelDevice
+    let device: AndroidDevice
 
     var body: some View {
         HStack {
@@ -98,7 +98,7 @@ struct DeviceRow: View {
 }
 
 struct DeviceDetailView: View {
-    let device: PixelDevice
+    let device: AndroidDevice
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -106,11 +106,13 @@ struct DeviceDetailView: View {
                 .font(.largeTitle)
 
             LabeledContent("Serial", value: device.serialNumber)
-            LabeledContent("Model", value: device.model.isEmpty ? "Unknown" : device.model)
+            LabeledContent("Model", value: device.marketingName.isEmpty ? "Unknown" : device.marketingName)
+            LabeledContent("Codename", value: device.deviceCodename.isEmpty ? "Unknown" : device.deviceCodename)
             LabeledContent("Manufacturer", value: device.manufacturer.isEmpty ? "Unknown" : device.manufacturer)
             LabeledContent("Android Version", value: device.androidVersion.isEmpty ? "Unknown" : device.androidVersion)
             LabeledContent("API Level", value: device.apiLevel > 0 ? "\(device.apiLevel)" : "Unknown")
             LabeledContent("Architecture", value: device.architecture.isEmpty ? "Unknown" : device.architecture)
+            LabeledContent("Supported ABIs", value: device.supportedABIs.isEmpty ? "Unknown" : device.supportedABIs.joined(separator: ", "))
             LabeledContent("State", value: device.state.description)
 
             Spacer()

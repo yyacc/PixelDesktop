@@ -1,7 +1,7 @@
 import Foundation
 
 protocol DeviceDiscoveryProtocol: AnyObject {
-    var devices: [PixelDevice] { get }
+    var devices: [AndroidDevice] { get }
     var isDiscovering: Bool { get }
     var lastError: PixelDesktopError? { get }
     var logMessages: [LogEntry] { get }

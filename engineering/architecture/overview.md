@@ -149,29 +149,36 @@ poll would add three ADB round trips per interval for information that cannot ch
 
 ## 5. Device Model — Current State
 
-`PixelDevice` (39 lines) currently holds:
+`AndroidDevice` (Phase 3) holds:
 
 | Field | Type | Populated by | Static? |
 |---|---|---|---|
 | `id` | `String` | `parseDeviceList` (serial) | Static |
 | `serialNumber` | `String` | `parseDeviceList` | Static |
-| `model` | `String` | `parseDeviceList` (`model:` token) | Static |
-| `manufacturer` | `String` | `parseDeviceList` (`device:` token) | Static |
+| `deviceCodename` | `String` | `parseDeviceList` (`device:` token) | Static |
+| `marketingName` | `String` | `DeviceEnricher` (`ro.product.model`) | Static |
+| `manufacturer` | `String` | `DeviceEnricher` (`ro.product.manufacturer`) | Static |
 | `androidVersion` | `String` | `DeviceEnricher` | Static |
 | `apiLevel` | `Int` | `DeviceEnricher` | Static |
 | `architecture` | `String` | `DeviceEnricher` | Static |
+| `supportedABIs` | `[String]` | `DeviceEnricher` (`ro.product.cpu.abilist`) | Static |
 | `state` | `DeviceState` | `parseDeviceList` | **Dynamic** |
 
+`displayName` precedence: `marketingName` → `deviceCodename` → `serialNumber`.
 `DeviceState`: `device` / `unauthorized` / `offline` / `unknown`, with `isConnected`.
 
-> **Naming note (candidate for Phase 3):** `manufacturer` is currently populated from the
-> `device:` token in `adb devices -l`, which is the device *codename* (`lynx` for the Pixel
-> 7a), not the manufacturer. The name does not match the data. Flagged in the Phase 3
-> proposal.
+**Phase 3 fixed two defects** (ADR-008): `manufacturer` previously held the device codename
+(`lynx`) and was rendered as "Manufacturer" in the UI; `model` also held the codename while
+the marketing name was not modelled at all.
 
-`DeviceProperties` (3 fields) is the transport-level enrichment payload:
-`androidVersion`, `apiLevel`, `architecture`, with `DevicePropertyKey` holding the
-`getprop` keys.
+`DeviceProperties` (6 fields) is the transport-level enrichment payload: `androidVersion`,
+`apiLevel`, `architecture`, `marketingName`, `manufacturer`, `supportedABIs`, with
+`DevicePropertyKey` holding the `getprop` keys and an `all` list `DeviceEnricher` iterates.
+
+`DeviceCapabilities` derives `supportedABIs` from a device (`supports(abi:)`).
+`DeviceOperation` lists only implemented operations: `.discover`, `.readSystemProperties`.
+
+**No `DeviceService`** — no on-device service exists to model (ADR-008).
 
 ---
 

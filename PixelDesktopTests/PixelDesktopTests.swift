@@ -233,34 +233,72 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertFalse(verification.isVerified)
     }
 
-    // MARK: - PixelDevice Tests
+    // MARK: - AndroidDevice Tests
 
-    func testPixelDeviceDisplayName() {
-        let device = PixelDevice(
+    func testAndroidDeviceDisplayNamePrefersMarketingName() {
+        let device = AndroidDevice(
             id: "test123",
             serialNumber: "test123",
-            model: "Pixel 7a",
+            deviceCodename: "lynx",
+            marketingName: "Pixel 7a",
             manufacturer: "Google",
-            androidVersion: "14",
-            apiLevel: 34,
+            androidVersion: "16",
+            apiLevel: 36,
             architecture: "arm64-v8a",
+            supportedABIs: ["arm64-v8a"],
             state: .device
         )
         XCTAssertEqual(device.displayName, "Pixel 7a")
     }
 
-    func testPixelDeviceDisplayNameFallback() {
-        let device = PixelDevice(
+    func testAndroidDeviceDisplayNameFallsBackToCodename() {
+        let device = AndroidDevice(
             id: "test123",
             serialNumber: "test123",
-            model: "",
+            deviceCodename: "lynx",
+            marketingName: "",
             manufacturer: "",
             androidVersion: "",
             apiLevel: 0,
             architecture: "",
+            supportedABIs: [],
+            state: .device
+        )
+        XCTAssertEqual(device.displayName, "lynx")
+    }
+
+    func testAndroidDeviceDisplayNameFallsBackToSerial() {
+        let device = AndroidDevice(
+            id: "test123",
+            serialNumber: "test123",
+            deviceCodename: "",
+            marketingName: "",
+            manufacturer: "",
+            androidVersion: "",
+            apiLevel: 0,
+            architecture: "",
+            supportedABIs: [],
             state: .device
         )
         XCTAssertEqual(device.displayName, "test123")
+    }
+
+    /// Regression for the Phase 3 defect: `manufacturer` must never be the codename.
+    func testAndroidDeviceManufacturerIsNotCodename() {
+        let device = AndroidDevice(
+            id: "test123",
+            serialNumber: "test123",
+            deviceCodename: "lynx",
+            marketingName: "Pixel 7a",
+            manufacturer: "Google",
+            androidVersion: "16",
+            apiLevel: 36,
+            architecture: "arm64-v8a",
+            supportedABIs: ["arm64-v8a"],
+            state: .device
+        )
+        XCTAssertNotEqual(device.manufacturer, device.deviceCodename)
+        XCTAssertNotEqual(device.marketingName, device.deviceCodename)
     }
 
     func testDeviceStateIsConnected() {
@@ -268,6 +306,59 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertFalse(DeviceState.unauthorized.isConnected)
         XCTAssertFalse(DeviceState.offline.isConnected)
         XCTAssertFalse(DeviceState.unknown.isConnected)
+    }
+
+    // MARK: - DeviceCapabilities Tests
+
+    func testCapabilitiesDerivedFromDevice() {
+        let device = AndroidDevice(
+            id: "test123",
+            serialNumber: "test123",
+            deviceCodename: "lynx",
+            marketingName: "Pixel 7a",
+            manufacturer: "Google",
+            androidVersion: "16",
+            apiLevel: 36,
+            architecture: "arm64-v8a",
+            supportedABIs: ["arm64-v8a"],
+            state: .device
+        )
+        let capabilities = DeviceCapabilities(device: device)
+
+        XCTAssertEqual(capabilities.supportedABIs, ["arm64-v8a"])
+        XCTAssertTrue(capabilities.supports(abi: "arm64-v8a"))
+        XCTAssertFalse(capabilities.supports(abi: "x86_64"))
+    }
+
+    func testCapabilitiesFromDeviceWithNoABIs() {
+        let device = AndroidDevice(
+            id: "test123",
+            serialNumber: "test123",
+            deviceCodename: "",
+            marketingName: "",
+            manufacturer: "",
+            androidVersion: "",
+            apiLevel: 0,
+            architecture: "",
+            supportedABIs: [],
+            state: .unknown
+        )
+        let capabilities = DeviceCapabilities(device: device)
+
+        XCTAssertTrue(capabilities.supportedABIs.isEmpty)
+        XCTAssertFalse(capabilities.supports(abi: "arm64-v8a"))
+    }
+
+    // MARK: - DeviceOperation Tests
+
+    func testDeviceOperationsMatchImplementedCapabilities() {
+        // Only operations that actually exist may appear. Phase 4 adds more.
+        XCTAssertEqual(Set(DeviceOperation.allCases), [.discover, .readSystemProperties])
+    }
+
+    func testDeviceOperationDescriptions() {
+        XCTAssertEqual(DeviceOperation.discover.description, "Discover attached devices")
+        XCTAssertEqual(DeviceOperation.readSystemProperties.description, "Read system properties")
     }
 
     // MARK: - PixelDesktopError Tests
@@ -299,7 +390,11 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertEqual(devices.count, 2)
         XCTAssertEqual(devices[0].serialNumber, "ABC123456789")
         XCTAssertEqual(devices[0].state, DeviceState.device)
-        XCTAssertEqual(devices[0].model, "Pixel_7a")
+        // The `device:` token is the build codename. Discovery must not claim to know
+        // the marketing name or manufacturer; those come from getprop during enrichment.
+        XCTAssertEqual(devices[0].deviceCodename, "bluefin")
+        XCTAssertEqual(devices[0].marketingName, "")
+        XCTAssertEqual(devices[0].manufacturer, "")
         XCTAssertEqual(devices[1].serialNumber, "DEF987654321")
         XCTAssertEqual(devices[1].state, DeviceState.unauthorized)
     }
@@ -344,17 +439,23 @@ final class PixelDesktopTests: XCTestCase {
         let properties = try DeviceProperties.make(
             androidVersion: "  16\n",
             apiLevelRaw: " 36 ",
-            architecture: "\tarm64-v8a\n"
+            architecture: "\tarm64-v8a\n",
+            marketingName: " Pixel 7a\n",
+            manufacturer: " Google ",
+            abiListRaw: " arm64-v8a \n"
         )
 
         XCTAssertEqual(properties.androidVersion, "16")
         XCTAssertEqual(properties.apiLevel, 36)
         XCTAssertEqual(properties.architecture, "arm64-v8a")
+        XCTAssertEqual(properties.marketingName, "Pixel 7a")
+        XCTAssertEqual(properties.manufacturer, "Google")
+        XCTAssertEqual(properties.supportedABIs, ["arm64-v8a"])
     }
 
     func testDevicePropertiesMakeRejectsEmptyVersion() {
         XCTAssertThrowsError(
-            try DeviceProperties.make(androidVersion: "", apiLevelRaw: "36", architecture: "arm64-v8a")
+            try DeviceProperties.make(androidVersion: "", apiLevelRaw: "36", architecture: "arm64-v8a", marketingName: "Pixel 7a", manufacturer: "Google", abiListRaw: "arm64-v8a")
         ) { error in
             guard case PixelDesktopError.invalidInput = error else {
                 return XCTFail("Expected invalidInput, got \(error)")
@@ -364,7 +465,7 @@ final class PixelDesktopTests: XCTestCase {
 
     func testDevicePropertiesMakeRejectsEmptyArchitecture() {
         XCTAssertThrowsError(
-            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "36", architecture: "  ")
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "36", architecture: "  ", marketingName: "Pixel 7a", manufacturer: "Google", abiListRaw: "arm64-v8a")
         ) { error in
             guard case PixelDesktopError.invalidInput = error else {
                 return XCTFail("Expected invalidInput, got \(error)")
@@ -374,7 +475,7 @@ final class PixelDesktopTests: XCTestCase {
 
     func testDevicePropertiesMakeRejectsNonNumericApiLevel() {
         XCTAssertThrowsError(
-            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "thirty-six", architecture: "arm64-v8a")
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "thirty-six", architecture: "arm64-v8a", marketingName: "Pixel 7a", manufacturer: "Google", abiListRaw: "arm64-v8a")
         ) { error in
             guard case PixelDesktopError.invalidInput = error else {
                 return XCTFail("Expected invalidInput, got \(error)")
@@ -384,7 +485,7 @@ final class PixelDesktopTests: XCTestCase {
 
     func testDevicePropertiesMakeRejectsZeroApiLevel() {
         XCTAssertThrowsError(
-            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "0", architecture: "arm64-v8a")
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "0", architecture: "arm64-v8a", marketingName: "Pixel 7a", manufacturer: "Google", abiListRaw: "arm64-v8a")
         ) { error in
             guard case PixelDesktopError.invalidInput = error else {
                 return XCTFail("Expected invalidInput, got \(error)")
@@ -396,16 +497,191 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertEqual(DevicePropertyKey.androidVersion, "ro.build.version.release")
         XCTAssertEqual(DevicePropertyKey.apiLevel, "ro.build.version.sdk")
         XCTAssertEqual(DevicePropertyKey.architecture, "ro.product.cpu.abi")
+        XCTAssertEqual(DevicePropertyKey.marketingName, "ro.product.model")
+        XCTAssertEqual(DevicePropertyKey.manufacturer, "ro.product.manufacturer")
+        XCTAssertEqual(DevicePropertyKey.supportedABIs, "ro.product.cpu.abilist")
+    }
+
+    func testDevicePropertyKeysAllAreCovered() {
+        // `all` must stay in sync with the individual keys; DeviceEnricher reads via `all`.
+        XCTAssertEqual(DevicePropertyKey.all, [
+            DevicePropertyKey.androidVersion,
+            DevicePropertyKey.apiLevel,
+            DevicePropertyKey.architecture,
+            DevicePropertyKey.marketingName,
+            DevicePropertyKey.manufacturer,
+            DevicePropertyKey.supportedABIs
+        ])
+        XCTAssertEqual(DevicePropertyKey.all.count, 6)
+    }
+
+    func testDevicePropertiesMakeRejectsEmptyMarketingName() {
+        XCTAssertThrowsError(
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "36", architecture: "arm64-v8a", marketingName: "  ", manufacturer: "Google", abiListRaw: "arm64-v8a")
+        ) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        }
+    }
+
+    func testDevicePropertiesMakeRejectsEmptyManufacturer() {
+        XCTAssertThrowsError(
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "36", architecture: "arm64-v8a", marketingName: "Pixel 7a", manufacturer: "", abiListRaw: "arm64-v8a")
+        ) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        }
+    }
+
+    func testDevicePropertiesMakeRejectsEmptyABIList() {
+        XCTAssertThrowsError(
+            try DeviceProperties.make(androidVersion: "16", apiLevelRaw: "36", architecture: "arm64-v8a", marketingName: "Pixel 7a", manufacturer: "Google", abiListRaw: "  ,  , ")
+        ) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("Expected invalidInput, got \(error)")
+            }
+        }
+    }
+
+    // MARK: - ABI List Parsing Tests
+
+    func testParseABIListMultiEntry() {
+        XCTAssertEqual(
+            DeviceProperties.parseABIList("arm64-v8a,armeabi-v7a,armeabi"),
+            ["arm64-v8a", "armeabi-v7a", "armeabi"]
+        )
+    }
+
+    func testParseABIListSingleEntry() {
+        // The Pixel 7a reports exactly one ABI. This is the common real-world case.
+        XCTAssertEqual(DeviceProperties.parseABIList("arm64-v8a"), ["arm64-v8a"])
+    }
+
+    func testParseABIListToleratesWhitespaceAndTrailingComma() {
+        XCTAssertEqual(
+            DeviceProperties.parseABIList(" arm64-v8a , armeabi-v7a ,"),
+            ["arm64-v8a", "armeabi-v7a"]
+        )
+    }
+
+    func testParseABIListEmptyInput() {
+        XCTAssertTrue(DeviceProperties.parseABIList("").isEmpty)
+        XCTAssertTrue(DeviceProperties.parseABIList("   ").isEmpty)
+        XCTAssertTrue(DeviceProperties.parseABIList(",,").isEmpty)
+    }
+
+    // MARK: - Batched getprop Parser Tests
+
+    func testParseSystemPropertiesTypicalOutput() {
+        let output = """
+        [ro.build.version.release]: [16]
+        [ro.build.version.sdk]: [36]
+        [ro.product.model]: [Pixel 7a]
+        [ro.product.manufacturer]: [Google]
+        [ro.product.cpu.abilist]: [arm64-v8a]
+        """
+
+        let props = ADBTransport.parseSystemProperties(output)
+
+        XCTAssertEqual(props["ro.build.version.release"], "16")
+        XCTAssertEqual(props["ro.product.model"], "Pixel 7a")
+        XCTAssertEqual(props["ro.product.manufacturer"], "Google")
+        XCTAssertEqual(props["ro.product.cpu.abilist"], "arm64-v8a")
+    }
+
+    func testParseSystemPropertiesOmitsUnsetKeys() {
+        let output = """
+        [ro.set.key]: [value]
+        [ro.unset.key]: []
+        """
+
+        let props = ADBTransport.parseSystemProperties(output)
+
+        XCTAssertEqual(props["ro.set.key"], "value")
+        XCTAssertNil(props["ro.unset.key"], "Unset properties must be absent, not empty")
+    }
+
+    func testParseSystemPropertiesHandlesValuesContainingBrackets() {
+        // The value is everything after the first "]: [", so brackets inside it survive.
+        let output = "[ro.weird]: [value with ] bracket and, comma]"
+
+        let props = ADBTransport.parseSystemProperties(output)
+
+        XCTAssertEqual(props["ro.weird"], "value with ] bracket and, comma")
+    }
+
+    func testParseSystemPropertiesHandlesEmptyAndGarbageOutput() {
+        XCTAssertTrue(ADBTransport.parseSystemProperties("").isEmpty)
+        XCTAssertTrue(ADBTransport.parseSystemProperties("not a property line").isEmpty)
+        XCTAssertTrue(ADBTransport.parseSystemProperties("[]: []").isEmpty)
+    }
+
+    /// End-to-end enrichment against the exact `getprop` output captured from the
+    /// Pixel 7a (serial 3C261JEHN25632) while it was attached. This exercises the
+    /// parser, DeviceProperties.make and DeviceEnricher on real device data without
+    /// needing the device, so it runs in the hermetic suite.
+    func testEnrichmentAgainstRealPixel7aOutput() async throws {
+        let realOutput = """
+        [ro.build.version.release]: [16]
+        [ro.build.version.sdk]: [36]
+        [ro.product.cpu.abi]: [arm64-v8a]
+        [ro.product.model]: [Pixel 7a]
+        [ro.product.manufacturer]: [Google]
+        [ro.product.cpu.abilist]: [arm64-v8a]
+        [ro.product.device]: [lynx]
+        [ro.kernel.qemu]: []
+        """
+
+        // The real `adb devices -l` line for this device.
+        let realDevices = "List of devices attached\n3C261JEHN25632         device usb:1048576X product:lynx model:Pixel_7a device:lynx transport_id:276\n"
+
+        let parsed = ADBTransport().parseDeviceList(realDevices)
+        XCTAssertEqual(parsed.count, 1)
+        guard let discovered = parsed.first else { return }
+
+        XCTAssertEqual(discovered.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(discovered.deviceCodename, "lynx")
+        // Discovery must not claim to know these.
+        XCTAssertEqual(discovered.marketingName, "")
+        XCTAssertEqual(discovered.manufacturer, "")
+
+        let transport = MockTransport()
+        await transport.setProperties(ADBTransport.parseSystemProperties(realOutput))
+        await transport.setDeviceList(parsed)
+
+        let enriched = try await DeviceEnricher(transport: transport).enrich(discovered)
+
+        XCTAssertEqual(enriched.marketingName, "Pixel 7a")
+        XCTAssertEqual(enriched.manufacturer, "Google")
+        XCTAssertEqual(enriched.androidVersion, "16")
+        XCTAssertEqual(enriched.apiLevel, 36)
+        XCTAssertEqual(enriched.architecture, "arm64-v8a")
+        XCTAssertEqual(enriched.supportedABIs, ["arm64-v8a"])
+        XCTAssertEqual(enriched.displayName, "Pixel 7a")
+        XCTAssertEqual(enriched.deviceCodename, "lynx")
+
+        // The Phase 3 defect, pinned against real data.
+        XCTAssertNotEqual(enriched.manufacturer, enriched.deviceCodename)
+        XCTAssertNotEqual(enriched.marketingName, enriched.deviceCodename)
+
+        let capabilities = DeviceCapabilities(device: enriched)
+        XCTAssertTrue(capabilities.supports(abi: "arm64-v8a"))
+        XCTAssertFalse(capabilities.supports(abi: "x86_64"))
+    }
+
+    func testParseSystemPropertiesHandlesCRLF() {
+        let props = ADBTransport.parseSystemProperties("[ro.a]: [1]\r\n[ro.b]: [2]\r\n")
+        XCTAssertEqual(props["ro.a"], "1")
+        XCTAssertEqual(props["ro.b"], "2")
     }
 
     // MARK: - ADBTransport.getprop Tests
 
     func testGetpropSuccess() async throws {
         let transport = MockTransport()
-        await transport.setResponse(
-            forKey: DevicePropertyKey.androidVersion,
-            result: TransportResult(exitCode: 0, stdout: "16\n", stderr: "")
-        )
+        await transport.setProperty(DevicePropertyKey.androidVersion, value: "16")
 
         let value = try await transport.getprop(
             deviceSerial: "TEST123",
@@ -419,6 +695,40 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertEqual(invocations.count, 1)
         XCTAssertEqual(invocations[0].command, "-s")
         XCTAssertEqual(invocations[0].arguments, ["TEST123", "shell", "getprop", "ro.build.version.release"])
+    }
+
+    func testGetSystemPropertiesBatchedRead() async throws {
+        let transport = MockTransport()
+        await transport.setProperties([
+            DevicePropertyKey.androidVersion: "16",
+            DevicePropertyKey.marketingName: "Pixel 7a"
+        ])
+
+        let props = try await transport.getSystemProperties(deviceSerial: "TEST123", timeout: 5)
+
+        XCTAssertEqual(props[DevicePropertyKey.androidVersion], "16")
+        XCTAssertEqual(props[DevicePropertyKey.marketingName], "Pixel 7a")
+
+        let invocations = await transport.invocations
+        XCTAssertEqual(invocations.count, 1, "A batched read must issue exactly one invocation")
+        XCTAssertEqual(invocations[0].command, "-s")
+        XCTAssertEqual(invocations[0].arguments, ["TEST123", "shell", "getprop"])
+    }
+
+    func testGetSystemPropertiesFailureSurfacesAdbError() async {
+        let transport = MockTransport()
+        await transport.setBatchedResult(TransportResult(exitCode: 1, stdout: "", stderr: "adb: device offline"))
+
+        do {
+            _ = try await transport.getSystemProperties(deviceSerial: "TEST123", timeout: 5)
+            XCTFail("Expected adbCommandFailed")
+        } catch let error as PixelDesktopError {
+            guard case .adbCommandFailed = error else {
+                return XCTFail("Expected adbCommandFailed, got \(error)")
+            }
+        } catch {
+            XCTFail("Expected PixelDesktopError, got \(error)")
+        }
     }
 
     func testGetpropFailureSurfacesAdbError() async {
@@ -469,24 +779,25 @@ final class PixelDesktopTests: XCTestCase {
 
     func testEnrichDevicePopulatesProperties() async throws {
         let transport = MockTransport()
-        await transport.setDefaultResult(TransportResult(exitCode: 0, stdout: "16\n", stderr: ""))
-        await transport.setResponse(
-            forKey: DevicePropertyKey.apiLevel,
-            result: TransportResult(exitCode: 0, stdout: "36\n", stderr: "")
-        )
-        await transport.setResponse(
-            forKey: DevicePropertyKey.architecture,
-            result: TransportResult(exitCode: 0, stdout: "arm64-v8a\n", stderr: "")
-        )
+        await transport.setProperties([
+            DevicePropertyKey.androidVersion: "16",
+            DevicePropertyKey.apiLevel: "36",
+            DevicePropertyKey.architecture: "arm64-v8a",
+            DevicePropertyKey.marketingName: "Pixel 7a",
+            DevicePropertyKey.manufacturer: "Google",
+            DevicePropertyKey.supportedABIs: "arm64-v8a"
+        ])
 
-        let discovered = PixelDevice(
+        let discovered = AndroidDevice(
             id: "3C261JEHN25632",
             serialNumber: "3C261JEHN25632",
-            model: "Pixel_7a",
-            manufacturer: "lynx",
+            deviceCodename: "lynx",
+            marketingName: "",
+            manufacturer: "",
             androidVersion: "",
             apiLevel: 0,
             architecture: "",
+            supportedABIs: [],
             state: .device
         )
 
@@ -495,29 +806,59 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertEqual(enriched.androidVersion, "16")
         XCTAssertEqual(enriched.apiLevel, 36)
         XCTAssertEqual(enriched.architecture, "arm64-v8a")
-        XCTAssertEqual(enriched.model, "Pixel_7a")
-        XCTAssertEqual(enriched.manufacturer, "lynx")
-        XCTAssertEqual(enriched.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(enriched.marketingName, "Pixel 7a")
+        XCTAssertEqual(enriched.manufacturer, "Google")
+        XCTAssertEqual(enriched.supportedABIs, ["arm64-v8a"])
 
+        // Identity from discovery is preserved untouched.
+        XCTAssertEqual(enriched.deviceCodename, "lynx")
+        XCTAssertEqual(enriched.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(enriched.state, .device)
+
+        // One batched read, not one process spawn per property.
         let invocations = await transport.invocations
-        XCTAssertEqual(invocations.count, 3)
-        XCTAssertEqual(invocations.map { $0.arguments.last }, [
-            DevicePropertyKey.androidVersion,
-            DevicePropertyKey.apiLevel,
-            DevicePropertyKey.architecture
+        XCTAssertEqual(invocations.count, 1)
+        XCTAssertEqual(invocations[0].arguments, ["3C261JEHN25632", "shell", "getprop"])
+    }
+
+    func testEnrichDeviceDoesNotSubstituteCodenameForManufacturer() async throws {
+        let transport = MockTransport()
+        await transport.setProperties([
+            DevicePropertyKey.androidVersion: "16",
+            DevicePropertyKey.apiLevel: "36",
+            DevicePropertyKey.architecture: "arm64-v8a",
+            DevicePropertyKey.marketingName: "Pixel 7a",
+            DevicePropertyKey.manufacturer: "Google",
+            DevicePropertyKey.supportedABIs: "arm64-v8a"
         ])
+
+        let discovered = AndroidDevice(
+            id: "s", serialNumber: "s", deviceCodename: "lynx",
+            marketingName: "", manufacturer: "", androidVersion: "",
+            apiLevel: 0, architecture: "", supportedABIs: [], state: .device
+        )
+
+        let enriched = try await DeviceEnricher(transport: transport).enrich(discovered)
+
+        // Regression for the Phase 3 defect.
+        XCTAssertEqual(enriched.manufacturer, "Google")
+        XCTAssertNotEqual(enriched.manufacturer, enriched.deviceCodename)
+        XCTAssertEqual(enriched.marketingName, "Pixel 7a")
+        XCTAssertNotEqual(enriched.marketingName, enriched.deviceCodename)
     }
 
     func testEnrichDeviceRejectsNonConnectedState() async {
         let transport = MockTransport()
-        let offline = PixelDevice(
+        let offline = AndroidDevice(
             id: "TEST123",
             serialNumber: "TEST123",
-            model: "Pixel_7a",
-            manufacturer: "lynx",
+            deviceCodename: "lynx",
+            marketingName: "",
+            manufacturer: "",
             androidVersion: "",
             apiLevel: 0,
             architecture: "",
+            supportedABIs: [],
             state: .offline
         )
 
@@ -536,20 +877,25 @@ final class PixelDesktopTests: XCTestCase {
 
     func testEnrichDevicePropagatesPropertyFailure() async {
         let transport = MockTransport()
-        await transport.setDefaultResult(TransportResult(exitCode: 0, stdout: "16\n", stderr: ""))
-        await transport.setResponse(
-            forKey: DevicePropertyKey.apiLevel,
-            result: TransportResult(exitCode: 0, stdout: "", stderr: "")
-        )
+        // apiLevel present but unset -> absent from the map -> make() rejects it.
+        await transport.setProperties([
+            DevicePropertyKey.androidVersion: "16",
+            DevicePropertyKey.architecture: "arm64-v8a",
+            DevicePropertyKey.marketingName: "Pixel 7a",
+            DevicePropertyKey.manufacturer: "Google",
+            DevicePropertyKey.supportedABIs: "arm64-v8a"
+        ])
 
-        let device = PixelDevice(
+        let device = AndroidDevice(
             id: "TEST123",
             serialNumber: "TEST123",
-            model: "Pixel_7a",
-            manufacturer: "lynx",
+            deviceCodename: "lynx",
+            marketingName: "",
+            manufacturer: "",
             androidVersion: "",
             apiLevel: 0,
             architecture: "",
+            supportedABIs: [],
             state: .device
         )
 
@@ -569,24 +915,25 @@ final class PixelDesktopTests: XCTestCase {
 
     func testDeviceManagerEnrichUpdatesPublishedDevice() async throws {
         let transport = MockTransport()
-        await transport.setDefaultResult(TransportResult(exitCode: 0, stdout: "16\n", stderr: ""))
-        await transport.setResponse(
-            forKey: DevicePropertyKey.apiLevel,
-            result: TransportResult(exitCode: 0, stdout: "36\n", stderr: "")
-        )
-        await transport.setResponse(
-            forKey: DevicePropertyKey.architecture,
-            result: TransportResult(exitCode: 0, stdout: "arm64-v8a\n", stderr: "")
-        )
+        await transport.setProperties([
+            DevicePropertyKey.androidVersion: "16",
+            DevicePropertyKey.apiLevel: "36",
+            DevicePropertyKey.architecture: "arm64-v8a",
+            DevicePropertyKey.marketingName: "Pixel 7a",
+            DevicePropertyKey.manufacturer: "Google",
+            DevicePropertyKey.supportedABIs: "arm64-v8a"
+        ])
         await transport.setDeviceList([
-            PixelDevice(
+            AndroidDevice(
                 id: "3C261JEHN25632",
                 serialNumber: "3C261JEHN25632",
-                model: "Pixel_7a",
-                manufacturer: "lynx",
+                deviceCodename: "lynx",
+                marketingName: "",
+                manufacturer: "",
                 androidVersion: "",
                 apiLevel: 0,
                 architecture: "",
+                supportedABIs: [],
                 state: .device
             )
         ])
@@ -602,11 +949,15 @@ final class PixelDesktopTests: XCTestCase {
 
         XCTAssertEqual(enriched?.androidVersion, "16")
         XCTAssertEqual(enriched?.apiLevel, 36)
+        XCTAssertEqual(enriched?.marketingName, "Pixel 7a")
+        XCTAssertEqual(enriched?.manufacturer, "Google")
 
         let published = await manager.devices
         XCTAssertEqual(published[0].androidVersion, "16")
         XCTAssertEqual(published[0].apiLevel, 36)
         XCTAssertEqual(published[0].architecture, "arm64-v8a")
+        XCTAssertEqual(published[0].supportedABIs, ["arm64-v8a"])
+        XCTAssertEqual(published[0].displayName, "Pixel 7a")
     }
 
     func testDeviceManagerEnrichUnknownSerialReturnsNil() async throws {
@@ -623,14 +974,16 @@ final class PixelDesktopTests: XCTestCase {
     func testDiscoveryLeavesPropertiesUnpopulated() async {
         let transport = MockTransport()
         await transport.setDeviceList([
-            PixelDevice(
+            AndroidDevice(
                 id: "TEST123",
                 serialNumber: "TEST123",
-                model: "Pixel_7a",
-                manufacturer: "lynx",
+                deviceCodename: "lynx",
+                marketingName: "",
+                manufacturer: "",
                 androidVersion: "",
                 apiLevel: 0,
                 architecture: "",
+                supportedABIs: [],
                 state: .device
             )
         ])
@@ -643,6 +996,9 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertEqual(devices[0].androidVersion, "")
         XCTAssertEqual(devices[0].apiLevel, 0)
         XCTAssertEqual(devices[0].architecture, "")
+        XCTAssertEqual(devices[0].supportedABIs, [])
+        XCTAssertEqual(devices[0].marketingName, "")
+        XCTAssertEqual(devices[0].manufacturer, "")
 
         let invocations = await transport.invocations
         XCTAssertTrue(
@@ -665,7 +1021,9 @@ actor MockTransport: TransportProtocol {
     private(set) var invocations: [Invocation] = []
     private var responses: [String: TransportResult] = [:]
     private var defaultResult = TransportResult(exitCode: 0, stdout: "", stderr: "")
-    private var deviceList: [PixelDevice] = []
+    private var deviceList: [AndroidDevice] = []
+    private var properties: [String: String] = [:]
+    private var batchedResult: TransportResult?
 
     func setResponse(forKey key: String, result: TransportResult) {
         responses[key] = result
@@ -675,8 +1033,21 @@ actor MockTransport: TransportProtocol {
         defaultResult = result
     }
 
-    func setDeviceList(_ devices: [PixelDevice]) {
+    func setDeviceList(_ devices: [AndroidDevice]) {
         deviceList = devices
+    }
+
+    /// Canned values for the batched `getprop` read. Absent keys model unset properties.
+    func setProperties(_ values: [String: String]) {
+        properties = values
+    }
+
+    func setProperty(_ key: String, value: String) {
+        properties[key] = value
+    }
+
+    func setBatchedResult(_ result: TransportResult) {
+        batchedResult = result
     }
 
     func execute(command: String, arguments: [String], timeout: TimeInterval) async throws -> TransportResult {
@@ -689,18 +1060,28 @@ actor MockTransport: TransportProtocol {
         return defaultResult
     }
 
-    func listDevices() async throws -> [PixelDevice] {
+    func listDevices() async throws -> [AndroidDevice] {
         deviceList
     }
 
-    func getprop(deviceSerial: String, key: String, timeout: TimeInterval) async throws -> String {
-        let result = try await execute(
-            command: "-s",
-            arguments: [deviceSerial, "shell", "getprop", key],
-            timeout: timeout
-        )
+    func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {
+        invocations.append(Invocation(command: "-s", arguments: [deviceSerial, "shell", "getprop"]))
 
-        guard result.isSuccess else {
+        if let result = batchedResult, !result.isSuccess {
+            throw PixelDesktopError.adbCommandFailed(
+                command: "getprop",
+                exitCode: Int(result.exitCode),
+                stderr: result.stderr
+            )
+        }
+
+        return properties
+    }
+
+    func getprop(deviceSerial: String, key: String, timeout: TimeInterval) async throws -> String {
+        invocations.append(Invocation(command: "-s", arguments: [deviceSerial, "shell", "getprop", key]))
+
+        if let result = responses[key], !result.isSuccess {
             throw PixelDesktopError.adbCommandFailed(
                 command: "getprop \(key)",
                 exitCode: Int(result.exitCode),
@@ -708,9 +1089,9 @@ actor MockTransport: TransportProtocol {
             )
         }
 
-        let value = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !value.isEmpty else {
+        // Mirrors the real transport: an unset property is absent from the map, and
+        // absence is what makes it invalid rather than empty.
+        guard let value = properties[key], !value.isEmpty else {
             throw PixelDesktopError.invalidInput("Property '\(key)' is unset on device \(deviceSerial)")
         }
 
@@ -734,7 +1115,7 @@ actor MockTransport: TransportProtocol {
 /// Assertions check only that values are present and well-formed. They
 /// deliberately do not pin an expected Android version or API level: the point
 /// is to verify the acquisition path, not to freeze the device's current build.
-final class PixelDeviceIntegrationTests: XCTestCase {
+final class AndroidDeviceIntegrationTests: XCTestCase {
     private var deviceSerial: String? {
         let value = ProcessInfo.processInfo.environment["PIXELDESKTOP_DEVICE_SERIAL"]
         return (value?.isEmpty ?? true) ? nil : value
@@ -759,26 +1140,58 @@ final class PixelDeviceIntegrationTests: XCTestCase {
         XCTAssertEqual(device.androidVersion, "")
         XCTAssertEqual(device.apiLevel, 0)
         XCTAssertEqual(device.architecture, "")
+        XCTAssertEqual(device.marketingName, "")
+        XCTAssertEqual(device.manufacturer, "")
+        XCTAssertTrue(device.supportedABIs.isEmpty)
 
         let enriched = try await DeviceEnricher(transport: transport).enrich(device)
 
         print("""
         REAL-DEVICE VERIFICATION
-          serial:     \(enriched.serialNumber)
-          model:      \(enriched.model)
-          android:    \(enriched.androidVersion)
-          api level:  \(enriched.apiLevel)
-          abi:        \(enriched.architecture)
+          serial:       \(enriched.serialNumber)
+          codename:     \(enriched.deviceCodename)
+          marketing:    \(enriched.marketingName)
+          manufacturer: \(enriched.manufacturer)
+          android:      \(enriched.androidVersion)
+          api level:    \(enriched.apiLevel)
+          abi:          \(enriched.architecture)
+          abi list:     \(enriched.supportedABIs.joined(separator: ", "))
         """)
 
         XCTAssertFalse(enriched.androidVersion.isEmpty)
         XCTAssertGreaterThan(enriched.apiLevel, 0)
         XCTAssertFalse(enriched.architecture.isEmpty)
+        XCTAssertFalse(enriched.marketingName.isEmpty)
+        XCTAssertFalse(enriched.manufacturer.isEmpty)
+        XCTAssertFalse(enriched.supportedABIs.isEmpty)
+
+        // The primary ABI must appear in the supported list.
+        XCTAssertTrue(enriched.supportedABIs.contains(enriched.architecture))
+
+        // Regression for the Phase 3 defect: manufacturer must not be the codename.
+        XCTAssertNotEqual(enriched.manufacturer, enriched.deviceCodename)
+        XCTAssertNotEqual(enriched.marketingName, enriched.deviceCodename)
 
         // Identity from discovery must survive enrichment untouched.
         XCTAssertEqual(enriched.serialNumber, device.serialNumber)
-        XCTAssertEqual(enriched.model, device.model)
+        XCTAssertEqual(enriched.deviceCodename, device.deviceCodename)
         XCTAssertEqual(enriched.state, .device)
+    }
+
+    /// The batched read must agree with single-key reads. If the parser were lying,
+    /// enrichment would silently produce wrong values.
+    func testRealDeviceBatchedReadAgreesWithSingleKeyReads() async throws {
+        guard let serial = deviceSerial else {
+            throw XCTSkip("PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification")
+        }
+
+        let transport = ADBTransport()
+        let batched = try await transport.getSystemProperties(deviceSerial: serial, timeout: 15)
+
+        for key in DevicePropertyKey.all {
+            let single = try await transport.getprop(deviceSerial: serial, key: key, timeout: 15)
+            XCTAssertEqual(batched[key], single, "Batched value for \(key) disagrees with single-key read")
+        }
     }
 
     func testRealDeviceUnsetPropertyIsRejected() async throws {

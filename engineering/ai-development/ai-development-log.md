@@ -283,6 +283,110 @@ cheaply and loudly.
 
 ---
 
+## Event 4 — Phase 3: Android Device Model
+
+**Date:** 2026-10-01
+**Phase:** 3
+
+### Agent
+Hermes (probe, architecture, implementation, review, verification)
+
+### Model
+`meituan/longcat-2.5-preview:free` (Nous Portal)
+
+### Task
+Build a proper internal representation of the Android device: correct the identity model,
+add verified properties, add minimal capabilities, and separate discovery / representation /
+operations — with the device probed before implementation.
+
+### Context
+Phase 2 delivered a `PixelDevice` with 8 fields. Two defects were found while preparing the
+proposal: `manufacturer` was populated from the `device:` token (the codename `lynx`), and
+`model` also held the codename. The user approved D1/D2/D4/D5, deferred D3, and made D6
+explicit: probe the exact proposed properties on the real device first, and do not proceed
+on AOSP documentation or assumed Pixel 7a values.
+
+### Tools Used
+- `terminal` (`adb` probes, `xcodegen`, `xcodebuild`, `swiftc`, `git rm`)
+- `patch` (all source and test edits)
+- `write_file` (new files only)
+- `read_file`, `execute_code`
+
+### Approach
+1. Attempted the probe; the device was physically disconnected. **Did not implement
+   against assumed values** — reported the blocker instead.
+2. Wrote the proposal with the three properties marked UNVERIFIED, and stopped for review.
+3. After approval and reattachment, probed all three properties plus `ro.product.device`,
+   and re-probed the Phase 2 properties as a regression cross-check.
+4. The probe established that `abilist` returns a **single entry** on this device — so the
+   parser treats single-entry as the common case, not an edge case.
+5. Implemented D1/D2/D4/D5 with targeted patches: 6-field `DeviceProperties`, `AndroidDevice`
+   rename with corrected identity, `DeviceCapabilities`, `DeviceOperation`, batched
+   `getSystemProperties` + `parseSystemProperties`.
+6. Removed the superseded `PixelDevice.swift` with `git rm` (auditable, recoverable).
+7. Built, ran the suite — one failure, in `MockTransport`, fixed.
+8. Ran live real-device verification — **the device had detached again mid-run.**
+9. Built a replay harness over the device's captured real `getprop` output, verified 13/13
+   checks, and **retained it as a permanent hermetic test**.
+10. Re-ran live verification after reattachment — PASS.
+
+### Result
+Phase 3 complete. BUILD SUCCEEDED; 73 tests, 0 failures. Real-device verification PASS:
+`Pixel 7a` / `Google` / `lynx` / Android `16` / API `36` / `arm64-v8a`, all 6 properties
+cross-checked against raw `adb`. Batched read measured 3.7× faster and agrees with
+single-key reads 6/6.
+
+### Errors
+1. **Device detached before the probe** — blocked implementation by design (D6). Resolved by
+   reporting the blocker and waiting, not by assuming values.
+2. **Device detached again during the first live verification** — resolved by verifying
+   against replayed real captured output, then re-running live once reattached.
+3. **`testGetpropSuccess` failed** — `MockTransport` had two independent property stores:
+   `setProperty` wrote the new map while `getprop` read the old one. Fixed by making the
+   mock's `getprop` resolve from the same map as the batched read.
+
+### Recovery
+- Detachment → report and wait; verify against replayed real output in the interim; re-run
+  live verification afterwards.
+- Mock inconsistency → unified the test double's store so its two read paths cannot disagree.
+
+### Human Intervention
+Required for: approving D1–D5, deferring D3, and physically reattaching the Pixel 7a
+(twice). The device attachment is a physical action the agent cannot perform.
+
+### Efficiency
+- ~35 tool calls
+- ~25 minutes
+- 4 files created, 10 modified, 1 removed
+- 24 tests added or updated
+- 2 builds, 3 test runs, 1 probe session, 1 replay run, 1 live verification run
+
+### Quality
+- Correctly refused to implement against assumed values when the device was absent.
+- Correctly probed before implementing, which caught the single-entry `abilist`.
+- Correctly refused to claim a live real-device pass when the device detached mid-run.
+- Correctly turned the captured real output into a permanent test rather than a throwaway.
+- Correctly used `git rm` for the superseded model instead of an untracked deletion.
+- Did **not** initially anticipate that `MockTransport` would need its two read paths
+  unified; found it via the test failure.
+
+### Lesson
+**A field can be populated, non-empty, and wrong.** `manufacturer` held `lynx` through all
+49 Phase 2 tests and rendered a falsehood in the UI. No test failed because every test
+asserted presence, not correctness of source. The test that catches this asserts a
+*relationship* — `manufacturer != deviceCodename` — and is only writable after probing what
+the source token actually contains.
+
+**Probing before implementing is what makes the regression test possible.** Without knowing
+that `device:` is the codename and `ro.product.manufacturer` is `Google`, there is no
+relationship to assert.
+
+**Verification must be honest about what it did and did not run.** When the device detached,
+the correct move was to verify against real captured data, say plainly that it was not live
+verification, and re-run live afterwards — not to report a pass.
+
+---
+
 ## Successful Techniques
 
 1. **xcodegen for project generation** — Eliminates pbxproj debugging

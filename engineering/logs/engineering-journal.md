@@ -264,3 +264,51 @@ until the device is reattached.
 **Next action:** Await review of the proposal and reattachment of the Pixel 7a.
 
 **Artifacts:** `phases/phase-03-android-device-model-proposal.md`.
+
+---
+
+## 2026-10-01 — Phase 3: Android Device Model
+
+**Phase:** 3
+**Task:** Build the device representation: correct identity, verified properties, minimal
+capabilities, and separate discovery / representation / operations.
+
+**Action:**
+Attempted the required real-device probe; the Pixel 7a was **physically disconnected**, so
+per D6 implementation was withheld rather than written against assumed values. After
+approval and reattachment, probed `ro.product.model` (`Pixel 7a`),
+`ro.product.manufacturer` (`Google`), `ro.product.cpu.abilist` (`arm64-v8a`) and
+`ro.product.device` (`lynx`), and re-probed the Phase 2 properties as a cross-check.
+
+Implemented: `DeviceProperties` 3 → 6 fields; `PixelDevice` → `AndroidDevice` with
+`deviceCodename` / `marketingName` / `manufacturer` / `supportedABIs`; `DeviceCapabilities`
+(`supportedABIs` only); `DeviceOperation` (`.discover`, `.readSystemProperties`);
+`TransportProtocol.getSystemProperties` batched read plus `parseSystemProperties`. Removed
+the superseded `PixelDevice.swift` with `git rm`. `DeviceService` not added (D3 deferred).
+
+The device detached again during the first live verification run. Rather than claim an
+unexecuted pass, replayed the device's captured real `getprop` output through the real
+pipeline (13/13 checks passed) and retained it as a permanent hermetic test. Re-ran live
+verification after reattachment.
+
+**Result:**
+BUILD SUCCEEDED. 73 tests executed, 0 failures. Live real-device verification PASS:
+`Pixel 7a` / `Google` / `lynx` / Android `16` / API `36` / `arm64-v8a`, all 6 properties
+cross-checked against raw `adb`. Batched read measured **3.7× faster** (0.095 s vs 0.354 s)
+and agrees with single-key reads 6/6.
+
+**Decision:**
+Phase 3 COMPLETE. Two identity defects fixed: `manufacturer` no longer holds the codename,
+and the marketing name is now modelled.
+
+**Reason:**
+The defects were identity defects — fixing them required distinguishing codename from
+marketing name from manufacturer, which is a model-shape change. The rename matches the
+master prompt's "an Android device" and its plan for multiple Android devices.
+
+**Next action:** Phase 4 (Android Application / Process Control) — RNZM-21 `shell()`,
+RNZM-22 lifecycle. Phase 4 must extend `DeviceOperation` and decide whether reconnect
+invalidates cached properties.
+
+**Artifacts:** `phases/phase-03-android-device-model.md`, ADR-008,
+`testing/phase-03-test-report.md`, `architecture/overview.md` updated.

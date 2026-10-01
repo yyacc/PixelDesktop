@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class AppState: ObservableObject {
-    @Published var devices: [PixelDevice] = []
+    @Published var devices: [AndroidDevice] = []
     @Published var isDiscovering: Bool = false
     @Published var lastError: PixelDesktopError?
     @Published var logMessages: [LogEntry] = []

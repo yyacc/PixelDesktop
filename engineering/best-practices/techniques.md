@@ -203,6 +203,61 @@ names.
 
 ---
 
+## T-009 — Assert field relationships, not just field presence
+
+**Technique:**
+Where two fields should differ (or agree), assert the relationship between them rather than
+asserting each is non-empty.
+
+**Worked:**
+Yes.
+
+**Evidence:**
+Phase 3. `manufacturer` was populated from the `device:` token of `adb devices -l`, which is
+the device codename (`lynx`). The field was non-empty, compiled cleanly, passed all 49
+Phase 2 tests, and rendered as "Manufacturer" in the UI — **displaying a falsehood**.
+
+Every existing test asserted presence. None could catch a field holding the wrong thing.
+`XCTAssertNotEqual(device.manufacturer, device.deviceCodename)` catches it in one line.
+
+**Recommended use:**
+Fields populated from an ambiguous or reused source: tokens carrying more than one meaning,
+enums reused for two purposes, identifiers that alias another field.
+
+**Avoid when:**
+The fields are genuinely independent and no relationship should hold. An arbitrary
+inequality assertion is noise.
+
+---
+
+## T-010 — Turn real captured system output into a permanent hermetic test
+
+**Technique:**
+When you capture real output from an external system, keep it as a test fixture so the
+parser and mapping logic stay verified against reality on every future run — without needing
+the external system present.
+
+**Worked:**
+Yes.
+
+**Evidence:**
+Phase 3. The Pixel 7a detached mid-verification. The exact `getprop` output captured from it
+was replayed through the real parser, `DeviceProperties.make` and `DeviceEnricher`
+(13/13 checks passed), then retained as `testEnrichmentAgainstRealPixel7aOutput`.
+
+That test now runs in the hermetic suite on every change and pins the pipeline to real device
+data, including both defect regressions and the unset-key omission.
+
+**Recommended use:**
+Parsers, protocol decoders, and any mapping from an external system's output into a model.
+Especially valuable for hardware that may not be attached.
+
+**Avoid when:**
+The captured output contains secrets or personally identifying data. Also not a substitute
+for live verification — it verifies the code, not the integration.
+
+---
+
 ## T-008 — Compile production sources into a CLI harness to produce real evidence
 
 **Technique:**

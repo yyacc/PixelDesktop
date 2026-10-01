@@ -20,7 +20,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 0 — Clean-Start Audit:** COMPLETE
 **Phase 1 — Engineering Foundation:** COMPLETE
 **Phase 2 — Device Discovery and ADB Transport:** COMPLETE
-**Phase 3 — Android Device Model:** PROPOSAL (awaiting review)
+**Phase 3 — Android Device Model:** COMPLETE
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md). Legacy documents use
@@ -33,7 +33,9 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 0 Clean-Start Audit](phases/phase-00-clean-start-audit.md) — Audit of the previous implementation
 - [Phase 1 Engineering Foundation](phases/phase-01-engineering-foundation.md) — Clean project, build and tests
 - [Phase 2 Device Discovery and ADB Transport](phases/phase-02-device-discovery.md) — `getprop` transport, device enrichment, real-device verification
-- [Phase 3 Proposal — Android Device Model](phases/phase-03-android-device-model-proposal.md) — proposal only, awaiting review
+- [Phase 3 Android Device Model](phases/phase-03-android-device-model.md) — corrected identity model, capabilities, batched getprop
+- [Phase 3 Proposal (approved)](phases/phase-03-android-device-model-proposal.md) — the approved proposal
+- [Phase 3 Test Report](testing/phase-03-test-report.md) — build, test and real-device evidence
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements
@@ -46,6 +48,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [ADR-005: Device Property Enrichment Is Separate From Discovery](decisions/ADR-005-device-property-enrichment.md)
 - [ADR-006: Test Isolation Strategy for Device-Dependent Code](decisions/ADR-006-test-isolation.md)
 - [ADR-007: Authoritative Phase Sequence](decisions/ADR-007-authoritative-phase-sequence.md)
+- [ADR-008: Android Device Representation Model](decisions/ADR-008-android-device-model.md)
 
 ### Records
 - [Engineering Journal](logs/engineering-journal.md) — Chronological build history
@@ -59,8 +62,8 @@ This directory contains all engineering documentation for the PixelDesktop proje
 
 ## Device
 
-**Pixel 7a** — serial `3C261JEHN25632`
-Verified: Android `16`, API level `36`, ABI `arm64-v8a`
+**Pixel 7a** — serial `3C261JEHN25632`, codename `lynx`, manufacturer `Google`
+Verified: Android `16`, API level `36`, ABI `arm64-v8a`, supported ABIs `["arm64-v8a"]`
 
 ## External References
 
