@@ -2,7 +2,50 @@
 
 ## Status
 
-**PROPOSED — NOT APPROVED.** A checkpoint for review. Nothing here is a requirement until approved.
+**SUPERSEDED — 2026-10-02, before any implementation.**
+
+This ADR proposed a `FeasibilityEvaluator` **inside PixelDesktop** that would decide Mac-vs-Pixel.
+That was withdrawn following architectural review. **Do not implement this ADR.**
+
+**Why it was withdrawn:** the master engineering prompt §1 places **orchestration on the Mac, above
+PixelDesktop**, not inside it:
+
+```text
+Mac
+ ├── UI
+ ├── orchestration        <-- NOT inside PixelDesktop
+ ├── complex reasoning
+ └── AI coordination
+          ▼
+     PixelDesktop
+```
+
+A router inside PixelDesktop therefore placed a decision-making component on the **wrong side of a
+boundary the master prompt had already drawn**, and duplicated a decision Hermes already owns.
+
+**Preserved deliberately, not deleted.** Its reconnaissance measurements remain valid and are reused
+by the replacement document:
+- Pixel latency varies **2.4×** for identical work — latency cannot be a routing input.
+- Model load varies **12×** (393 ms → 4,954 ms) with page-cache state.
+- **No Mac executor exists.**
+- Thermal signals are **not comparable** across macOS and Android.
+- Transfer cost is negligible (~600 bytes); the one-time 1.04 GiB model push is the only material transfer.
+- A snapshot is not a reservation (`MemAvailable` moved 2.15 → 2.40 GiB).
+
+**Replacement:** `phases/phase-07-architecture-reevaluation.md` — Hermes owns decomposition and
+placement; PixelDesktop publishes a capability contract and **enforces** feasibility.
+
+**Also withdrawn with it:** `WorkloadDescriptor`, `Decision{target,reasons}`, `ResourceSnapshot` as a
+local decision input, the `Executors`/`ExecutionNode` abstraction, and any Mac executor.
+
+**Retained from this ADR:** P2 (routing selects among approved capabilities only), P6 (fail and
+report; no retries), P7 (a snapshot is not a reservation), P8 (capability stated as
+support / non-support / unknown), and the entire §M failure-hypothesis table.
+
+**Its own reconnaissance warned against it.** §B found "there is only one executor"; §H judged
+cost-comparison routing "blocked by evidence"; §N asked whether routing was worth it at all. The
+proposal was made anyway because the brief's candidate structure listed a router. Recorded as a
+process lesson: **when the evidence says "no component", propose no component.**
 
 ## Date
 

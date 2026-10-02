@@ -258,6 +258,65 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-021 — When the evidence says "no component", propose no component
+
+**Technique:**
+At the end of a reconnaissance, re-read your own findings and ask whether they argue *against* the
+component the brief's candidate structure suggested. A candidate structure is a prompt, not a
+requirement.
+
+**Worked:**
+No — this was violated, and the reconnaissance had already done the work to prevent it.
+
+**Evidence:**
+Phase 7. The reconnaissance itself established that a router was unjustified, in three separate
+places: §B "there is only one executor" (the Mac cannot run inference, so a router could only ever
+choose the Pixel); §H judged cost-comparison routing "blocked by evidence"; §N asked "whether routing
+is worth it at all" and suggested the honest frame was a specialised node, not load balancing.
+
+A `FeasibilityEvaluator` inside PixelDesktop was proposed anyway, because the brief listed a candidate
+structure containing a router. Architectural review found it **contradicted the master prompt §1**,
+which places orchestration on the Mac *above* PixelDesktop. Withdrawn before implementation.
+
+**Cost:** one wasted document and one review cycle. Cheap here only because it was caught before
+code. The same failure after implementation would have been a rewrite.
+
+**Recommended use:**
+Every reconnaissance that produces a proposal. Explicitly ask: *"do my own findings support this
+component, or merely fail to rule it out?"*
+
+**Avoid when:**
+Never. The check costs one paragraph.
+
+---
+
+## T-022 — Distinguish a decision from an enforcement point
+
+**Technique:**
+When two layers could both judge whether something is possible, designate one as the **decision**
+maker (may be wrong, is optimising) and the other as the **enforcer** (authoritative, refuses). Do
+not let both decide, and do not let the decider bypass the enforcer.
+
+**Worked:**
+Yes — it is what makes an LLM-driven planner safe here.
+
+**Evidence:**
+Phase 7 re-evaluation. Hermes (an LLM) decides where work goes; PixelDesktop (infrastructure) refuses
+anything it cannot actually execute. A stale Hermes belief about Pixel capability therefore costs a
+**wasted round-trip, never an invalid execution**. This preserved the entire D8/Phase 6 containment
+model unchanged while still letting an LLM own planning.
+
+The alternative — both layers deciding — was the withdrawn ADR-013, where PixelDesktop would have
+re-judged a placement Hermes had already made.
+
+**Recommended use:**
+Any architecture where a non-deterministic or remote component influences what gets executed.
+
+**Avoid when:**
+Never — but be explicit about *which* layer is authoritative, or the distinction erodes.
+
+---
+
 ## T-017 — Test the highest-risk assumption BEFORE building anything on it
 
 **Technique:**

@@ -848,3 +848,63 @@ no Mac executor, the router can only ever choose the Pixel, and a feasibility ga
 than as a new subsystem.
 
 **Artifacts:** `phases/phase-07-routing-reconnaissance.md`, ADR-013 (PROPOSED, not approved).
+
+---
+
+## 2026-10-02 — Phase 7 architecture RE-EVALUATION: the router proposal was withdrawn
+
+**Phase:** 7 (architecture re-evaluation; no code changed)
+**Task:** Re-evaluate ADR-013's router against the actual Phase 1–6 implementation and the master
+prompt, following a user correction that Hermes should own workload planning.
+
+**Result — the correction was right, and for a stronger reason than given:**
+
+**Master prompt §1 places orchestration on the Mac, ABOVE PixelDesktop:**
+
+```
+Mac
+ ├── UI
+ ├── orchestration        <-- NOT inside PixelDesktop
+ ├── complex reasoning
+ └── AI coordination
+```
+
+ADR-013's `FeasibilityEvaluator` inside PixelDesktop therefore put a decision-making component on
+the **wrong side of a boundary the master prompt had already drawn**, and duplicated a decision
+Hermes already owns. §9 independently assigns Hermes the capability understanding, workload
+creation, monitoring and result receipt.
+
+**How the error happened, recorded honestly:** the reconnaissance *found* the evidence against a
+router — §B "there is only one executor"; §H cost-comparison routing "blocked by evidence"; §N
+"the honest frame may be that the Mac is the compute node and the Pixel is a specialised node". The
+right question was surfaced and then a router was proposed anyway, because the brief's candidate
+structure listed one. **Process lesson: when the evidence says "no component", propose no
+component.** Added as T-021.
+
+**The corrected architecture:** Hermes owns decomposition, placement and synthesis; PixelDesktop
+publishes a **capability contract** and **enforces** feasibility. The critical distinction is
+**decision vs enforcement** — Hermes's belief about capability is an optimisation input; PixelDesktop's
+validation is the authority. A stale Hermes belief costs a wasted round-trip, never an invalid
+execution. **D8/Phase 6 containment is unchanged.**
+
+**Key finding on scope:** the proposed contract is **~80% already implemented** — `ModelContract`
+supplies model name/hash/size, `InferenceRuntimeIdentity` supplies runtime+backend,
+`DeviceCapabilities` supplies ABIs, `InferenceResult` already returns timings and model hash. **Only
+context size is genuinely missing** (it lives only in `llama_jni.cpp` as `kContextSize`). The work is
+*publishing existing state*, not building machinery — and the corrected design has **fewer components**
+than the router it replaces.
+
+**Withdrawn:** `FeasibilityEvaluator`, `WorkloadDescriptor`, `Decision{target,reasons}`,
+`ResourceSnapshot` as a local decision input, `Executors`/`ExecutionNode`, and any Mac executor.
+**Retained:** P2 (approved capabilities only), P6 (fail and report; no retries), P7 (a snapshot is
+not a reservation), P8 (support / non-support / unknown), and the full §M failure-hypothesis table.
+**ADR-013 marked SUPERSEDED, preserved not deleted** — its measurements remain valid.
+
+**Most consequential new risks:** R1 — LLM decomposition is non-deterministic, so routing becomes
+irreproducible (mitigation: require an explicit plan before execution); R4 — this redefines Phase 7
+into territory adjacent to Phase 9, needing an ADR-007 amendment.
+
+**Next action:** BLOCKED pending review. Recommended first step is an ADR-007 amendment renaming the
+phase's purpose, then publishing the contract **before** writing the Hermes skill.
+
+**Artifacts:** `phases/phase-07-architecture-reevaluation.md`; ADR-013 marked SUPERSEDED.
