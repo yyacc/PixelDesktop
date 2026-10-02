@@ -258,6 +258,66 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-027 — A state model that cannot express the failure will hide it
+
+**Technique:**
+When a system misbehaves, check whether its state model can even *represent* the condition you are
+seeing. If it cannot, the bug is in the model, and every diagnostic built on it will be misleading.
+
+**Worked:**
+Yes — it reframed an entire design.
+
+**Evidence:**
+The observed condition was `USB device CONNECTED` + `ADB DISCONNECTED`. The existing `DeviceState`
+(`.device` / `.unauthorized` / `.offline` / `.unknown`) can only express "not connected", which
+collapses two very different situations into one:
+- the cable is unplugged → check the hardware
+- the hardware is fine and the problem is above it → check ADB
+
+Those need opposite responses. Because the model could not distinguish them, the condition was
+invisible to both the UI and the logs. Adding a single orthogonal `wiredDegraded` state makes it
+representable.
+
+**Recommended use:**
+Before debugging a failure, ask whether the state model can name it. Extend the model as a separate
+axis rather than overloading an existing enum — `DeviceState` and `TransportState` are orthogonal,
+and both can be true at once.
+
+**Avoid when:**
+Never. The check takes one question.
+
+---
+
+## T-028 — Verify what you are about to depend on, by running it
+
+**Technique:**
+When a design depends on a platform API, write a throwaway probe and run it before writing the
+design. Documentation describes what should work; a probe describes what does.
+
+**Worked:**
+Yes — it converted an assumption into a verified fact in about ten minutes.
+
+**Evidence:**
+The design depended on macOS delivering USB attach/detach events to an ordinary app. Rather than
+citing documentation, a ~90-line Swift probe was compiled and run on the target machine
+(macOS 27.0, Swift 6.4). It returned `KERN_SUCCESS` for both attach and detach notifications,
+matched `IOUSBHostDevice`, required no root or entitlement, and — the part that mattered most —
+read `kUSBSerialNumberString` as `3C261JEHN25632`, **the same serial ADB uses**, which closed the
+trust boundary without any further work.
+
+The same probe also **disproved a tempting alternative**: `IOUSBHost` callbacks would require
+claiming the device, which would have made our app a third competitor for exclusive USB access
+alongside the two browsers already causing contention.
+
+**Recommended use:**
+Any design whose feasibility rests on platform behaviour — especially deprecation status, entitlement
+requirements, and whether an API returns the identity you need.
+
+**Avoid when:**
+Never, for load-bearing platform assumptions. The probe is disposable; the design is not.
+
+---
+
 ## T-025 — Sample the layers independently, or "disconnected" will mislead you
 
 **Technique:**

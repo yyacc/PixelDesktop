@@ -666,6 +666,15 @@
       "task_id": "usb-investigation",
       "purpose": "USB disconnection investigation (Mac to Pixel 7a)",
       "status": "complete"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/design/usb-aware-transport-design.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "usb-transport-design",
+      "purpose": "USB-aware transport design investigation (design only)",
+      "status": "proposal"
     }
   ],
   "evidence_artifacts_outside_repo": [

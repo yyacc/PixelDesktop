@@ -1103,3 +1103,72 @@ physical-layer fault behind a software workaround — the exact outcome the inve
 to avoid. No reconnect mechanism is justified by this evidence.
 
 **Artifacts:** `failures/FAIL-006-usb-connection-drops.md`. No production code changed.
+
+---
+
+## 2026-10-02 — USB-aware transport design (investigation/design only)
+
+**Phase:** none — transport resilience. Explicitly NOT workload routing or resource management.
+**Task:** Determine whether macOS offers an event-driven USB presence mechanism, and design
+transport recovery around it. **No production code modified.**
+
+**VERIFIED BY RUNNING CODE — IOKit USB notifications work on macOS 27.0.**
+A throwaway Swift probe compiled and ran, then was deleted:
+  attach notification registered (result=0)
+  PRESENT-AT-START: Pixel 7a  0x18d1/0x4ee2  serial=3C261JEHN25632
+  detach notification registered (result=0)
+`IOServiceAddMatchingNotification` returned KERN_SUCCESS for BOTH `kIOFirstMatchNotification` and
+`kIOTerminatedNotification`, matched `IOUSBHostDevice`, required **no root and no entitlement**, and
+— critically — **`kUSBSerialNumberString` returns `3C261JEHN25632`, the SAME serial ADB uses.**
+That closes the trust boundary cheaply: a USB attach carries the identity needed to decide "is this
+my Pixel?" WITHOUT first trusting ADB.
+
+**THREE FINDINGS THAT SHAPE THE DESIGN**
+
+1. **There is no wireless support at all.** `grep -rniE 'wireless|mdns|bonjour|tcp|:5555|pair'`
+   over `PixelDesktop/` returns ZERO functional matches. And wireless ADB is OFF ON THE DEVICE:
+   `service.adb.tcp.port` unset, `adb_wifi_enabled=0`. So the proposed flow "wireless active → USB
+   appears → switch to wired" has **no wireless leg to start from**. Implementing transport
+   switching now would build a state machine with one reachable state.
+
+2. **`TransportProtocol` is already device-targeted, not transport-targeted.** Every method takes
+   `deviceSerial:` and `ADBTransport` builds `adb -s <serial>`. **A wireless transport can satisfy
+   it unchanged, and no caller needs to know which is active.** The abstraction boundary is already
+   correct — no parallel transport architecture is needed, and no `TransportManager` is proposed
+   (with one implementation it would manage one thing — the ADR-013 mistake repeating).
+
+3. **`wiredDegraded` is the state the code cannot express, and it is the whole point.** FAIL-006's
+   live observation was USB CONNECTED + ADB DISCONNECTED. The current model can only say "not
+   connected", which loses the most important fact: the hardware is fine and the problem is above
+   it. That distinction decides whether the right response is "check the cable" or "check ADB".
+
+**HONEST LIMITATION OF APPROACH B, stated plainly:** cases 3 and 7 (USB present, ADB broken) are
+**event-silent**. The USB device never left, so IOKit fires nothing. **No USB-triggered mechanism can
+detect them** — only an attempted operation that fails, or a low-frequency reconciliation check.
+This is a genuine gap in the intended direction, not a detail.
+
+**Debounce:** justified by measured evidence (FAIL-006 recorded three teardowns within ~1 second at
+13:40:27, and the device repeatedly vanished from `adb devices` while `ioreg` continuously showed it
+present). Debounce ATTACH only; DETACH must be immediate. **No duration is proposed** — the flap
+distribution is unmeasured, and choosing a constant would repeat the invented-policy mistake that
+ADR-013 §P7 and Phase 7 Step 2's `Freshness` both avoided. The window is a parameter with no
+default. Better still: **verification subsumes most of the need for a timeout.**
+
+**Verification must be positive, not inferred:** listed by ADB + state `.device` + transport field
+begins `usb:` + a round-trip succeeds. Note the `usb:` field is **currently parsed and discarded**,
+and the observed value `usb:1048576X` is anomalous — so the design must not validate the full
+string.
+
+**RECOMMENDATION — do not implement yet, for a concrete reason:** the wireless leg does not exist,
+the physical fault is unresolved (building recovery on it would hide it — the outcome FAIL-006
+warned against), and the flap distribution is unmeasured. Order: (1) finish the FAIL-006 physical
+isolation test + 1-hour observation; (2) then `USBPresenceMonitor` + `TransportState`, which is
+useful even with zero wireless support because it makes `wiredDegraded` visible; (3) wireless
+transport as its own decision.
+
+**Phase 7 architectural boundary: UNCHANGED.** This is transport resilience — "is the connection I
+have still usable?", not "where should this workload run?". It does reinforce one Phase 7 principle:
+`wiredDegraded` is the transport-layer expression of ADR-007 Amendment 1 §A1.6 — know the difference
+between "capable" and "currently usable", and never let the first stand in for the second.
+
+**Artifacts:** `design/usb-aware-transport-design.md`. No production code changed.
