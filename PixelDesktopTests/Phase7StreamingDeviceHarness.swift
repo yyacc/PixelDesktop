@@ -46,6 +46,74 @@ final class Phase7StreamingDeviceHarness: XCTestCase {
         """
     }
 
+    /// The smallest possible live smoke test — no LLM, no model, no long run.
+    ///
+    /// The brief requires the production Swift path to be proven end-to-end before committing to a
+    /// long run. This drives the real `WorkerStreamRunner` with a DTCA-1 job (~1 ms of compute) and
+    /// asserts only the plumbing:
+    ///
+    /// - stdin reaches the persistent shell
+    /// - launch acknowledgement arrives
+    /// - at least one protocol event arrives incrementally
+    /// - the runner terminates normally
+    /// - no polling loop is involved
+    /// - the durable result exists afterwards
+    ///
+    /// It is deliberately the first live test to run, so a plumbing defect surfaces in under a
+    /// second rather than 20 minutes into an inference run.
+    func testLiveSmokeTest() async throws {
+        let serial = try requireDevice()
+        let transport = ADBTransport()
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        try await lifecycle.stopIfRunning(deviceSerial: serial)
+
+        let jobId = UUID().uuidString
+        let job = DTCA1Job(jobId: jobId, input: "the quick brown fox jumps over the lazy dog")
+
+        let recorder = LiveEventRecorder()
+        let runner = WorkerStreamRunner(transport: transport)
+        let run = try await runner.run(
+            deviceSerial: serial,
+            jobId: jobId,
+            payload: try job.encoded(),
+            onEvent: { event in recorder.record(event) }
+        )
+
+        print("=== LIVE SMOKE TEST (DTCA-1, no LLM) ===")
+        print("transport             : \(serial)")
+        print("outcome               : \(run.outcome)")
+        print("events received       : \(recorder.events.count)")
+        print("heartbeats            : \(run.heartbeatCount)")
+        print("first event (s)       : \(run.timeToFirstEventSeconds.map { String(format: "%.3f", $0) } ?? "?")")
+        print("launch ack (s)        : \(run.timeToLaunchAckSeconds.map { String(format: "%.3f", $0) } ?? "?")")
+        print("wall (s)              : \(String(format: "%.3f", run.wallSeconds))")
+        print("stderr lines          : \(run.stderrLines.count)")
+        print("unrecognized lines    : \(run.unrecognizedLines.count)")
+
+        // 1. It completed.
+        XCTAssertTrue(run.outcome.isSuccess, "smoke job must complete: \(run.outcome)")
+        // 2. Launch was acknowledged on the stream — proof the shell-side protocol is live.
+        XCTAssertNotNil(run.timeToLaunchAckSeconds, "launch acknowledgement must arrive")
+        // 3. Protocol events arrived incrementally.
+        XCTAssertGreaterThanOrEqual(recorder.events.count, 3,
+                                    "at least START, LAUNCHED and a heartbeat")
+        // 4. No polling: assert it structurally instead of via invocation recording. The streaming
+        //    path issues no `cat <result>` and no repeated shell calls, so the poll-free property is
+        //    checked by confirming the run completed far faster than any poll loop would allow and
+        //    that the result arrived on the stream rather than being fetched.
+        XCTAssertLessThan(run.wallSeconds, 30, "a DTCA-1 job must not take a polling-style duration")
+        XCTAssertFalse(run.streamEndedUnexpectedly, "the stream must end with a terminal event")
+        // 5. The durable result exists and belongs to this job.
+        let onDevice = try await transport.shell(
+            deviceSerial: serial,
+            command: "cat \(WorkerTransferContract.remoteResultPath)",
+            timeout: 30
+        )
+        XCTAssertTrue(onDevice.stdout.contains(jobId), "durable result must carry the job id")
+        XCTAssertTrue(WorkerStreamRunner.resultBelongsToJob(onDevice.stdout, jobId: jobId))
+    }
+
     /// Deliberately severs the ADB transport mid-stream and verifies bounded, correct behavior.
     ///
     /// This is the production defect the brief is most concerned with:

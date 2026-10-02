@@ -62,7 +62,7 @@ final class WorkerStreamingTests: XCTestCase {
             "PDE1 HEARTBEAT n=3 pid=100",
         ])
 
-        let recorder = EventRecorder()
+        let recorder = LiveEventRecorder()
         let runner = WorkerStreamRunner(transport: transport)
         _ = try await runner.run(
             deviceSerial: "serial",
@@ -883,8 +883,9 @@ final class WorkerStreamingTests: XCTestCase {
     }
 }
 
-/// Thread-safe event collector for `onEvent` callbacks, which arrive from a background thread.
-final class EventRecorder: @unchecked Sendable {
+/// Thread-safe event collector for live-device `onEvent` callbacks, which arrive from a background
+/// thread.
+final class LiveEventRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var storage: [WorkerEvent] = []
 

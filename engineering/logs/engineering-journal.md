@@ -1665,3 +1665,76 @@ only and real generation progress needs a worker-side change.
   Defect 1 remains the notable one: a pure string-assembly error that no unit test caught.
 
 **Artifacts:** `phases/phase-07-e1-streaming-implementation.md` (sections 16-22).
+
+---
+
+## 2026-10-02 — E1 streaming CLOSEOUT
+
+**Phase:** 7. Final closeout. **19 new lifecycle regression tests; 336 tests, 0 failures; 9/9 live tests.**
+
+**THE GAP THIS ROUND CLOSED**
+The deadlock defects (2 and 3) were FIXED but never proven in isolation. The existing suite tested the
+reducer and runner against a scripted transport, which CANNOT reproduce a defect living in the
+interaction between Process, pipe file handles, a reader thread and a timer - the bug WAS that the
+real objects did not behave as assumed.
+
+`StreamingLifecycleTests.swift` (new, 19 tests) drives the REAL ADBTransport with REAL subprocesses,
+via a wrapper emulating adb's `-s <serial> shell <command>` argument shape, so the production code
+path is exercised unmodified.
+
+** Every test is wrapped in a hard wall-clock bound: the failure mode under test is a hang, so a test
+   that could itself hang would be unable to report it. A bounded wait that expires FAILS, not skips. **
+
+To make termination paths observable in bounded time, streamStallTimeout and childReapTimeout became
+INSTANCE properties with the PRODUCTION DEFAULTS UNCHANGED (120 s / 5 s). A test that had to wait the
+production 120 s to observe the watchdog would never be run.
+
+**COVERAGE - all nine required cases PASS**
+  child exits while reader blocked      -> testChildExitingWhileReaderBlockedStillResumesTheContinuation
+  reader reaches EOF after child exits  -> testReaderReachesEOFCleanlyAfterChildExit
+  child running but stream stalls       -> testWatchdogTerminatesAStalledChild
+  child exits WITH completion event     -> testNormalCompletionDeliversTheResultEvent
+  child exits WITHOUT completion event  -> testChildExitingWithoutCompletionReportsNonZeroExit
+  cancellation while blocked            -> testTaskCancellationWhileBlockedDoesNotHang
+  watchdog while process still alive    -> testWatchdogFiresWhileProcessIsStillAlive
+  watchdog racing with process exit     -> testWatchdogRacingWithProcessExitResumesExactlyOnce
+  pipe closure during streaming         -> testPipeClosureDuringStreamingIsBounded
+Plus: final line without newline; child exiting with no output; stdin delivered AND CLOSED; stdin
+without trailing newline; stdout/stderr separation; large output on BOTH streams (400 lines each -
+proves concurrent draining prevents a pipe-buffer deadlock); empty lines; CRLF normalisation; all four
+termination paths resumed exactly once; and NO LEAKED SUBPROCESSES.
+The race test runs 40 iterations of a very short-lived child against a 0.05 s watchdog - a double
+resume traps in CheckedContinuation, a missed resume hangs.
+
+**LIVE SMOKE TEST (new, runs FIRST so a plumbing defect surfaces in under a second, not 20 minutes in)**
+  outcome            : completed (401 bytes)
+  events received    : 6      first event: 0.048 s      launch ack: 0.159 s      wall: 0.819 s
+  stderr lines: 0     unrecognized lines: 0
+  stdin delivered, launch acknowledged, events incremental, terminated normally, durable result present.
+
+**FINAL LIVE RESULTS: 9/9 PASS**
+  live smoke (DTCA-1) 0.819 s | raw primitive | streamed DTCA-1 | F4 death 3.940 s |
+  F7 session loss 177.493 s | cancellation 156 ms | deliberate transport loss 4.04 s |
+  recovery after loss (2098 bytes) | performance on the E1 workload 18.512 s
+
+**FINAL COUNTS**
+  unit/integration tests: 336      failures: 0      skipped: 15 (all device-gated)
+  live-device tests: 9/9 PASS      build: SUCCEEDED
+  Count history 307 -> 314 -> 316 -> 335 -> 336, each change accounted for (+4 recovery-ownership,
+  streaming unit tests, +19 lifecycle regression, +1 smoke+helper). ** No test was removed or skipped
+  to make the suite pass. **
+
+**TRANSPORT USED: USB**, because wireless ADB could not be established (see the verification-round
+entry). This is an ENVIRONMENT/TRANSPORT FINDING, NOT an E1 implementation failure - the production
+path was exercised end-to-end, and f3552cf established wireless ADB working. USB instability is
+recorded separately as FAIL-006 and is NOT interpreted as a streaming implementation failure. ** No
+reconnect logic was added. **
+
+**ARCHITECTURE UNCHANGED - confirmed by inspection:** no TransportManager, no custom mDNS, no USB
+reconnect logic, no custom RPC, no WebSocket, no gRPC, no second protocol, no Android
+Service/listener, no new permissions, no network listener, and NO JOB TIMEOUT. The only time bounds
+remain the 120 s stall detector and the 5 s reap deadline.
+  persistent adb shell  ->  live progress / events / liveness / completion
+  durable result.json   ->  final result
+
+**Artifacts:** `phases/phase-07-e1-streaming-implementation.md` (section 23).

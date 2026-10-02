@@ -606,3 +606,128 @@ permissions and no Service; the Android sources are unchanged.
 **Not claimed:** any throughput improvement (the wall-time difference is within this workload's
 observed variance); any resolution of FAIL-006; any wireless persistence beyond what was previously
 verified in `f3552cf`.
+
+---
+
+## 23. Closeout — lifecycle regression suite and final state
+
+### 23.1 The gap this round closed
+
+The deadlock defects (2, 3) were **fixed but never proven in isolation**. The suite tested the
+reducer and the runner against a scripted transport, which cannot reproduce a defect that lives in
+the interaction between `Process`, pipe file handles, a reader thread and a timer — the bug *was*
+that the real objects did not behave as assumed.
+
+`StreamingLifecycleTests.swift` (new, **19 tests**) drives the **real** `ADBTransport` with **real
+subprocesses**, via a wrapper that emulates `adb`'s `-s <serial> shell <command>` argument shape so
+the production code path is exercised unmodified.
+
+Every test is wrapped in a hard wall-clock bound: **the failure mode under test is a hang, so a test
+that could itself hang would be unable to report it.** A bounded wait that expires raises a failure,
+not a skip.
+
+To make the termination paths observable in bounded time, `streamStallTimeout` and `childReapTimeout`
+were made **instance** properties with the production defaults unchanged (`120 s` / `5 s`). A test
+that had to wait the production 120 s to observe the watchdog would never be run.
+
+### 23.2 Coverage against the required cases
+
+| Required case | Test | Result |
+|---|---|---|
+| child exits while reader blocked | `testChildExitingWhileReaderBlockedStillResumesTheContinuation` | **PASS** |
+| reader reaches EOF after child exits | `testReaderReachesEOFCleanlyAfterChildExit` | **PASS** |
+| child running but stream stalls | `testWatchdogTerminatesAStalledChild` | **PASS** |
+| child exits normally with completion event | `testNormalCompletionDeliversTheResultEvent` | **PASS** |
+| child exits without completion event | `testChildExitingWithoutCompletionReportsNonZeroExit` | **PASS** |
+| cancellation while blocked | `testTaskCancellationWhileBlockedDoesNotHang` | **PASS** |
+| watchdog while process still alive | `testWatchdogFiresWhileProcessIsStillAlive` | **PASS** |
+| watchdog racing with process exit | `testWatchdogRacingWithProcessExitResumesExactlyOnce` | **PASS** |
+| pipe closure during streaming | `testPipeClosureDuringStreamingIsBounded` | **PASS** |
+
+Plus: final line without newline, child exiting with no output, stdin delivered **and closed**, stdin
+without trailing newline, stdout/stderr separation, large output on both streams (400 lines each —
+proves concurrent draining prevents a pipe-buffer deadlock), empty lines, CRLF normalisation, all
+four termination paths resumed exactly once (repeated), and **no leaked subprocesses**.
+
+The race test runs **40 iterations** of a very short-lived child against a 0.05 s watchdog, which is
+what makes the collision observable: a double resume traps in `CheckedContinuation`, a missed resume
+hangs.
+
+### 23.3 Live smoke test
+
+A bounded DTCA-1 smoke test was added as the **first** live test, so a plumbing defect surfaces in
+under a second rather than 20 minutes into an inference run. Result over USB:
+
+```
+=== LIVE SMOKE TEST (DTCA-1, no LLM) ===
+outcome               : completed(... 401 bytes)
+events received       : 6
+heartbeats            : 1
+first event (s)       : 0.048
+launch ack (s)        : 0.159
+wall (s)              : 0.819
+stderr lines          : 0
+unrecognized lines    : 0
+PASS
+```
+
+stdin delivered · launch acknowledged · 6 events incremental · terminated normally · zero stderr ·
+zero unrecognized · durable result present and carrying the job id.
+
+### 23.4 Final live results — 9/9 PASS
+
+| Test | Result |
+|---|---|
+| live smoke test (DTCA-1) | **PASS** (0.819 s) |
+| raw streaming primitive | **PASS** |
+| streamed DTCA-1 job with durable result | **PASS** |
+| worker death detected (F4) | **PASS** (3.940 s) |
+| session loss while worker continues (F7) | **PASS** (177.493 s) |
+| cancellation via `am force-stop` | **PASS** (156 ms) |
+| deliberate transport loss — bounded | **PASS** (4.04 s) |
+| recovery after deliberate transport loss | **PASS** (2098 bytes) |
+| performance on the E1 workload | **PASS** (18.512 s) |
+
+### 23.5 Final counts
+
+| Metric | Value |
+|---|---|
+| unit/integration tests | **336** |
+| failures | **0** |
+| skipped | **15** — all device-gated, skipped when `PIXELDESKTOP_DEVICE_SERIAL` is unset |
+| live-device tests | **9 / 9 PASS** |
+| build | SUCCEEDED |
+
+**Count history, and why it changed:** 307 → 314 → 316 → 335 → 336. Each change is accounted for:
+the four recovery-ownership tests (+4 → 314 as counted at the time), the streaming unit tests as the
+round progressed (316), and **+19 lifecycle regression tests** (335), then **+1** once the smoke test
+and its helper landed. **No test was removed or skipped to make the suite pass.**
+
+### 23.6 Transport used, and the wireless finding
+
+Live verification was performed over **USB**, because **wireless ADB could not be established**
+(§17). The brief asked for wireless; the attempt and its observations are recorded rather than
+worked around. This is an **environment/transport finding, not an E1 implementation failure** — the
+production path was exercised end-to-end, and the earlier verification (`f3552cf`) established
+wireless ADB working.
+
+Per the brief, the USB link's instability is recorded separately as **FAIL-006** (§18) and is **not**
+interpreted as a streaming implementation failure. **No reconnect logic was added.**
+
+### 23.7 Architecture unchanged
+
+Confirmed by inspection: no `TransportManager`, no custom mDNS, no USB reconnect logic, no custom
+RPC, no WebSocket, no gRPC, no second protocol, no Android Service/listener, no new permissions, no
+network listener, and **no job timeout**. The only time bounds remain the 120 s stall detector and
+the 5 s reap deadline.
+
+```
+persistent adb shell  →  live progress / events / liveness / completion
+durable result.json   →  final result
+```
+
+### 23.8 Final state
+
+Working tree clean after commit. See the repository log for the E1 commit sequence:
+`790164d` (experiment) → `715a173` (implementation) → `78595f4` (verification round) →
+final closeout commit.

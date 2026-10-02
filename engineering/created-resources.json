@@ -774,6 +774,15 @@
       "task_id": "e1-streaming-implementation",
       "purpose": "6 live-device streaming tests",
       "status": "active"
+    },
+    {
+      "path": "PixelDesktopTests/StreamingLifecycleTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-closeout",
+      "purpose": "19 bounded regression tests for the streaming subprocess/reader/watchdog lifecycle",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0B94C65804A065FE4F58021B /* Phase7EvidenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */; };
+		A1B2C3D40000000000000042 /* StreamingLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000000000041 /* StreamingLifecycleTests.swift */; };
 		A1B2C3D40000000000000032 /* Phase7StreamingDeviceHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000000000031 /* Phase7StreamingDeviceHarness.swift */; };
 		A1B2C3D40000000000000022 /* WorkerStreamingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000000000021 /* WorkerStreamingTests.swift */; };
 		0ED167DF68BEA9DBA5598406 /* InstalledApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */; };
@@ -78,6 +79,7 @@
 		832112C57257637193F8B80A /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
 		8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledApp.swift; sourceTree = "<group>"; };
 		90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7EvidenceTests.swift; sourceTree = "<group>"; };
+		A1B2C3D40000000000000041 /* StreamingLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingLifecycleTests.swift; sourceTree = "<group>"; };
 		A1B2C3D40000000000000031 /* Phase7StreamingDeviceHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7StreamingDeviceHarness.swift; sourceTree = "<group>"; };
 		A1B2C3D40000000000000021 /* WorkerStreamingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamingTests.swift; sourceTree = "<group>"; };
 		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -265,6 +267,7 @@
 				BDAA783B52EAF6DADE7A3ACC /* Phase7CapabilityContractTests.swift */,
 				DAC6788DDB017C6B88F28F6C /* Phase7DeviceEvidenceHarness.swift */,
 				90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */,
+				A1B2C3D40000000000000041 /* StreamingLifecycleTests.swift */,
 				A1B2C3D40000000000000031 /* Phase7StreamingDeviceHarness.swift */,
 				A1B2C3D40000000000000021 /* WorkerStreamingTests.swift */,
 				560A663C5EAF42792941431A /* PixelDesktopTests.swift */,
@@ -370,6 +373,7 @@
 				EE351D09DFE728DB6E40FBFC /* Phase7CapabilityContractTests.swift in Sources */,
 				733E8ACD972D747654978D05 /* Phase7DeviceEvidenceHarness.swift in Sources */,
 				0B94C65804A065FE4F58021B /* Phase7EvidenceTests.swift in Sources */,
+				A1B2C3D40000000000000042 /* StreamingLifecycleTests.swift in Sources */,
 				A1B2C3D40000000000000032 /* Phase7StreamingDeviceHarness.swift in Sources */,
 				A1B2C3D40000000000000022 /* WorkerStreamingTests.swift in Sources */,
 				619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */,

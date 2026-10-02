@@ -9,11 +9,28 @@ actor ADBTransport: TransportProtocol {
     /// This is **not** a job timeout — it is a *stall* detector. A live worker reports a heartbeat
     /// every 0.5 s, so silence of this length means the transport is gone, not that the job is long.
     /// E1 F5 proved a job may legitimately exceed 90 s, so the bound is on quiet, not duration.
-    static let streamStallTimeout: TimeInterval = 120.0
+    ///
+    /// Instance-level rather than static so the watchdog's termination path can be exercised in
+    /// bounded time by a regression test. A test that had to wait the production 120 s to observe
+    /// the watchdog would be a test nobody runs.
+    let streamStallTimeout: TimeInterval
 
-    init(adbPath: String = "/opt/homebrew/bin/adb", defaultTimeout: TimeInterval = 30.0) {
+    /// How long to wait for the child to exit before forcibly reaping it.
+    ///
+    /// Also instance-level for the same reason: it is a termination path, and termination paths
+    /// must be testable.
+    let childReapTimeout: TimeInterval
+
+    init(
+        adbPath: String = "/opt/homebrew/bin/adb",
+        defaultTimeout: TimeInterval = 30.0,
+        streamStallTimeout: TimeInterval = 120.0,
+        childReapTimeout: TimeInterval = 5.0
+    ) {
         self.adbPath = adbPath
         self.defaultTimeout = defaultTimeout
+        self.streamStallTimeout = streamStallTimeout
+        self.childReapTimeout = childReapTimeout
     }
 
     func execute(command: String, arguments: [String], timeout: TimeInterval) async throws -> TransportResult {
@@ -276,7 +293,7 @@ actor ADBTransport: TransportProtocol {
         // defect already found twice in this path.
         let stderrHandle = stderrPipe.fileHandleForReading
         let stderrQueue = DispatchQueue(label: "pixeldesktop.adb.stderr")
-        stderrQueue.asyncAfter(deadline: .now() + Self.streamStallTimeout + 5.0) {
+        stderrQueue.asyncAfter(deadline: .now() + streamStallTimeout + 5.0) {
             try? stderrHandle.close()
         }
         stderrQueue.async {
@@ -345,7 +362,7 @@ actor ADBTransport: TransportProtocol {
             // `streamStallTimeout` means the transport is gone — not that the job is long. This is
             // a stall detector, never a job-duration limit (E1 F5).
             let watchdog = DispatchQueue(label: "pixeldesktop.adb.watchdog")
-            watchdog.asyncAfter(deadline: .now() + Self.streamStallTimeout) {
+            watchdog.asyncAfter(deadline: .now() + streamStallTimeout) {
                 guard !state.isFinished else { return }
 
                 if process.isRunning {
@@ -369,7 +386,7 @@ actor ADBTransport: TransportProtocol {
         // caller would never return. Observed on the real device — the wireless entry vanished
         // mid-session and the run sat for 15 minutes with the watchdog already fired. The child is
         // therefore polled with a deadline and killed if it does not exit.
-        let reapDeadline = Date().addingTimeInterval(5.0)
+        let reapDeadline = Date().addingTimeInterval(childReapTimeout)
         while process.isRunning, Date() < reapDeadline {
             Thread.sleep(forTimeInterval: 0.05)
         }
