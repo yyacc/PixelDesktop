@@ -783,6 +783,14 @@
       "task_id": "e1-closeout",
       "purpose": "19 bounded regression tests for the streaming subprocess/reader/watchdog lifecycle",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-step-3-refusal-path.md",
+      "created_by": "Hermes",
+      "phase": 7,
+      "task_id": "phase-07-step-3",
+      "purpose": "Step 3 refusal-path reconnaissance, findings, and results",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

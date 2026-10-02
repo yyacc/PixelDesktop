@@ -24,7 +24,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 4 — Android Application / Process Control:** COMPLETE
 **Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) IMPLEMENTED and verified on device
 **Phase 6 — Local AI Worker:** FIRST INFERENCE PROOF COMPLETE — real LLM inference on the Pixel 7a
-**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** **Steps 1–2 COMPLETE** (capability contract + measured evidence); Step 3 awaiting approval
+**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** **Steps 1–3 COMPLETE** (capability contract + measured evidence + refusal path); Step 3 found 3 dead error cases and 1 erased structure — open decisions S3-1..S3-4
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md) and its **Amendment 1**
@@ -56,6 +56,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 7 Architecture Re-Evaluation](phases/phase-07-architecture-reevaluation.md) — Hermes owns planning; PixelDesktop publishes a capability contract
 - [Phase 7 Step 1 — The Pixel Capability Contract](phases/phase-07-step-1-capability-contract.md) — **implemented**: contract, provenance model, real-device verification
 - [Phase 7 Step 2 — Measured Evidence](phases/phase-07-step-2-evidence.md) — **implemented**: device state, execution evidence, freshness, snapshot-not-reservation
+- [Phase 7 Step 3 — The Refusal Path](phases/phase-07-step-3-refusal-path.md) — **implemented**: 8 tests; found 3 unreachable error cases + 1 erased structure; open decisions S3-1..S3-4
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements

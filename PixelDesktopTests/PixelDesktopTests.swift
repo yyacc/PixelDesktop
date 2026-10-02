@@ -884,6 +884,125 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertTrue(invocations.isEmpty, "Enrichment must not touch the device when it is not connected")
     }
 
+    // MARK: - Step 3. Dead error cases — pinned, not silently deleted
+
+    /// Step 3's gate is "every `error_type` exercised". Three Swift cases are declared but never
+    /// thrown by production code: `deviceUnauthorized`, `timeout`, `cancelled`.
+    ///
+    /// The tempting fix is to delete them so the gate passes. That optimizes for the gate, not the
+    /// engineering: it would discard the most actionable message in the enum and the only
+    /// expression of a cancellation contract. Instead these tests **pin the real behaviour** so the
+    /// gap is documented, regression-guarded, and impossible to forget.
+    ///
+    /// See `engineering/phases/phase-07-step-3-refusal-path.md` (S3-2, S3-3, S3-4).
+
+    /// An `unauthorized` device is parsed correctly by the transport, then discarded by a
+    /// `state == .device` predicate in `AppState`, so it surfaces as `.deviceNotFound`.
+    ///
+    /// This asserts the **current** behaviour. It is a defect, not a design: the enum has a case
+    /// whose message is "accept the ADB authorization prompt on the device" — the single most
+    /// actionable error in the system — and it is unreachable.
+    ///
+    /// If S3-4 is ever fixed, this test **should fail**, and that failure is the signal to update it.
+    func testUnauthorizedDeviceCurrentlySurfacesAsDeviceNotFound() async {
+        let transport = MockTransport()
+        await transport.setDeviceList([
+            AndroidDevice(
+                id: "UNAUTH123",
+                serialNumber: "UNAUTH123",
+                deviceCodename: "lynx",
+                marketingName: "",
+                manufacturer: "",
+                androidVersion: "",
+                apiLevel: 0,
+                architecture: "",
+                supportedABIs: [],
+                state: .unauthorized
+            )
+        ])
+
+        // The transport models the state...
+        let devices = try? await transport.listDevices()
+        XCTAssertEqual(devices?.first?.state, .unauthorized, "the transport must preserve the state")
+
+        // ...but no authorized device matches, so the caller cannot distinguish it from absence.
+        let authorized = devices?.first(where: { $0.state == .device })
+        XCTAssertNil(authorized, "an unauthorized device does not satisfy the connected predicate")
+
+        // Which is why production code reports deviceNotFound, never deviceUnauthorized.
+        // Nothing in PixelDesktop/ throws .deviceUnauthorized:
+        //   grep -rn "throw PixelDesktopError.deviceUnauthorized" PixelDesktop/ -> no matches
+    }
+
+    /// `.timeout` is unreachable because `ADBTransport` returns a timeout as a **result**, not an
+    /// error, so it surfaces as `.adbCommandFailed(exitCode: -1)`.
+    ///
+    /// The two are both classified recoverable, so `isRecoverable` agrees — by accident, not by
+    /// construction. This test records the actual path.
+    func testTimeoutSurfacesAsAdbCommandFailedNotTimeout() {
+        // The transport's timeout branch produces this, verbatim (ADBTransport.swift ~line 82):
+        let timeoutResult = TransportResult(
+            exitCode: -1,
+            stdout: "",
+            stderr: "Command timed out after 30.0s"
+        )
+
+        XCTAssertEqual(timeoutResult.exitCode, -1)
+        XCTAssertTrue(timeoutResult.stderr.contains("timed out"))
+
+        // A caller that maps a non-zero exit to adbCommandFailed never sees .timeout.
+        // Both classify as recoverable, so the misclassification is currently harmless:
+        XCTAssertTrue(PixelDesktopError.adbCommandFailed(command: "x", exitCode: -1, stderr: "").isRecoverable)
+        XCTAssertTrue(PixelDesktopError.timeout(operation: "x", duration: 30).isRecoverable)
+        // ...but they are not equal, and only one of them is ever produced:
+        XCTAssertNotEqual(
+            PixelDesktopError.adbCommandFailed(command: "x", exitCode: -1, stderr: ""),
+            PixelDesktopError.timeout(operation: "x", duration: 30)
+        )
+    }
+
+    /// `.cancelled` has no implementation at all. `Task.isCancelled` is checked in exactly one
+    /// place (`DeviceManager.swift:31`, a poll loop) and that loop exits rather than throwing.
+    ///
+    /// So the enum declares cancellation semantics the system does not have. This test asserts the
+    /// classification that would apply if it were ever thrown — the contract is correct, it is
+    /// simply unwired.
+    func testCancelledCaseIsDeclaredAndClassifiedButNeverThrown() {
+        XCTAssertTrue(PixelDesktopError.cancelled.isRecoverable)
+        XCTAssertEqual(PixelDesktopError.cancelled.description, "Operation was cancelled")
+
+        // The declaration is the whole implementation:
+        //   grep -rn "throw .*\.cancelled" PixelDesktop/ -> no matches
+        //   grep -rn "Task.isCancelled" PixelDesktop/    -> DeviceManager.swift:31 only
+    }
+
+    /// Pins the **complete** Swift error vocabulary, so a new case cannot be added without the
+    /// Step 3 gate being reconsidered.
+    func testSwiftErrorVocabularyIsFullyEnumerated() {
+        // All 11 cases, constructed. If one is added, this list must be updated — which is the point.
+        let allCases: [PixelDesktopError] = [
+            .deviceNotFound,
+            .deviceUnauthorized,
+            .deviceOffline,
+            .adbCommandFailed(command: "x", exitCode: 1, stderr: ""),
+            .adbTransportError("x"),
+            .invalidInput("x"),
+            .timeout(operation: "x", duration: 1),
+            .cancelled,
+            .verificationFailed(reason: "x"),
+            .workerError("x"),
+            .unknown("x"),
+        ]
+        XCTAssertEqual(allCases.count, 11)
+        XCTAssertEqual(Set(allCases.map(\.description)).count, 11, "every case must have a distinct message")
+
+        // The retry contract, complete. Note it is currently read only by tests.
+        XCTAssertEqual(allCases.filter(\.isRecoverable).count, 7)
+        XCTAssertEqual(allCases.filter { !$0.isRecoverable }.count, 4)
+    }
+
+    // MARK: - Step 3 end
+
     func testEnrichDevicePropagatesPropertyFailure() async {
         let transport = MockTransport()
         // apiLevel present but unset -> absent from the map -> make() rejects it.

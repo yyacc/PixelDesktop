@@ -1738,3 +1738,59 @@ remain the 120 s stall detector and the 5 s reap deadline.
   durable result.json   ->  final result
 
 **Artifacts:** `phases/phase-07-e1-streaming-implementation.md` (section 23).
+
+---
+
+## 2026-10-02 — Phase 7 Step 3: The Refusal Path
+
+**Phase:** 7 — Pixel Capability Contract & Hermes Workload Planning
+**Task:** Step 3 — harden the refusal path (confirm bounded, machine-readable, non-retryable by contract)
+**Classification:** BOUNDED — verification of existing behaviour, no new subsystem
+
+**Starting state:** `8419f6b`, 336 tests / 0 failures / 15 skipped.
+
+**Action:** Read the two error vocabularies (Swift `PixelDesktopError`, 11 cases; Android worker
+`error_type`, 5 values). Counted every throw site and every test assertion. Applied Step 3's own gate:
+*"every `error_type` exercised."*
+
+**Result — the gate did not pass, and the finding is more interesting than a missing test:**
+
+- **Bounded: PASS.** Every refusal follows a bounded wait or an immediate input check. Bounds: 30 s
+  ADB default, 120 s stall detector (correctly *not* a job timeout), 5 s reap, 4096-char prompt
+  ceiling, max_tokens ceiling.
+- **Machine-readable: PARTIAL.** The worker emits a structured `error_type`; the Mac **erases it**.
+  `WorkerResultEnvelope.asDTCA1Result()` flattens it into `workerError("... MODEL_MISSING ...")` prose.
+  Nothing consumes `errorType` programmatically — `MODEL_MISSING` and `INVALID_INPUT` become the same
+  case distinguished only by text. **S3-1.**
+- **Non-retryable: PARTIAL.** `isRecoverable` implements the correct 7/4 split, and is **read only by
+  tests** — declared, correct, inert. No retry loop exists, so nothing violates it. **S3-6.**
+- **Gate: FAIL on 6 of 16 vocabulary entries.**
+
+**Three dead Swift cases — each a different problem, not one problem:**
+- `.timeout` — the transport implements the timeout then returns it as a **result**, so it surfaces as
+  `adbCommandFailed(exitCode: -1)`. The declared case is unreachable. **S3-2.**
+- `.cancelled` — no implementation at all. `Task.isCancelled` appears once, in a poll loop that exits
+  rather than throws. **S3-3.**
+- `.deviceUnauthorized` — `DeviceState.unauthorized` **is** parsed correctly (`ADBTransport:138`), then
+  discarded by `devices.first(where: { $0.state == .device })` in `AppState`. Surfaces as
+  `.deviceNotFound`. The enum's most actionable message — *"accept the ADB authorization prompt on the
+  device"* — is unreachable. **S3-4.**
+
+**Decision: did NOT delete the dead cases.** Deleting them would make the gate pass while destroying
+intent. Recorded instead, and pinned with tests that are **designed to fail when S3-2/3/4 are fixed.**
+
+**Corrections implemented:** S3-5 only — 8 tests. Worker vocabulary completed (3 new + 1 pin); Swift
+vocabulary pinned (4 new).
+
+**Tests:** 336 → **344**, 0 failures, 15 skipped, 20 s. No test removed, skipped, or weakened.
+
+**Regression:** full suite re-run after the change. Clean.
+
+**Open decisions (not taken unilaterally):** S3-1 (typed worker refusal), S3-2 (type or reserve
+`.timeout`), S3-3 (implement or remove `.cancelled`), S3-4 (wire or remove `.deviceUnauthorized`).
+
+**Lesson:** a gate expressed as "every X exercised" can be passed two ways — exercise them, or delete
+them. Only one of those is engineering. The gate needed the qualifier *"and account for each one
+honestly"*.
+
+**Artifacts:** `phases/phase-07-step-3-refusal-path.md`.

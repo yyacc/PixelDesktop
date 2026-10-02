@@ -167,6 +167,116 @@ final class WorkerStreamingTests: XCTestCase {
         XCTAssertTrue(json.contains("MODEL_MISSING"))
     }
 
+    // MARK: - 5b. Step 3 — every worker error_type is exercised
+
+    /// Step 3's gate requires that **every** `error_type` the worker can emit is exercised.
+    ///
+    /// `MODEL_MISSING` and `INVALID_INPUT` were already covered above; the three below were not,
+    /// so the gate could not pass. Each test drives the real failure envelope through the real
+    /// reducer and asserts the structured `error_type` survives the boundary intact.
+    ///
+    /// The worker's full vocabulary is fixed in `LlmWorkload.java`: INVALID_INPUT,
+    /// NATIVE_LIBRARY_MISSING, MODEL_MISSING, MODEL_LOAD_FAILED, INFERENCE_FAILED. These tests
+    /// complete the set.
+    ///
+    /// Note what these tests do **not** yet assert: that the error_type is *typed* rather than
+    /// prose on the Mac side. It is currently flattened by `asDTCA1Result()` into a
+    /// `workerError(String)` — see engineering/phases/phase-07-step-3-refusal-path.md (S3-1).
+    /// These tests pin the current, observable behaviour so the gate is honest; they are the
+    /// regression harness a future S3-1 fix must keep passing.
+    private func assertWorkerFailureSurfaces(
+        errorType: String,
+        errorMessage: String,
+        jobId: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async throws {
+        let transport = MockTransport()
+        let failureJSON = """
+        {"status":"FAILED","job_id":"\(jobId)","error_type":"\(errorType)","error_message":"\(errorMessage)"}
+        """
+        await transport.setStreamingLines([
+            "PDE1 START job_id=\(jobId)",
+            "PDE1 LAUNCHED",
+            "PDE1 HEARTBEAT n=1 pid=60",
+            "PDE1 RESULT_BEGIN",
+            failureJSON,
+            "PDE1 RESULT_END bytes=\(failureJSON.utf8.count)",
+        ])
+        await transport.setShellResponse(
+            "stat -c %s \(WorkerTransferContract.remoteResultPath)",
+            TransportResult(exitCode: 0, stdout: "\(failureJSON.utf8.count)", stderr: "")
+        )
+
+        let runner = WorkerStreamRunner(transport: transport)
+        let run = try await runner.run(deviceSerial: "serial", jobId: jobId, payload: "{}")
+
+        guard case .completed(let json, _) = run.outcome else {
+            return XCTFail("Expected the failure envelope, got \(run.outcome)", file: file, line: line)
+        }
+        XCTAssertTrue(
+            json.contains(errorType),
+            "worker error_type \(errorType) must survive to the durable result",
+            file: file, line: line
+        )
+
+        // The Mac-side flattening: this is the current contract, asserted so a change is deliberate.
+        let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
+        XCTAssertEqual(envelope.errorType, errorType, file: file, line: line)
+        XCTAssertFalse(envelope.isCompleted, file: file, line: line)
+        XCTAssertThrowsError(try envelope.asDTCA1Result(), file: file, line: line) { error in
+            guard case PixelDesktopError.workerError(let message) = error else {
+                return XCTFail("Expected workerError, got \(error)", file: file, line: line)
+            }
+            XCTAssertTrue(message.contains(errorType), file: file, line: line)
+        }
+    }
+
+    /// The native library failed to load — a packaging/build failure, not a job failure.
+    func testNativeLibraryMissingIsExercised() async throws {
+        try await assertWorkerFailureSurfaces(
+            errorType: "NATIVE_LIBRARY_MISSING",
+            errorMessage: "libllama.so not found",
+            jobId: "job-native-missing"
+        )
+    }
+
+    /// The model file exists but the runtime refused it (corrupt or incompatible).
+    func testModelLoadFailedIsExercised() async throws {
+        try await assertWorkerFailureSurfaces(
+            errorType: "MODEL_LOAD_FAILED",
+            errorMessage: "failed to load model from gguf",
+            jobId: "job-load-failed"
+        )
+    }
+
+    /// Inference started and then failed — the catch-all for runtime failure.
+    func testInferenceFailedIsExercised() async throws {
+        try await assertWorkerFailureSurfaces(
+            errorType: "INFERENCE_FAILED",
+            errorMessage: "native decode returned null",
+            jobId: "job-inference-failed"
+        )
+    }
+
+    /// Pins the **complete** worker vocabulary in one place.
+    ///
+    /// If the worker gains a new `error_type`, this test fails and forces the gate to be revisited
+    /// rather than silently shrinking. The five values are fixed in `LlmWorkload.java`.
+    func testWorkerErrorVocabularyIsFullyEnumerated() {
+        let workerVocabulary: Set<String> = [
+            "INVALID_INPUT",
+            "NATIVE_LIBRARY_MISSING",
+            "MODEL_MISSING",
+            "MODEL_LOAD_FAILED",
+            "INFERENCE_FAILED",
+        ]
+        XCTAssertEqual(
+            workerVocabulary.count, 5,
+            "worker error_type vocabulary changed — update Step 3's gate and the tests above"
+        )
+    }
+
     // MARK: - 6/7. Worker exits unexpectedly; PID disappears during execution (E1 F4)
 
     func testWorkerDeathDuringExecutionProducesAnExplicitTerminalOutcome() async throws {
