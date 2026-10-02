@@ -2,8 +2,27 @@
 
 ## Status
 
-**PROPOSED — NOT APPROVED.** This ADR is a checkpoint for review. Nothing in it is a requirement
-until approved.
+**APPROVED and IMPLEMENTED.** Approved as the Phase 6 design checkpoint; implementation complete
+and verified on the physical Pixel 7a.
+
+**Post-implementation update (2026-10-02):**
+- **R1 is RESOLVED — the one-shot Activity survives.** Measured first with a self-contained probe
+  (300 s CPU-bound Activity): PASS unlocked/active, PASS locked/dozing, PASS forced deep doze. Then
+  confirmed on the real inference workload, which completed while the device was Dozing. **No
+  Service is required.** See `phases/phase-06-local-ai-implementation.md` §3.
+- **R4 is RESOLVED — greedy IS reproducible here.** 3/3 runs produced identical token IDs
+  `[785, 6722, 315, 9625, 374, 12095, 13]`, compared on token ids rather than text.
+- **P6 (llama.cpp + GGUF on CPU) was implemented as proposed.** llama.cpp `a868c3e`, ggml 0.25.3,
+  NDK 27.2, arm64-v8a, CPU only.
+- **The model class changed from the proposed ~1B to ~1.5B** (Qwen2.5-1.5B-Instruct Q4_K_M,
+  Apache-2.0). The measured 1279 MB peak fits the budget ADR-012 estimated at 1.2–1.5 GB.
+- **R5 (decode rate) is now measured: ~0.97–1.46 tok/s.** ADR-012 deliberately refused to
+  estimate this, and it turned out to be the limiting factor.
+- **R3 (memory) is RESOLVED:** 1279 MB native peak against ~2.6 GB available — five times the
+  256 MB Java heap cap, confirming the reconnaissance distinction.
+- No approved decision was contradicted. **No Android platform assumption was falsified** — the
+  first phase where that is true, plausibly because R1 and the runtime were probed before the
+  design was committed to.
 
 ## Date
 

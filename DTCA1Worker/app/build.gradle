@@ -5,13 +5,37 @@ plugins {
 android {
     namespace 'com.pixeldesktop.worker'
     compileSdk 36
+    ndkVersion '27.2.12479018'
 
     defaultConfig {
         applicationId 'com.pixeldesktop.worker'
         minSdk 31
         targetSdk 36
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '2.0'
+
+        // arm64-v8a ONLY. The Pixel 7a reports ro.product.cpu.abilist = arm64-v8a with no
+        // 32-bit fallback, and llama.cpp is built for aarch64. Shipping additional ABIs would
+        // multiply APK size for no benefit on this device.
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+
+        externalNativeBuild {
+            cmake {
+                // c++_static must match the STL llama.cpp was built with, or the static
+                // libraries will not link.
+                arguments '-DANDROID_STL=c++_static'
+                cppFlags '-std=c++17'
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+            version '3.22.1'
+        }
     }
 
     buildTypes {
@@ -23,8 +47,17 @@ android {
         }
     }
 
+    // The native runtime ships as a shared library inside the APK. This is the ONLY executable
+    // location available to an app: the reconnaissance measured /storage/emulated as mounted
+    // noexec, so a runtime could never be executed from the exchange directory.
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
     // No dependencies beyond the Android SDK. JSON comes from org.json, which is in the
-    // platform. The worker declares ZERO permissions.
+    // platform. The worker still declares ZERO permissions.
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17

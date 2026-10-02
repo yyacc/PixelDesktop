@@ -12,6 +12,7 @@
 		16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045B4B73580F62547149ED08 /* PixelDesktopError.swift */; };
 		1B38F5862DED7D80E048E372 /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1C96AAA82CA14C8156167C /* DeviceManager.swift */; };
 		29FAB8602ECBCFF901C8CBD6 /* AppOperationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F9BDD850C20BCFC6BCA598 /* AppOperationsProtocol.swift */; };
+		31F8DF7D7DF82AC901DEF04E /* InferenceRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */; };
 		336E7BB5E988EE0A004A6E45 /* AndroidDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */; };
 		5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D453AF971B8227981443968 /* DTCA1Worker.swift */; };
 		619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560A663C5EAF42792941431A /* PixelDesktopTests.swift */; };
@@ -19,10 +20,12 @@
 		6588C60ED7417106754355CB /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832112C57257637193F8B80A /* Transport.swift */; };
 		70635EF1BAFDE1C6600A49A6 /* WorkerInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1E177AF6227A5996CA07B3 /* WorkerInstaller.swift */; };
 		809AB5880C38024AC93D96AC /* ADBAppOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */; };
+		83BB4FAB62407EE3B74B8CB4 /* Phase6InferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB80C04344731006041936C /* Phase6InferenceTests.swift */; };
 		83F0BD2A99208139ABB6CE8A /* DTCA1Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CCD306C655C2A44C786B42 /* DTCA1Job.swift */; };
 		88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */; };
 		91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */; };
 		9E0652E777A5E8BE5946EF59 /* WorkerLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C234D386B8952BA7EE0FF257 /* WorkerLifecycle.swift */; };
+		9EFBC0E7990967B866CAFC41 /* ModelProvisioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56771EB671377140963F0BF /* ModelProvisioning.swift */; };
 		A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */; };
 		A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */; };
 		B00693F03ADEF73B54EB40A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C52DFC447810455E987F16D /* Assets.xcassets */; };
@@ -31,6 +34,7 @@
 		E72D168C6E8BEE4FCD149163 /* ADBTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */; };
 		ECA8FE38ADF8E7F5FCC57FE6 /* WorkerOperationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */; };
 		EFB4F801B6B07AFAC5090BFE /* WorkerComputeProof.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE82D7431F3D03AEDA966728 /* WorkerComputeProof.swift */; };
+		F76C2625B9B1AA0520FADC18 /* InferenceEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +53,7 @@
 		29EEE5EA3E8F6933113FA516 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		31CCD306C655C2A44C786B42 /* DTCA1Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTCA1Job.swift; sourceTree = "<group>"; };
 		41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultVerifier.swift; sourceTree = "<group>"; };
+		4BB80C04344731006041936C /* Phase6InferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase6InferenceTests.swift; sourceTree = "<group>"; };
 		560A663C5EAF42792941431A /* PixelDesktopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopTests.swift; sourceTree = "<group>"; };
 		59495D8B39B4270FE682515C /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		5C52DFC447810455E987F16D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -60,14 +65,17 @@
 		832112C57257637193F8B80A /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
 		8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledApp.swift; sourceTree = "<group>"; };
 		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A56771EB671377140963F0BF /* ModelProvisioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelProvisioning.swift; sourceTree = "<group>"; };
 		B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
 		BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerOperationsProtocol.swift; sourceTree = "<group>"; };
 		C234D386B8952BA7EE0FF257 /* WorkerLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerLifecycle.swift; sourceTree = "<group>"; };
 		C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBAppOperations.swift; sourceTree = "<group>"; };
+		CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InferenceRuntime.swift; sourceTree = "<group>"; };
 		D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopApp.swift; sourceTree = "<group>"; };
 		DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEnricher.swift; sourceTree = "<group>"; };
 		DEECEB33C31DAB1BF023236B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E7C2D83AFA87754C63612A30 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InferenceEvidence.swift; sourceTree = "<group>"; };
 		EE1C96AAA82CA14C8156167C /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
 		EE82D7431F3D03AEDA966728 /* WorkerComputeProof.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerComputeProof.swift; sourceTree = "<group>"; };
 		FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerTransferContract.swift; sourceTree = "<group>"; };
@@ -100,6 +108,7 @@
 				464295B08B2849859094B2BE /* Compute */,
 				7A34BB91CBC8A89E485F96B7 /* Core */,
 				B9D2EC1D7C2A00ED2D2BBABD /* Device */,
+				80CED929C0F4541EFB8D81A3 /* Inference */,
 				EC5B83872D0FD302834606B2 /* Operations */,
 				D052E11B69A45A0FE1265DF4 /* Transport */,
 				297CB6D35AA23D96C557A278 /* Verification */,
@@ -150,6 +159,16 @@
 				09877C10C67BC1CB066C4E91 /* Models */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		80CED929C0F4541EFB8D81A3 /* Inference */ = {
+			isa = PBXGroup;
+			children = (
+				E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */,
+				CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */,
+				A56771EB671377140963F0BF /* ModelProvisioning.swift */,
+			);
+			path = Inference;
 			sourceTree = "<group>";
 		};
 		8BD41B949A36854C01BCF408 /* App */ = {
@@ -214,6 +233,7 @@
 		FC2E3DC2516F7D52AF7895C8 /* PixelDesktopTests */ = {
 			isa = PBXGroup;
 			children = (
+				4BB80C04344731006041936C /* Phase6InferenceTests.swift */,
 				560A663C5EAF42792941431A /* PixelDesktopTests.swift */,
 			);
 			path = PixelDesktopTests;
@@ -313,6 +333,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83BB4FAB62407EE3B74B8CB4 /* Phase6InferenceTests.swift in Sources */,
 				619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -333,7 +354,10 @@
 				A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */,
 				88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */,
 				1B38F5862DED7D80E048E372 /* DeviceManager.swift in Sources */,
+				F76C2625B9B1AA0520FADC18 /* InferenceEvidence.swift in Sources */,
+				31F8DF7D7DF82AC901DEF04E /* InferenceRuntime.swift in Sources */,
 				0ED167DF68BEA9DBA5598406 /* InstalledApp.swift in Sources */,
+				9EFBC0E7990967B866CAFC41 /* ModelProvisioning.swift in Sources */,
 				91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */,
 				16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */,
 				A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */,

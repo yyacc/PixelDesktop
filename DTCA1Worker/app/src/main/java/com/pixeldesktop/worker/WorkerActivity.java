@@ -122,19 +122,37 @@ public class WorkerActivity extends Activity {
             String workload = job.optString("workload", "");
             String input = job.optString("input", "");
 
-            if (!"DTCA-1".equals(workload)) {
+            JSONObject result;
+
+            if ("DTCA-1".equals(workload)) {
+                // The Phase 5 deterministic workload. Unchanged, and still independently
+                // verifiable by re-computation on the Mac.
+                result = Dtca1.execute(input, jobId);
+
+            } else if (LlmWorkload.WORKLOAD_NAME.equals(workload)) {
+                // Phase 6: real local language-model inference. Not recomputable on the Mac —
+                // the Mac has no model and no runtime — so it is verified by an evidence chain
+                // and an ablation test instead. See ADR-012 §P7.
+                LlmWorkload.ensureModelDirectory(dir);
+                result = LlmWorkload.execute(job, dir);
+
+            } else {
                 throw new Dtca1.InvalidInput("unsupported workload: '" + workload + "'");
             }
-
-            // The computation. Everything above is I/O and validation.
-            JSONObject result = Dtca1.execute(input, jobId);
 
             writeFile(resultFile, result.toString());
             Log.i(TAG, "WORKER_RESULT_READY job_id=" + jobId
                     + " status=" + result.optString("status")
-                    + " total_words=" + result.optInt("total_words")
-                    + " unique_words=" + result.optInt("unique_words")
+                    + " workload=" + workload
+                    + " generated_tokens=" + result.optInt("generated_tokens")
                     + " duration_ms=" + result.optLong("execution_duration_ms"));
+
+        } catch (LlmWorkload.Failure llmFailure) {
+            // Bounded, machine-readable failure. The error type is a fixed token, never raw
+            // native output, so a native error cannot become an unrestricted protocol.
+            writeFailure(resultFile, jobId, llmFailure.errorType, llmFailure.getMessage());
+            Log.e(TAG, "WORKER_FAILED job_id=" + jobId + " type=" + llmFailure.errorType
+                    + " " + llmFailure.getMessage());
 
         } catch (Dtca1.InvalidInput invalid) {
             // Deterministic failure reporting: write a FAILED result rather than crashing, so the

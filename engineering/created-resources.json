@@ -468,6 +468,96 @@
       "task_id": "phase-06-recon",
       "purpose": "ADR-012 local AI worker (PROPOSED, not approved)",
       "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-06-local-ai-implementation.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "Phase 6 implementation report and inference proof",
+      "status": "complete"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/InferenceRuntime.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "Runtime adapter boundary (ADR-012 section 2)",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/ModelProvisioning.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "Model contract, validation, transfer verification",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/InferenceEvidence.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "Evidence chain and greedy stability",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase6InferenceTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "40 deterministic Phase 6 tests",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/cpp/llama_jni.cpp",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "JNI bridge to llama.cpp (only file touching the C API)",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/cpp/CMakeLists.txt",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "Native runtime build integration",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/java/com/pixeldesktop/worker/LlamaBridge.java",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "Java-side native runtime boundary",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/java/com/pixeldesktop/worker/LlmWorkload.java",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "LOCAL-LLM-1 workload executor",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-impl",
+      "purpose": "Model artifact (Apache-2.0); not committed - too large",
+      "status": "external"
     }
   ],
   "evidence_artifacts_outside_repo": [
