@@ -165,7 +165,10 @@ struct WorkerStreamRunner {
             // the worker is independent of it, so ask the device before concluding anything.
             let (alive, pid) = try await observeWorkerAfterStream(deviceSerial: deviceSerial)
 
-            if let recovered = try await recoverDurableResult(deviceSerial: deviceSerial) {
+            if let recovered = try await recoverDurableResult(
+                deviceSerial: deviceSerial,
+                expectedJobId: jobId
+            ) {
                 finalOutcome = .recoveredFromDevice(
                     resultJSON: recovered.json,
                     resultBytes: recovered.bytes
@@ -234,12 +237,27 @@ struct WorkerStreamRunner {
         }
     }
 
-    /// Reads the durable result if it exists on the device.
+    /// Reads the durable result if it exists on the device **and belongs to this job**.
     ///
     /// This is the recovery path for E1 F7: the stream is gone, but the worker may have completed
     /// and written its result anyway.
+    ///
+    /// ## Why the job id is checked here
+    ///
+    /// The device script removes any previous `result.json` before launching, but that removal only
+    /// happens if the script actually ran. When the session dies before producing **any** output,
+    /// there is no evidence the script reached its `rm`, so a result left by an earlier job could
+    /// still be sitting at the fixed path.
+    ///
+    /// Reporting that as a recovery for *this* job would be a false positive — the exact failure
+    /// mode the fixed-path contract's staleness rule exists to prevent. A recovered result whose
+    /// `job_id` does not match is therefore **not** treated as this job's result.
+    ///
+    /// - Returns: the result and its device-reported size, or `nil` when there is no result, or the
+    ///   result belongs to a different job.
     private func recoverDurableResult(
-        deviceSerial: String
+        deviceSerial: String,
+        expectedJobId: String
     ) async throws -> (json: String, bytes: Int)? {
         guard let bytes = try await durableResultBytes(deviceSerial: deviceSerial), bytes > 0 else {
             return nil
@@ -254,7 +272,25 @@ struct WorkerStreamRunner {
         let content = read.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
         guard read.isSuccess, !content.isEmpty else { return nil }
 
+        guard Self.resultBelongsToJob(content, jobId: expectedJobId) else {
+            return nil
+        }
+
         return (content, bytes)
+    }
+
+    /// Whether a result payload carries the expected `job_id`.
+    ///
+    /// Deliberately tolerant of a payload that is not valid JSON: an unparseable result is not
+    /// evidence of ownership, so it is rejected rather than accepted. This mirrors ADR-004's rule
+    /// that a result which cannot be parsed is never trusted.
+    static func resultBelongsToJob(_ json: String, jobId: String) -> Bool {
+        guard let data = json.data(using: .utf8) else { return false }
+        guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return false
+        }
+        guard let returned = object["job_id"] as? String else { return false }
+        return returned == jobId
     }
 
     /// Reads the size of the durable result file, or `nil` when it does not exist.

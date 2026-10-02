@@ -384,6 +384,63 @@ Never. Count the blocking calls and bound each one.
 
 ---
 
+## T-040 — A recovered artifact must prove it belongs to the request
+
+**Technique:**
+When recovering state from a fixed path after a failure, verify the artifact's own identity field
+before treating it as the result of the current request. Absence of the cleanup step is not evidence
+the cleanup ran.
+
+**Worked:**
+Yes — it prevented a false success classification.
+
+**Evidence:**
+The recovery path read `result.json` from a fixed path after a transport loss. The device script
+removes any previous result before launching, which looks like sufficient protection — **but that
+removal only happens if the script actually ran.** When the session dies before producing any output,
+there is no evidence the script reached its `rm`, so a result left by an *earlier* job can still be
+sitting there.
+
+Recovering it would have reported a stale result as this job's outcome — a false positive, and
+exactly the failure mode the fixed-path contract's staleness rule exists to prevent.
+
+Fixed by parsing the recovered payload and requiring a matching `job_id`. Missing, mismatched, or
+unparseable results are rejected.
+
+**Recommended use:**
+Any recovery-after-failure path: caches, checkpoint files, fixed-path outputs, retry queues.
+
+**Avoid when:**
+Never. It is one field comparison.
+
+---
+
+## T-041 — Bound the drain, not just the read
+
+**Technique:**
+When bounding an interruptible read, bound *every* pipe and thread in the path — including ones that
+exist only to prevent a different deadlock.
+
+**Worked:**
+Yes — it found a leaked thread per session.
+
+**Evidence:**
+The stdout read was made bounded and interruptible. The stderr drain was left unbounded, because it
+was written to prevent the *child* deadlocking on a full stderr buffer. But if the transport dies
+while `adb` keeps its stderr pipe open, that drain thread blocks in `availableData` **forever** — one
+leaked thread per session, growing with every job.
+
+The thread that exists to prevent a deadlock became a leak. It is now bounded by the same stall
+timeout, after which the read end is closed.
+
+**Recommended use:**
+Any subprocess handling with concurrent pipe drains.
+
+**Avoid when:**
+Never. Count the threads and bound each one.
+
+---
+
 ## T-033 — Measure the thing you are about to replace before replacing it
 
 **Technique:**

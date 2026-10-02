@@ -318,6 +318,97 @@ final class WorkerStreamingTests: XCTestCase {
         }
     }
 
+    // MARK: - 8b. No false recovery classification (stale result)
+
+    func testRecoveryRejectsAResultBelongingToADifferentJob() async throws {
+        let transport = MockTransport()
+        // The session dies before producing ANY output. The script's `rm -f result.json` may
+        // therefore never have run, so a stale result from a previous job can still be present.
+        await transport.setStreamingLines([], exitCode: -1)
+        await transport.setShellResponse(
+            "pidof \(WorkerTransferContract.workerPackageName)",
+            TransportResult(exitCode: 1, stdout: "", stderr: "")
+        )
+        await transport.setShellResponse(
+            "stat -c %s \(WorkerTransferContract.remoteResultPath)",
+            TransportResult(exitCode: 0, stdout: "2983", stderr: "")
+        )
+        await transport.setShellResponse(
+            "cat \(WorkerTransferContract.remoteResultPath)",
+            TransportResult(exitCode: 0, stdout: "{\"status\":\"OK\",\"job_id\":\"A-DIFFERENT-JOB\"}", stderr: "")
+        )
+
+        let runner = WorkerStreamRunner(transport: transport)
+        let run = try await runner.run(deviceSerial: "serial", jobId: "job-mine", payload: "{}")
+
+        // A stale result must NOT be reported as a recovery for this job — that would be a false
+        // positive, and precisely what the fixed-path contract's staleness rule exists to prevent.
+        if case .recoveredFromDevice = run.outcome {
+            XCTFail("a result belonging to another job must not be recovered as this job's")
+        }
+        XCTAssertFalse(run.outcome.isSuccess)
+    }
+
+    func testRecoveryAcceptsAResultBelongingToThisJob() async throws {
+        let transport = MockTransport()
+        await transport.setStreamingLines([], exitCode: -1)
+        await transport.setShellResponse(
+            "pidof \(WorkerTransferContract.workerPackageName)",
+            TransportResult(exitCode: 0, stdout: "17751", stderr: "")
+        )
+        await transport.setShellResponse(
+            "stat -c %s \(WorkerTransferContract.remoteResultPath)",
+            TransportResult(exitCode: 0, stdout: "40", stderr: "")
+        )
+        await transport.setShellResponse(
+            "cat \(WorkerTransferContract.remoteResultPath)",
+            TransportResult(exitCode: 0, stdout: "{\"status\":\"OK\",\"job_id\":\"job-mine\"}", stderr: "")
+        )
+
+        let runner = WorkerStreamRunner(transport: transport)
+        let run = try await runner.run(deviceSerial: "serial", jobId: "job-mine", payload: "{}")
+
+        guard case .recoveredFromDevice(_, let bytes) = run.outcome else {
+            return XCTFail("expected recovery, got \(run.outcome)")
+        }
+        XCTAssertEqual(bytes, 40)
+        XCTAssertTrue(run.outcome.isSuccess)
+    }
+
+    func testRecoveryRejectsAnUnparseableResult() async throws {
+        let transport = MockTransport()
+        await transport.setStreamingLines([], exitCode: -1)
+        await transport.setShellResponse(
+            "pidof \(WorkerTransferContract.workerPackageName)",
+            TransportResult(exitCode: 1, stdout: "", stderr: "")
+        )
+        await transport.setShellResponse(
+            "stat -c %s \(WorkerTransferContract.remoteResultPath)",
+            TransportResult(exitCode: 0, stdout: "12", stderr: "")
+        )
+        await transport.setShellResponse(
+            "cat \(WorkerTransferContract.remoteResultPath)",
+            TransportResult(exitCode: 0, stdout: "not json at all", stderr: "")
+        )
+
+        let runner = WorkerStreamRunner(transport: transport)
+        let run = try await runner.run(deviceSerial: "serial", jobId: "job-mine", payload: "{}")
+
+        // ADR-004: a result that cannot be parsed is never trusted.
+        XCTAssertFalse(run.outcome.isSuccess)
+    }
+
+    func testResultBelongsToJobMatching() {
+        XCTAssertTrue(WorkerStreamRunner.resultBelongsToJob(
+            "{\"status\":\"OK\",\"job_id\":\"abc\"}", jobId: "abc"))
+        XCTAssertFalse(WorkerStreamRunner.resultBelongsToJob(
+            "{\"status\":\"OK\",\"job_id\":\"xyz\"}", jobId: "abc"))
+        XCTAssertFalse(WorkerStreamRunner.resultBelongsToJob(
+            "{\"status\":\"OK\"}", jobId: "abc"))
+        XCTAssertFalse(WorkerStreamRunner.resultBelongsToJob("garbage", jobId: "abc"))
+        XCTAssertFalse(WorkerStreamRunner.resultBelongsToJob("", jobId: "abc"))
+    }
+
     // MARK: - 9. Stream disconnect after worker completion
 
     func testStreamLossAfterCompletionStillRecoversTheDurableResult() async throws {

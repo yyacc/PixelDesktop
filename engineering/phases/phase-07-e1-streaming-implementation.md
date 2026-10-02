@@ -347,12 +347,252 @@ USB transport, `adb forward` RPC, TransportManager, scheduler or custom mDNS was
 
 ---
 
+## 16. Verification round — deliberate transport loss and review findings
+
+A second verification pass was performed specifically to exercise the transport-loss behaviour and
+to review the implementation for unbounded waits. It produced **one production fix**, **three
+harness corrections**, and **two new deliberate-failure tests**.
+
+### 16.1 Production fix — recovery must prove ownership
+
+**Defect 5: `recoverDurableResult` did not verify the recovered result belonged to the job.**
+
+The device script removes any previous `result.json` before launching, **but that removal only
+happens if the script actually ran**. When a session dies before producing *any* output, there is no
+evidence the script reached its `rm`, so a result left by an earlier job can still be sitting at the
+fixed path.
+
+Reporting that as a recovery for the current job is a **false `recoveredFromDevice` classification** —
+precisely the failure mode the fixed-path contract's staleness rule exists to prevent.
+
+Fixed: recovery now parses the payload and requires a matching `job_id`
+(`WorkerStreamRunner.resultBelongsToJob`). A result that is missing the field, mismatched, or not
+parseable is **not** treated as this job's result — consistent with ADR-004's rule that an
+unparseable result is never trusted.
+
+Four unit tests were added, including one that fails without the fix.
+
+### 16.2 Production fix — bounded stderr drain
+
+**Defect 6: the stderr drain thread was unbounded and its handle was never closed.**
+
+A transport that dies while `adb` keeps its stderr pipe open would leave that thread blocked in
+`availableData` **forever** — a leaked thread per session, the same class of defect already found
+twice in this path. The drain is now bounded by `streamStallTimeout + 5 s`, after which the read end
+is closed.
+
+### 16.3 Deliberate transport-loss tests (new)
+
+Two live-device tests now sever the transport on purpose by killing the ADB **server** mid-session —
+deterministic and fully reversible, unlike a physical unplug.
+
+**Test: `testDeliberateTransportLossIsBoundedAndDoesNotFailTheJob`** — passes (3.94 s):
+
+```
+transport severed      : true
+session returned after : 3.94 s
+outcome                : streamLostWorkerRunning(pid: 1683)
+mayStillBeRunning      : true
+```
+
+The exact defect the brief was most concerned with — *"the stream reader blocks, `waitUntilExit()`
+never returns"* — is **fixed and demonstrated**: the session terminates in under 4 seconds, and
+transport loss is classified as worker-still-running, **not** as a job failure.
+
+**Test: `testResultIsRecoverableAfterDeliberateTransportLoss`** — passes (169.8 s):
+
+```
+worker running before sever   : true pid=1798
+worker seen running after sever: true
+durable result bytes          : 2098
+```
+
+The worker **survived** the transport being severed, was **not killed**, and its durable result was
+recovered afterwards and confirmed to carry this job's id.
+
+### 16.4 Harness corrections (not production defects)
+
+| # | Correction | Why |
+|---|---|---|
+| 1 | DTCA-1 test no longer requires an observed PID | DTCA-1 completes in ~1 ms, so the process is often gone before the first heartbeat. Requiring a PID asserted a race, not a behaviour — measured: a successful 401-byte result arrived with `pid=none` on heartbeat 1 |
+| 2 | F7 recovery deadline raised from 240 s to 900 s | 192 tokens at ~1 tok/s legitimately exceeds 300 s; E1 measured a 256-token job at **313 s**. The bound was too short, not the implementation wrong |
+| 3 | Same for the deliberate-loss recovery deadline | Same reasoning |
+
+**These are recorded explicitly because a harness that fails for its own reasons must not be
+mistaken for a production defect.** Each was a wrong assertion or a mis-sized bound, not a fault in
+the code under test.
+
+### 16.5 Final live-device results — 8/8 PASS
+
+| Test | Result |
+|---|---|
+| raw streaming primitive (stdout/stderr/stdin) | **PASS** |
+| streamed DTCA-1 job with durable result | **PASS** |
+| worker death detected (F4) | **PASS** |
+| session loss while worker continues (F7) | **PASS** |
+| cancellation via `am force-stop` | **PASS** |
+| **deliberate transport loss — bounded** | **PASS** (3.94 s) |
+| **recovery after deliberate transport loss** | **PASS** (2098-byte result) |
+| performance on the E1 workload | **PASS** |
+
+**Full suite: 316 tests, 0 failures** (14 skipped are the device-gated tests when no serial is set).
+
+### 16.6 Transport used
+
+The deliberate-loss tests were run over **USB**. The brief asked for wireless where practical;
+**wireless ADB could not be established** during this round — see §17.
+
+---
+
+## 17. Wireless ADB — not established this round (honest blocker)
+
+The brief specified wireless ADB as the path for completing live verification. **It could not be
+established**, and the attempt is recorded rather than worked around.
+
+**What was tried** (all reversible):
+
+1. `settings put global adb_wifi_enabled` toggled off → on (the method that worked in the earlier
+   verification).
+2. Confirmed the setting took (`adb_wifi_enabled = 1`).
+3. Confirmed the device was **listening**: `tcp6 [::]:38309`, later `46777`.
+4. `adb kill-server` / `start-server` to re-initialise mDNS discovery.
+5. Wi-Fi reset on the device (`svc wifi disable` → `enable`) to force the supplicant to re-establish.
+6. Woke the device — it was **`mWakefulness=Dozing`**, which restricts wireless ADB, and it was kept
+   awake (`svc power stayon usb`) for the attempts.
+7. Explicit `adb connect 192.168.1.9:<port>` against every bound candidate port.
+
+**Observed state:**
+
+| Check | Result |
+|---|---|
+| `adb_wifi_enabled` | `1` (enabled) |
+| device TLS listener | **bound** — `tcp6 [::]:38309`, later `46777` |
+| `getprop service.adb.tls.port` | **empty** |
+| `adb mdns services` | **empty** — no advertisement reached the Mac |
+| `dns-sd -B _adb-tls-connect._tcp` | no service found |
+| Mac ↔ Pixel reachability | Pixel was on `192.168.1.9/24`, Mac on `192.168.1.10/24`, same subnet; ping succeeded **only after waking the device** |
+| `adb connect` result | `offline` on 38309; `Host is down` on 46777; refused on the loopback-only port |
+
+**Interpretation, stated conservatively:** the device binds a TLS port and reports wireless debugging
+enabled, but the ADB TLS handshake does not complete and **mDNS never advertises**. The Mac and Pixel
+are on the same subnet and can reach each other, so this is not a routing problem. The most likely
+cause is the device's Wi-Fi/doze state — the Pixel was Dozing and its Wi-Fi had been reset — but
+**that is not established**, and no cause is claimed.
+
+**What this does and does not affect.** The brief's reason for preferring wireless was that the USB
+link is unstable (FAIL-006). The verification therefore used USB, and **the USB link held for the
+entire 8-test run (~7.5 minutes) without a drop** — which is itself a useful observation, but *not*
+evidence that FAIL-006 is resolved, and it is not claimed as such.
+
+**Wireless ADB remains reachable in principle**: the earlier verification (`f3552cf`) established it
+end-to-end, including `adb -s <wireless-serial>`. Nothing in this round contradicts that; the
+transport simply could not be brought up on this attempt.
+
+---
+
+## 18. USB FAIL-006 — separately classified
+
+Per the brief, the recurring USB failures are recorded as their own finding and **must not** be
+treated as a streaming implementation failure.
+
+```
+FAIL-006:
+  macOS USB/XHCI physical transport instability
+  — the Pixel physically disappeared from the USB bus three times during the earlier
+    implementation round, with ioreg showing no Pixel present at the kernel level.
+
+Streaming implementation:
+  tested independently — 8/8 live-device tests passed, including two deliberate
+  transport-loss tests, with the USB link stable throughout the verification run.
+```
+
+**No USB reconnect logic was added. The Phase 7 transport architecture is unchanged.** FAIL-006
+remains open and unresolved; this round did not attempt to fix it.
+
+---
+
+## 19. Lifecycle state verification
+
+The brief asked for the four situations to be verified in the implementation's own terminology
+rather than with invented states. Measured results:
+
+| Situation | Implementation state | Evidence |
+|---|---|---|
+| RUNNING + stream connected + worker alive | `.streamAliveWorkerAlive(pid:)` | live run: `worker pid observed: 31546`, 33 heartbeats |
+| RUNNING + stream disconnected + worker alive | `.streamLostWorkerRunning(pid:)` | **deliberate sever: `streamLostWorkerRunning(pid: 1683)` in 3.94 s** |
+| FAILED + worker exited unexpectedly | `.streamAliveWorkerExited` → `.workerExitedUnexpectedly(sequence:)` | kill test: `sequence: 3`, terminated in 2.6 s |
+| COMPLETED + worker completed + durable result present | `.completed(resultJSON:resultBytes:)` | DTCA-1: 401 bytes; LLM: `completed` |
+| UNCERTAIN / RECOVERY + transport lost, worker/result undetermined | `.streamLostUnknown(reason:)` / `.recoveredFromDevice` | recovery test: 2098-byte result recovered after sever |
+
+**Transport failure is never collapsed into job failure.** The deliberate-sever test asserts this
+directly: the outcome carries `mayStillBeRunning: true` and is not a hard failure.
+
+---
+
+## 20. Long-running behaviour
+
+**No artificial ceiling was imposed or tested against.** The E1 F5 finding — that a 90 s harness cap
+was wrong — is respected:
+
+- the production path has **no job timeout**, only the 120 s *stall* detector;
+- the live harness bounds were raised to **900 s**, sized to the workload rather than to make tests
+  terminate (a 192-token job legitimately needs over 300 s at ~1 tok/s);
+- the F7 test ran **243 s** to natural completion.
+
+The only production time bounds, both justified by an actual system requirement:
+
+| Bound | Value | Justification |
+|---|---|---|
+| `streamStallTimeout` | 120 s | a live worker heartbeats every 0.5 s, so 120 s of silence means the transport is gone — a stall detector, not a duration limit |
+| reap deadline | 5 s | bounds process reaping after a session ends, so a stuck `adb` child cannot block the caller |
+
+---
+
+## 21. Remaining limitations (updated)
+
+| # | Limitation |
+|---|---|
+| **L1** | A session that dies loses the **stream**. Progress is not durable; only the file is |
+| **L2** | Cancellation remains external (`am force-stop`); the stream cannot cancel |
+| **L3** | **Progress is liveness only.** Real generation progress needs a worker-side change — not made here |
+| **L4** | One session = one job; concurrency still needs multiple sessions |
+| **L5** | The session is host-initiated; the Pixel still cannot speak first |
+| **L6** | The old polling path still exists for Phase 5/6 flows; the two coexist |
+| **L7** | The stall detector assumes a 0.5 s heartbeat cadence; a change to that cadence must update `streamStallTimeout` |
+| **L8** | **Wireless ADB could not be established this round** — verification was over USB |
+| **L9** | The deliberate-loss tests sever the ADB *server*, which is a deterministic proxy for a physical unplug, not a physical unplug itself |
+| **L10** | FAIL-006 (USB instability) remains open and unresolved |
+
+**L3 remains the most consequential for future work.**
+
+---
+
+## 22. Defects found by live execution (complete list)
+
+| # | Defect | Found by | Fixed |
+|---|---|---|---|
+| 1 | `do;` shell syntax error — the entire script failed to parse, producing no output | live device | yes |
+| 2 | Watchdog resumed the continuation only when the child was alive | live device | yes |
+| 3 | `process.waitUntilExit()` blocked forever | live device | yes |
+| 4 | Unbounded waits in the device harness | live device | yes (harness) |
+| 5 | **Recovery did not verify the result belonged to the job** | **code review** | **yes** |
+| 6 | **Unbounded stderr drain thread** | **code review** | **yes** |
+
+**Defects 5 and 6 were found by the review requested in this round, not by execution.** Both are
+production fixes with new tests. Defect 1 remains the notable one — a pure string-assembly error
+that no unit test caught.
+
+---
+
 ## Provenance
 
-**Measured on the physical Pixel 7a:** 6/6 live tests passing; DTCA-1 streamed completion at 0.765 s
-with a 401-byte durable result; F4 death detected at heartbeat 4 with the run ending in 3.3 s;
-F7 recovery of a 2389-byte durable result with no session alive; `am force-stop` 140–144 ms; the E1
-workload completing in 20.985 s with 37 heartbeats; first output at 0.036 s.
+**Measured on the physical Pixel 7a (this verification round):** 8/8 live-device tests passing;
+deliberate transport sever returning in **3.94 s** with `streamLostWorkerRunning(pid: 1683)` and
+`mayStillBeRunning: true`; recovery of a **2098-byte** durable result after a sever with the worker
+surviving; F7 session loss recovering a **2389-byte** result in 242.955 s; F4 death detected at
+heartbeat 3, terminating in 2.605 s; `am force-stop` 108–144 ms; DTCA-1 completing in 0.938 s with a
+401-byte result; the E1 LLM workload completing in 22.540 s with 40 heartbeats; full suite **316
+tests, 0 failures**.
 
 **Measured in E1 (cited as baseline):** first output 0.060 s, launch ack 0.170 s, wall 27.600 s,
 758 ms result wait, 26 heartbeats.
@@ -360,5 +600,9 @@ workload completing in 20.985 s with 37 heartbeats; first output at 0.036 s.
 **Verified by source inspection:** the worker writes nothing to stdout; the manifest declares zero
 permissions and no Service; the Android sources are unchanged.
 
-**Not claimed:** any throughput improvement. The 6.6 s wall difference is within this workload's
-observed variance and is explicitly not attributed to the change.
+**Attempted and not achieved:** wireless ADB could not be established — device TLS port bound,
+`service.adb.tls.port` empty, mDNS silent, handshake not completing. Recorded in §17.
+
+**Not claimed:** any throughput improvement (the wall-time difference is within this workload's
+observed variance); any resolution of FAIL-006; any wireless persistence beyond what was previously
+verified in `f3552cf`.

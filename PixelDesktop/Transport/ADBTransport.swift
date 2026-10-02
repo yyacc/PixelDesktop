@@ -269,8 +269,16 @@ actor ADBTransport: TransportProtocol {
 
         // Drain stderr concurrently. A device script can produce enough stderr to fill the pipe
         // buffer and deadlock the child if nobody reads it.
+        //
+        // The drain is bounded by the same stall timeout as stdout. Without a bound, a transport
+        // that dies while `adb` keeps its stderr pipe open leaves this thread blocked in
+        // `availableData` forever — a leaked thread per session, which is exactly the class of
+        // defect already found twice in this path.
         let stderrHandle = stderrPipe.fileHandleForReading
         let stderrQueue = DispatchQueue(label: "pixeldesktop.adb.stderr")
+        stderrQueue.asyncAfter(deadline: .now() + Self.streamStallTimeout + 5.0) {
+            try? stderrHandle.close()
+        }
         stderrQueue.async {
             var buffer = Data()
             while true {

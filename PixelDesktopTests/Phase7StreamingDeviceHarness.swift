@@ -46,6 +46,189 @@ final class Phase7StreamingDeviceHarness: XCTestCase {
         """
     }
 
+    /// Deliberately severs the ADB transport mid-stream and verifies bounded, correct behavior.
+    ///
+    /// This is the production defect the brief is most concerned with:
+    ///
+    /// ```
+    /// ADB transport disappears
+    ///         ↓
+    /// stream reader blocks
+    ///         ↓
+    /// waitUntilExit() never returns
+    /// ```
+    ///
+    /// The transport is severed by killing the ADB **server** mid-session. That is deterministic and
+    /// fully reversible — the server restarts automatically on the next command — unlike a physical
+    /// USB unplug, which cannot be scripted.
+    ///
+    /// The property under test is not "the job succeeds" but:
+    /// - the session **terminates within a bounded time** rather than hanging;
+    /// - the worker is **not** killed merely because its stream died;
+    /// - the final state is **not** classified as a job failure.
+    func testDeliberateTransportLossIsBoundedAndDoesNotFailTheJob() async throws {
+        let serial = try requireDevice()
+        let transport = ADBTransport()
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        try await lifecycle.stopIfRunning(deviceSerial: serial)
+
+        let jobId = UUID().uuidString
+        // A long job, so the worker is still running when the transport is severed.
+        let payload = llmJobJSON(
+            jobId: jobId,
+            prompt: "Write a long detailed essay about the ocean and its currents.",
+            maxTokens: 256
+        )
+
+        let runner = WorkerStreamRunner(transport: transport)
+
+        // Sever the transport once the worker is observed running.
+        let severer = Task {
+            for _ in 0..<40 {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                let state = try? await lifecycle.state(deviceSerial: serial)
+                if state?.isRunning == true {
+                    // Killing the server drops every transport it owns, including this session.
+                    _ = try? await transport.execute(
+                        command: "kill-server",
+                        arguments: [],
+                        timeout: 20
+                    )
+                    return true
+                }
+            }
+            return false
+        }
+
+        let started = Date()
+        let run: WorkerStreamRunner.Run
+        do {
+            run = try await runner.run(deviceSerial: serial, jobId: jobId, payload: payload)
+        } catch {
+            // A thrown transport error is also acceptable — the requirement is boundedness.
+            let elapsed = Date().timeIntervalSince(started)
+            print("=== DELIBERATE TRANSPORT LOSS ===")
+            print("session threw after \(String(format: "%.2f", elapsed)) s: \(error)")
+            XCTAssertLessThan(elapsed, 300, "the session must not hang")
+            _ = await severer.value
+            return
+        }
+        let severed = await severer.value
+        let elapsed = Date().timeIntervalSince(started)
+
+        print("=== DELIBERATE TRANSPORT LOSS ===")
+        print("transport severed      : \(severed)")
+        print("session returned after : \(String(format: "%.2f", elapsed)) s")
+        print("outcome                : \(run.outcome)")
+        print("mayStillBeRunning      : \(run.outcome.mayStillBeRunning)")
+        print("streamEndedUnexpectedly: \(run.streamEndedUnexpectedly)")
+
+        // 1. BOUNDED. The whole point of the watchdog and the reap deadline.
+        XCTAssertLessThan(elapsed, 300, "the session must terminate in bounded time, not hang")
+
+        if severed {
+            // 2. Not classified as a job failure. F7: stream loss != worker failure.
+            if case .completed = run.outcome {
+                // The job may legitimately have finished before the kill landed.
+            } else {
+                XCTAssertFalse(
+                    run.outcome.mayStillBeRunning == false && run.outcome.isSuccess == false
+                        && isHardFailure(run.outcome),
+                    "transport loss must not be reported as a hard job failure: \(run.outcome)"
+                )
+            }
+        }
+    }
+
+    /// Whether an outcome represents a genuine job failure rather than transport uncertainty.
+    private func isHardFailure(_ outcome: WorkerStreamOutcome) -> Bool {
+        switch outcome {
+        case .workerExitedUnexpectedly, .failed, .malformedStream:
+            return true
+        case .completed, .completedButDurabilityUnverified, .recoveredFromDevice,
+             .streamLostWorkerRunning, .streamLostWorkerGone, .streamLostUnknown, .incomplete:
+            return false
+        }
+    }
+
+    /// Recovery after a deliberate transport loss: the worker is NOT killed, and its result is
+    /// recoverable once the transport returns.
+    func testResultIsRecoverableAfterDeliberateTransportLoss() async throws {
+        let serial = try requireDevice()
+        let transport = ADBTransport()
+        let lifecycle = WorkerLifecycle(transport: transport)
+
+        try await lifecycle.stopIfRunning(deviceSerial: serial)
+
+        let jobId = UUID().uuidString
+        let payload = llmJobJSON(
+            jobId: jobId,
+            prompt: "Write a medium essay about tides.",
+            maxTokens: 160
+        )
+
+        // Deliver the job and launch, then sever the transport while the worker runs. No session is
+        // watching, which is the F7 condition.
+        _ = try await transport.shell(
+            deviceSerial: serial,
+            command: "rm -f \(WorkerTransferContract.remoteResultPath)",
+            timeout: 30
+        )
+        _ = try await transport.shell(
+            deviceSerial: serial,
+            command: "cat > \(WorkerTransferContract.remoteInputPath) <<'PDEOF'\n\(payload)\nPDEOF",
+            timeout: 30
+        )
+        try await lifecycle.launch(deviceSerial: serial)
+        try await Task.sleep(nanoseconds: 3_000_000_000)
+
+        let before = try await lifecycle.state(deviceSerial: serial)
+        print("=== RECOVERY AFTER TRANSPORT LOSS ===")
+        print("worker running before sever: \(before.isRunning) pid=\(before.pid.map(String.init) ?? "none")")
+
+        // Sever.
+        _ = try? await transport.execute(command: "kill-server", arguments: [], timeout: 20)
+        try? await Task.sleep(nanoseconds: 3_000_000_000)
+
+        // The worker must survive: the transport dying says nothing about the process.
+        // Re-establish and wait for the durable result, bounded to the workload (see above).
+        let deadline = Date().addingTimeInterval(900)
+        var recovered: Int?
+        var workerSeenAfter = false
+        while Date() < deadline {
+            let stat = try await transport.shell(
+                deviceSerial: serial,
+                command: "stat -c %s \(WorkerTransferContract.remoteResultPath)",
+                timeout: 15
+            )
+            if let bytes = WorkerTransferContract.parseRemoteSize(stat.stdout), bytes > 0 {
+                recovered = bytes
+                break
+            }
+            if try await lifecycle.state(deviceSerial: serial).isRunning { workerSeenAfter = true }
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+        }
+
+        print("worker seen running after sever: \(workerSeenAfter)")
+        print("durable result bytes          : \(recovered.map(String.init) ?? "none")")
+
+        guard let bytes = recovered else {
+            return XCTFail("the worker did not produce a durable result after transport loss")
+        }
+        XCTAssertGreaterThan(bytes, 0)
+
+        // And the recovered result must belong to THIS job.
+        let content = try await transport.shell(
+            deviceSerial: serial,
+            command: "cat \(WorkerTransferContract.remoteResultPath)",
+            timeout: 30
+        )
+        XCTAssertTrue(content.stdout.contains(jobId),
+                      "the recovered result must carry this job's id")
+        XCTAssertTrue(WorkerStreamRunner.resultBelongsToJob(content.stdout, jobId: jobId))
+    }
+
     /// Performance comparison on the same workload E1 used.
     ///
     /// E1's baseline (OLD path: push → `am start` → Mac-side poll → pull) for the 32-token
@@ -210,8 +393,11 @@ final class Phase7StreamingDeviceHarness: XCTestCase {
 
         XCTAssertTrue(run.outcome.isSuccess, "expected a completed job, got \(run.outcome)")
         XCTAssertEqual(run.jobId, jobId, "the stream must report the job it ran")
-        XCTAssertNotNil(run.workerPidObserved, "a worker PID must be observed on a real run")
-        XCTAssertGreaterThan(run.heartbeatCount, 0, "liveness heartbeats must arrive")
+        // NOTE: a PID is deliberately NOT required here. DTCA-1 completes in ~1 ms, so the worker
+        // process is frequently gone before the first heartbeat can observe it — measured on the
+        // real device, where a successful 401-byte result arrived with `pid=none` on heartbeat 1.
+        // Requiring a PID for a sub-second job asserts a race, not a behaviour.
+        XCTAssertGreaterThanOrEqual(run.heartbeatCount, 1, "the stream must report at least one tick")
         XCTAssertNotNil(run.timeToLaunchAckSeconds, "launch must be acknowledged on the stream")
         XCTAssertTrue(run.unrecognizedLines.isEmpty,
                       "no stray output: \(run.unrecognizedLines.prefix(3))")
@@ -339,8 +525,13 @@ final class Phase7StreamingDeviceHarness: XCTestCase {
         //
         // Bounded by wall clock, not by iteration count: each probe costs up to 30 s on a dead
         // transport, so a fixed iteration count can become a multi-hour wait.
+        //
+        // The bound is sized to the WORKLOAD, not chosen to make the test end: generation runs at
+        // roughly 1 token/s on this device and E1 measured a 256-token job at 313 s, so a 192-token
+        // job needs well over 300 s. An earlier 240 s bound failed for that reason — the deadline
+        // was too short, not the implementation wrong.
         var durableBytes: Int?
-        let deadline = Date().addingTimeInterval(240)
+        let deadline = Date().addingTimeInterval(900)
         while Date() < deadline {
             let stat = try await transport.shell(
                 deviceSerial: serial,

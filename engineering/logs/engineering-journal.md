@@ -1566,3 +1566,102 @@ the need for a second communication architecture. No WebSocket, gRPC, Service, c
 adb forward RPC, TransportManager, scheduler or custom mDNS was added.
 
 **Artifacts:** `phases/phase-07-e1-streaming-implementation.md`.
+
+---
+
+## 2026-10-02 — E1 streaming implementation VERIFICATION ROUND
+
+**Phase:** 7. Verification + review. **Two production fixes found by code review; 8/8 live tests pass.**
+
+**PRODUCTION FIX 5 — recovery must prove ownership (found by CODE REVIEW, not execution)**
+`recoverDurableResult` did not verify the recovered result belonged to the job. The device script
+removes any previous result.json before launching, BUT that removal only happens if the script
+actually ran. When a session dies before producing ANY output there is no evidence the script reached
+its `rm`, so a result left by an earlier job can still be at the fixed path - and reporting it as a
+recovery would be a FALSE recoveredFromDevice classification, exactly what the fixed-path contract's
+staleness rule exists to prevent. Fixed: recovery now parses the payload and requires a matching
+job_id (WorkerStreamRunner.resultBelongsToJob). Missing/mismatched/unparseable results are rejected,
+consistent with ADR-004. Four unit tests added, one of which fails without the fix.
+
+**PRODUCTION FIX 6 — bounded stderr drain (found by CODE REVIEW)**
+The stderr drain thread was unbounded and its handle never closed. A transport that dies while adb
+keeps its stderr pipe open would leave that thread blocked in availableData FOREVER - a leaked thread
+per session, the same class of defect already found twice in this path. Now bounded by
+streamStallTimeout + 5 s, after which the read end is closed.
+
+**DELIBERATE TRANSPORT-LOSS TESTS (new, 2)**
+Sever the transport on purpose by killing the ADB SERVER mid-session - deterministic and fully
+reversible, unlike a physical unplug.
+  testDeliberateTransportLossIsBoundedAndDoesNotFailTheJob - PASS (3.94 s)
+    transport severed      : true
+    session returned after : 3.94 s
+    outcome                : streamLostWorkerRunning(pid: 1683)
+    mayStillBeRunning      : true
+  ** The exact defect the brief was most concerned with - the reader blocking and waitUntilExit()
+     never returning - is FIXED AND DEMONSTRATED: the session terminates in under 4 s, and transport
+     loss is classified as worker-still-running, NOT as a job failure. **
+  testResultIsRecoverableAfterDeliberateTransportLoss - PASS (169.8 s)
+    worker running before sever    : true pid=1798
+    worker seen running after sever: true
+    durable result bytes           : 2098
+  The worker SURVIVED the sever, was NOT killed, and its result was recovered and confirmed to carry
+  this job's id.
+
+**HARNESS CORRECTIONS (not production defects - recorded so they are not mistaken for one)**
+  1. The DTCA-1 test no longer requires an observed PID. DTCA-1 completes in ~1 ms, so the process
+     is often gone before the first heartbeat; requiring a PID asserted a RACE, not a behaviour.
+     Measured: a successful 401-byte result arrived with pid=none on heartbeat 1.
+  2. F7 recovery deadline raised 240 s -> 900 s. 192 tokens at ~1 tok/s legitimately exceeds 300 s;
+     E1 measured a 256-token job at 313 s. The BOUND was too short, not the implementation wrong.
+  3. Same for the deliberate-loss recovery deadline.
+
+**FINAL LIVE RESULTS: 8/8 PASS** - raw primitive, streamed DTCA-1, F4 death detection, F7 session
+loss, cancellation, deliberate transport loss (bounded), recovery after transport loss, performance.
+**Full suite: 316 tests, 0 failures** (14 skipped = device-gated tests with no serial set).
+
+**WIRELESS ADB COULD NOT BE ESTABLISHED THIS ROUND - recorded honestly, not worked around**
+  Tried, all reversible: adb_wifi_enabled toggle off->on (confirmed = 1); adb kill-server/start-server
+  to re-init mDNS; device Wi-Fi reset (svc wifi disable -> enable); woke the device (it was
+  mWakefulness=Dozing) and kept it awake; explicit adb connect against every bound candidate port.
+  Observed: device TLS listener BOUND (tcp6 :38309, later :46777); service.adb.tls.port EMPTY;
+  adb mdns services EMPTY; dns-sd found no service; Mac 192.168.1.10 and Pixel 192.168.1.9 on the
+  same subnet, ping OK only after waking; adb connect -> offline / Host is down.
+  Interpretation stated conservatively: the port binds but the TLS handshake does not complete and
+  mDNS never advertises. Not a routing problem. Most likely the device's Wi-Fi/doze state, but that
+  is NOT established and no cause is claimed.
+  ** Wireless ADB remains reachable in principle - f3552cf established it end-to-end. Nothing in this
+     round contradicts that; the transport simply could not be brought up on this attempt. **
+  Verification therefore used USB, and **the USB link held for the entire 8-test run (~7.5 min)
+     without a drop** - useful, but NOT evidence FAIL-006 is resolved, and not claimed as such.
+
+**FAIL-006 SEPARATELY CLASSIFIED** (per the brief)
+  FAIL-006: macOS USB/XHCI physical transport instability - the Pixel physically disappeared from the
+  USB bus three times during the earlier implementation round (ioreg showed no Pixel at kernel level).
+  Streaming implementation: tested independently - 8/8 live tests pass, including two deliberate
+  transport-loss tests, with the USB link stable throughout the verification run.
+  ** No USB reconnect logic added. The Phase 7 transport architecture is unchanged. FAIL-006 remains
+     open and unresolved. **
+
+**LIFECYCLE STATES VERIFIED in the implementation's own terminology**
+  RUNNING + stream connected + worker alive   -> .streamAliveWorkerAlive(pid:)      (pid 31546, 33 hb)
+  RUNNING + stream disconnected + worker alive-> .streamLostWorkerRunning(pid:)     (sever, 3.94 s)
+  FAILED + worker exited unexpectedly         -> .workerExitedUnexpectedly(sequence:)(seq 3, 2.6 s)
+  COMPLETED + durable result present          -> .completed(...)                    (401 bytes)
+  UNCERTAIN / RECOVERY                        -> .streamLostUnknown / .recoveredFromDevice (2098 B)
+  Transport failure is never collapsed into job failure.
+
+**LONG-RUNNING BEHAVIOUR: no artificial ceiling.** Production has NO job timeout, only the 120 s
+STALL detector. Harness bounds raised to 900 s, sized to the workload rather than to make tests end.
+The F7 test ran 243 s to natural completion. Only two production bounds exist, both justified:
+streamStallTimeout 120 s (a live worker heartbeats every 0.5 s) and a 5 s reap deadline.
+
+**LIMITATIONS now 10** (L8 wireless not established; L9 the sever is a proxy for a physical unplug,
+not a physical unplug; L10 FAIL-006 open). **L3 remains most consequential**: progress is liveness
+only and real generation progress needs a worker-side change.
+
+**DEFECTS FOUND BY LIVE EXECUTION - complete list (6)**
+  1-4 found by live execution (do; syntax error, watchdog resume, waitUntilExit, unbounded harness)
+  5-6 ** found by the code review requested in this round ** (recovery ownership, stderr drain)
+  Defect 1 remains the notable one: a pure string-assembly error that no unit test caught.
+
+**Artifacts:** `phases/phase-07-e1-streaming-implementation.md` (sections 16-22).
