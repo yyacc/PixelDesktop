@@ -1,5 +1,35 @@
 # Phase 7 Reconnaissance — Resource-Aware Workload Routing
 
+> ## ⚠️ SUPERSEDED — read this first
+>
+> **The router proposal in this document was WITHDRAWN before implementation.** Commit `e339691`.
+>
+> This document is **preserved as historical reconnaissance evidence**, not as current architecture.
+> Its §H–§K architecture proposal and §L reuse map describe a PixelDesktop-internal router that
+> **must not be built**.
+>
+> **Why it was withdrawn:** master prompt §1 places **orchestration on the Mac, above
+> PixelDesktop**. A router inside PixelDesktop put a decision-making component on the wrong side of
+> a boundary the master prompt had already drawn, duplicating a decision Hermes already owns.
+>
+> **Current authority:**
+> - `ADR-007` **Amendment 1** — Phase 7 redefined as *Pixel Capability Contract & Hermes Workload
+>   Planning*. **Hermes decides. PixelDesktop enforces.**
+> - `phases/phase-07-architecture-reevaluation.md` — the replacement design.
+> - `ADR-013` — marked **SUPERSEDED**.
+>
+> **What remains valid and is still cited:** every measurement in §C–§G. In particular the
+> **2.4× latency variance**, the **12× model-load variance**, the absence of a Mac executor, the
+> thermal non-comparability, and the finding that transfer cost is negligible. Those measurements
+> are what *justified* the withdrawal and are retained by ADR-007 Amendment 1 §A1.9.
+>
+> **Retained principles:** approved-capabilities-only · support/non-support/unknown ·
+> fail-and-report · no automatic retries · a snapshot is not a reservation.
+>
+> **Withdrawn:** `FeasibilityEvaluator` · `WorkloadDescriptor` · `Decision{target,reasons}` ·
+> `ResourceSnapshot` as a routing input · `Executors`/`ExecutionNode` · Mac executor · internal
+> router/scheduler.
+
 **Status:** RECONNAISSANCE + PROPOSAL. **Implementation BLOCKED pending review.**
 **Date:** 2026-10-02
 **Phase:** 7 (Resource-Aware Workload Routing) — authoritative per ADR-007

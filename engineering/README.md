@@ -24,10 +24,11 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 4 — Android Application / Process Control:** COMPLETE
 **Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) IMPLEMENTED and verified on device
 **Phase 6 — Local AI Worker:** FIRST INFERENCE PROOF COMPLETE — real LLM inference on the Pixel 7a
-**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** re-evaluation COMPLETE; implementation BLOCKED pending review
+**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** redefined by **ADR-007 Amendment 1**; implementation BLOCKED pending review
 
 > Phase numbering follows the master engineering prompt §16 — see
-> [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md). Legacy documents use
+> [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md) and its **Amendment 1**
+> (which redefines Phase 7). Legacy documents use
 > three different, incompatible phase numbering schemes; their numbers are **not**
 > PixelDesktop product phase numbers.
 
@@ -64,7 +65,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [ADR-004: Verification by Re-computation](decisions/ADR-004-verification.md)
 - [ADR-005: Device Property Enrichment Is Separate From Discovery](decisions/ADR-005-device-property-enrichment.md)
 - [ADR-006: Test Isolation Strategy for Device-Dependent Code](decisions/ADR-006-test-isolation.md)
-- [ADR-007: Authoritative Phase Sequence](decisions/ADR-007-authoritative-phase-sequence.md)
+- [ADR-007: Authoritative Phase Sequence](decisions/ADR-007-authoritative-phase-sequence.md) — **includes Amendment 1**: Phase 7 redefined (Hermes decides, PixelDesktop enforces)
 - [ADR-008: Android Device Representation Model](decisions/ADR-008-android-device-model.md)
 - [ADR-009: Application Operations, Shell Containment, and Lifecycle Invalidation](decisions/ADR-009-application-operations-and-shell-containment.md)
 - [ADR-010: Worker Transfer Contract and Path Containment](decisions/ADR-010-worker-transfer-contract.md) — **revised 2026-10-02**: transfer root corrected for the identity boundary

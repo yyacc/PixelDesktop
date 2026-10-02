@@ -908,3 +908,42 @@ into territory adjacent to Phase 9, needing an ADR-007 amendment.
 phase's purpose, then publishing the contract **before** writing the Hermes skill.
 
 **Artifacts:** `phases/phase-07-architecture-reevaluation.md`; ADR-013 marked SUPERSEDED.
+
+---
+
+## 2026-10-02 — Phase 7 Step 0: ADR-007 Amendment 1 (Phase 7 formally redefined)
+
+**Phase:** 7 (Step 0 — documentation only; no code changed)
+**Task:** Amend ADR-007 to formally redefine Phase 7 per the completed re-evaluation.
+
+**Action:**
+Appended **Amendment 1** to ADR-007. The original text is untouched — the Phase 7 row of the
+master-prompt phase table now carries a `†` marker pointing to the amendment, and the amendment
+states its effective date and explicitly supersedes ADR-013, which is exactly what ADR-007's own
+*Future Reconsideration Conditions* required before any amendment could be made.
+
+**Content:** 15 clauses (A1.1–A1.15) covering: why the router was withdrawn; the Hermes/PixelDesktop
+boundary; Hermes as planning authority; PixelDesktop as enforcement authority; why LLM
+decision-making does not remove the need for PixelDesktop-side validation; the
+round-trip-not-safety guarantee; the new Phase 7 purpose; the eight removed components; the five
+retained principles and eight retained measurements with their limitations; the Phase 9 relationship;
+**R4** (the Phase 7/Phase 9 boundary, resolved by direction of information); and **R9** (`shell()`
+stays inaccessible to Hermes, not Phase 7 work).
+
+**Why the original text was annotated rather than rewritten:** ADR-007 itself established that
+convention when it annotated the Phase 0 audit §9 table instead of rewriting it. The same rule
+applies to itself — erasing the fact that Phase 7's definition changed would destroy the reasoning
+that produced the correction.
+
+**Consistency corrections made:**
+- `phase-07-routing-reconnaissance.md` — added a SUPERSEDED banner naming the current authority and
+  separating what remains valid (all §C–§G measurements) from what is withdrawn (§H–§K architecture).
+- `architecture/overview.md` — the phase table row for Phase 7 now points at the amendment.
+- `engineering/README.md` — Phase 7 line and the ADR-007 index entry updated.
+
+**Preserved:** ADR-013 remains on disk, SUPERSEDED, measurements intact and cited by the amendment.
+
+**Next action:** STOPPED at Step 0 as instructed. Step 1 (publish the capability contract) awaits
+explicit approval.
+
+**Artifacts:** `ADR-007-authoritative-phase-sequence.md` (Amendment 1).

@@ -383,7 +383,7 @@ Listed so this document cannot be mistaken for a description of delivered functi
 | DTCA-1 execution on the Pixel (worker APK) | **5** | Not implemented. Only the local macOS reference implementation exists. |
 | Result retrieval from the device | **5** | Not implemented |
 | Local AI worker on the Pixel | **6** | Not implemented |
-| Resource-aware workload routing | **7** | Not implemented |
+| Resource-aware workload routing | **7** | Not implemented. **Redefined by [ADR-007 Amendment 1](../decisions/ADR-007-authoritative-phase-sequence.md)** as *Pixel Capability Contract & Hermes Workload Planning* — routing is owned by Hermes; PixelDesktop publishes capabilities and enforces feasibility. No PixelDesktop-internal router. |
 | UI for workloads / worker state | **8** | Not implemented. Current UI shows device list + identity only. |
 | Hermes integration | **9** | Not implemented |
 | Production hardening | **10** | Not implemented |
