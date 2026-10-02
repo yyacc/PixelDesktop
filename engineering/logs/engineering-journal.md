@@ -1172,3 +1172,74 @@ have still usable?", not "where should this workload run?". It does reinforce on
 between "capable" and "currently usable", and never let the first stand in for the second.
 
 **Artifacts:** `design/usb-aware-transport-design.md`. No production code changed.
+
+---
+
+## 2026-10-02 — Wireless ADB persistence design (investigation/design only)
+
+**Phase:** none — transport resilience. Explicitly NOT workload routing or resource management.
+**Task:** Determine why a previously-working wireless ADB connection needed manual intervention, and
+design persistent wireless fallback. **No production code modified. No device settings changed.**
+
+**THE FINDING THAT RESHAPES THE REQUIREMENT**
+`adb` ALREADY does automatic mDNS discovery and reconnection:
+    $ADB_MDNS_AUTO_CONNECT   comma-separated list of mdns services to allow auto-connect
+                             (default adb-tls-connect)
+The default IS adb-tls-connect. So adb already discovers the device and connects to whatever endpoint
+is currently advertised — no hardcoded IP, no hardcoded port. **PixelDesktop does not need to
+implement mDNS discovery at all.** Verified: `adb mdns check` succeeds. Not verified: the actual
+auto-connect, because nothing is advertising.
+
+**THE REAL CAUSE: the toggle, not the connection**
+Android automatically DISABLES wireless debugging after inactivity, on Wi-Fi disconnect, and on
+reboot. Multiple independent sources; and Google is fixing it in Android 17 + adb 37 by
+auto-RE-ENABLING on trusted Wi-Fi — the existence of that fix corroborates the mechanism.
+So almost everything that breaks the connection automatically also disables the toggle, and the
+toggle is what needs a human.
+
+**THE MANUAL-INTERVENTION BOUNDARY IS NARROWER THAN EXPECTED**
+NOT "reconnection". It is: **"re-enabling wireless debugging while no transport is available."**
+Reconnection is already automatic (adb mDNS). And with USB present the toggle can plausibly be
+re-enabled programmatically: the device shell runs as uid 2000 in group 1011(adb) and HAS
+WRITE_SECURE_SETTINGS (verified, 3 grants). That yields a genuine recovery ladder:
+    wired healthy  -> can re-enable wireless programmatically -> wireless available as fallback
+    wireless only + toggle off -> NO transport exists to re-enable it -> MANUAL (chicken-and-egg)
+The write was NOT executed — it is a device state change and must be tested deliberately.
+
+**PREVIOUS FAILURE — investigated, NOT reproduced, and said so plainly**
+Evidence a wireless session occurred: ~/.android/adb_known_hosts.pb exists (29 bytes, Sep 17 22:52).
+But that is TWO WEEKS ago, not "yesterday", and the file may only be written on first pairing, so it
+is weak dating evidence — not presented as proof of when the failure happened. Mac logs for the last
+24h returned only WebKit QUIC noise (the string "adb" inside random hex). Pixel logcat had no
+wireless history — the buffer had rolled over. **The cause is inferred from documented mechanism,
+not reproduced.**
+
+**VERIFIED DEVICE FACTS (Android 16, API 36, BP3A.251005.004.B1)**
+wireless debugging OFF (adb_wifi_enabled=0); service.adb.tcp.port and service.adb.tls.port unset;
+adb_enabled=1; ro.adb.secure=1; adb_allowed_connection_time=0; Wi-Fi on, SSID "RCB"; Pixel
+192.168.1.9 / Mac 192.168.1.10, same subnet; mdnsd not running; /data/misc/adb/adb_keys NOT readable.
+
+**TWO INDEPENDENT STATES, the core distinction**
+  STATE A: is wireless debugging ENABLED?  (adb_wifi_enabled) -> VOLATILE, lost on reboot/Wi-Fi/
+           inactivity. Controls whether the device advertises at all.
+  STATE B: is the Mac PAIRED/AUTHORIZED?   (/data/misc/adb/adb_keys) -> PERSISTENT, a key written
+           once. Same file serves USB authorization AND wireless pairing — which is why USB
+           debugging is the recovery path.
+Conflating A and B is the mistake this design exists to prevent.
+
+**SECURITY:** no key material read, copied, or displayed. Automatic pairing NOT proposed — pairing
+requires a code the user reads off the device; automating it would weaken the model. Prefer the
+modern TLS mechanism over legacy plaintext tcpip 5555.
+
+**RECOMMENDATION — do not implement yet:** wireless debugging is off so nothing can be verified; the
+load-bearing assumption (does `adb -s <serial>` work for a wireless device?) is UNTESTED and decides
+whether this is a small change or a structural one; and the FAIL-006 physical fault is unresolved.
+Order: (1) enable + pair, then test `-s <serial>` — this single test decides the architecture;
+(2) test whether `settings put global adb_wifi_enabled 1` works over USB; (3) then the pure
+classification type + TransportState, valuable on its own merits because today the user cannot tell
+"cable unplugged" from "wireless debugging silently turned itself off six hours ago".
+
+**Phase 7 architectural boundary: UNCHANGED.** Transport resilience — "which transport can reach
+the Pixel?", not "where should a workload run?".
+
+**Artifacts:** `design/wireless-adb-persistence-design.md`. No production code changed.

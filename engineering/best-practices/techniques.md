@@ -258,6 +258,70 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-029 — Check whether the platform already solves the problem before designing a solution
+
+**Technique:**
+Before designing a mechanism, check whether the tool you are already using implements it. The
+capability may be present, undocumented in your own notes, and switched off by default for reasons
+that do not apply to you.
+
+**Worked:**
+Yes — it removed most of a design.
+
+**Evidence:**
+The requirement was "PixelDesktop should automatically rediscover and reconnect to the Pixel without
+hardcoded IP or port". The obvious design was an mDNS discovery layer: browse
+`_adb-tls-connect._tcp`, parse endpoints, track address changes, reconnect.
+
+Running `adb --help` showed:
+    $ADB_MDNS_AUTO_CONNECT   comma-separated list of mdns services to allow auto-connect
+                             (default adb-tls-connect)
+**adb already does exactly that, by default.** The discovery layer would have duplicated working
+functionality, and — worse — a custom implementation would have had to keep pace with adb's own
+reconnection logic.
+
+The design collapsed from "implement mDNS discovery" to "call the right commands and report state
+honestly".
+
+**Recommended use:**
+Before designing any layer, read the full `--help` of the tool underneath it. Look specifically for
+environment variables — defaulted behaviour often lives there.
+
+**Avoid when:**
+Never. It costs one command.
+
+---
+
+## T-030 — Find the real intervention boundary, not the obvious one
+
+**Technique:**
+When a system "requires manual intervention", do not accept the first boundary you find. Test
+whether the failure and the fix are actually at the same layer. The boundary is often one level
+away from where the symptom appears.
+
+**Worked:**
+Yes — it turned a broad complaint into one narrow, actionable condition.
+
+**Evidence:**
+The complaint was "wireless ADB worked yesterday, needed manual reconnection today", which reads as
+*reconnection is the problem*. Investigation showed reconnection is **already automatic** (adb mDNS
+auto-connect). The actual failure was that Android **disables wireless debugging entirely** on
+inactivity, Wi-Fi drop, and reboot.
+
+So the manual boundary is not "reconnect" — it is **"re-enable the toggle while no transport
+exists"**. That is a far smaller condition, and it has a partial automated answer: with USB present,
+the device shell holds `WRITE_SECURE_SETTINGS` and can plausibly re-enable it.
+
+**Recommended use:**
+Whenever a design is described as "make X automatic", first verify that X is what is actually
+failing. Separate the *symptom* (needed to reconnect) from the *state that changed* (the toggle went
+off).
+
+**Avoid when:**
+Never. The wrong boundary produces automation that never fires.
+
+---
+
 ## T-027 — A state model that cannot express the failure will hide it
 
 **Technique:**
