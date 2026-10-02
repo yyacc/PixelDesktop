@@ -730,4 +730,41 @@ durable result.json   →  final result
 
 Working tree clean after commit. See the repository log for the E1 commit sequence:
 `790164d` (experiment) → `715a173` (implementation) → `78595f4` (verification round) →
-final closeout commit.
+`e3a83bd` (closeout).
+
+### 23.9 Final bounded smoke verification
+
+One final bounded smoke test was run against the production path over USB, as the last act of E1.
+Small workload (DTCA-1), no long LLM run, hard-capped at 300 s.
+
+```
+=== LIVE SMOKE TEST (DTCA-1, no LLM) ===
+transport             : 3C261JEHN25632
+outcome               : completed(... job_id C67641EB-..., resultBytes: 401)
+events received       : 6
+heartbeats            : 1
+first event (s)       : 0.029
+launch ack (s)        : 0.132
+wall (s)              : 0.873
+stderr lines          : 0
+unrecognized lines    : 0
+PASS (0.987 s)
+```
+
+Process exit 0, total wall **3 s** against the 300 s cap. Confirms stdin delivery, launch
+acknowledgement, incremental events, normal termination, zero stderr, zero unrecognized output, and a
+durable result carrying the job id.
+
+### 23.10 Final counts
+
+| Metric | Value |
+|---|---|
+| unit/integration tests | **336** |
+| failures | **0** |
+| test runtime | **13.2 s** (900 s cap not approached) |
+| live verification tests | **9 / 9 PASS** |
+| final bounded smoke verification | **PASS** |
+| commit | **`e3a83bd`** |
+| working tree | **clean** |
+
+**E1 is closed.**
