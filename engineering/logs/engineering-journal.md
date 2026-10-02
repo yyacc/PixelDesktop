@@ -690,3 +690,64 @@ or Hermes integration.
 
 **Artifacts:** `phases/phase-05-d8-worker-implementation.md`, ADR-011,
 `failures/FAIL-004-android-assumptions-falsified.md`, `DTCA1Worker/`.
+
+---
+
+## 2026-10-02 — Phase 6 reconnaissance: Local AI Worker (no code changed)
+
+**Phase:** 6 (reconnaissance + proposal only)
+**Task:** Establish the smallest, simplest, experimentally defensible path to real local
+language-model inference on the Pixel 7a. **No model downloaded, no runtime installed, no source
+modified.**
+
+**Action:**
+Read the authoritative Phase 6/7 requirements and the relevant ADRs. Ran read-only measurements on
+the Pixel 7a covering SoC, CPU topology, ABI, RAM, swap, storage, GPU, Vulkan/NNAPI/EdgeTPU
+availability, SELinux, mount options, exec capability, Java heap caps, ADB throughput, thermal
+baseline. Fetched primary documentation for llama.cpp, LiteRT-LM, ExecuTorch, ONNX Runtime and
+MediaPipe.
+
+**Result — findings that determine the design:**
+
+1. **NNAPI is NOT available on this device** — `pm list features` has no `neuralnetworks` entry and
+   no HAL is present. Measured, not assumed.
+2. **EdgeTPU/GXP are present but gated** — the app allowlist (`edgetpu_native.allowlist_app1..12`)
+   is entirely empty, so a third-party app cannot use them.
+3. **Vulkan compute IS available** (`android.hardware.vulkan.compute`, Mali-G710 ICD).
+4. **`/storage/emulated` is mounted `noexec`** — the worker's exchange dir cannot execute anything.
+   The model is data, so this does not block it; a runtime binary must ship as an APK native lib.
+5. **Only ~2.05 GiB MemAvailable** of 7.27 GiB, with swap 0.6 GB free.
+6. **LiteRT-LM's published benchmark** shows a ~2B model needing **1733 MB peak on CPU** — measured
+   on a device faster than the Pixel 7a.
+7. **ADB throughput is 27.7 MB/s** on incompressible data (an earlier 4030 MB/s reading from a
+   sparse file was rejected as not credible).
+8. **The Java heap cap (256 MB) does not bound the model** — ggml-style runtimes allocate natively.
+
+**The finding that contradicts a standing assumption:** the historical preference for a 3B–4B model
+on the Pixel is **not supportable on this device**. ~2.05 GiB available against ~2.5–3 GB needed for
+a 3B Q4 model. Recorded as falsified by measurement rather than quietly adjusted. The first proof
+should target ~1B at Q4, with a ~0.5B fallback.
+
+**Decision:**
+Propose a one-shot Activity (as D8), file-based exchange over ADB (unchanged), the model in the
+worker's own external files dir (app-created, hash-verified), and **llama.cpp with GGUF on CPU** as
+the runtime — chosen for its MIT licence, quantization range, single self-describing artifact, and
+because CPU-only avoids making the first proof also a GPU backend bring-up. Nine proposed decisions
+(P1–P9) and eight unresolved risks (R1–R8).
+
+**The most important honesty point:** D8's independent re-computation verification **does not
+transfer** to LLM inference, because the Mac lacks the same model/runtime/backend and generation may
+not be bit-reproducible. Proposed replacement is an **evidence chain** whose load-bearing links are
+attributable per-process CPU time and an **ablation test** (remove the model → the worker fails),
+which establishes causation. It proves inference *occurred on the device*; it does **not** prove the
+output is *correct*. Stated plainly rather than glossed.
+
+**The highest-risk assumption (R1):** D8 proved a ~250 ms Activity launches while locked and
+dozing. A model load plus generation is two to three orders of magnitude longer, and that is **not**
+proven. It must be measured **first**, before any runtime work, because falsifying it changes the
+process model — an architecture change, not an implementation detail.
+
+**Next action:** Await review of ADR-012 and the nine proposed decisions. Implementation is BLOCKED.
+
+**Artifacts:** `phases/phase-06-local-ai-reconnaissance.md`, `decisions/ADR-012-local-ai-worker.md`
+(PROPOSED, not approved).

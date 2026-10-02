@@ -450,6 +450,24 @@
       "task_id": "phase-05-d8",
       "purpose": "Android worker APK project (sources)",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-06-local-ai-reconnaissance.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-recon",
+      "purpose": "Phase 6 reconnaissance report (blocked pending review)",
+      "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-012-local-ai-worker.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 6,
+      "task_id": "phase-06-recon",
+      "purpose": "ADR-012 local AI worker (PROPOSED, not approved)",
+      "status": "proposal"
     }
   ],
   "evidence_artifacts_outside_repo": [
