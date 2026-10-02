@@ -258,6 +258,65 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-031 — Verify the identifier, not just the operation
+
+**Technique:**
+When testing whether an abstraction survives a new context, test the *identifier* it keys on, not
+only the *operation* it performs. An operation can work perfectly while the identity model beneath
+it is wrong.
+
+**Worked:**
+Yes — it inverted the expected conclusion.
+
+**Evidence:**
+The question was "does `adb -s <serial>` work over wireless TLS?". Testing only the operation would
+have produced a clean PASS: six command patterns returned byte-identical results over both
+transports, including a write.
+
+But `adb devices` showed:
+    3C261JEHN25632                                      device usb:...    <- USB
+    adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp     device            <- WIRELESS
+**Two independent entries, two different serials, one physical phone.** The operation works; the
+identity model does not. A discovery pass would see a duplicate device, and code keying on
+`serialNumber` would treat one phone as two.
+
+**Recommended use:**
+Any test of "does this abstraction still hold?" — check what it *identifies by*, not just what it
+*does*. Especially when the identifier is an opaque string supplied by a third party.
+
+**Avoid when:**
+Never. It costs one extra `devices -l`.
+
+---
+
+## T-032 — Distinguish a stable identifier from a stable endpoint
+
+**Technique:**
+When a system exposes both a name and an address, test which one survives change. Design against the
+one that does.
+
+**Worked:**
+Yes — it justified targeting by name.
+
+**Evidence:**
+The wireless ADB endpoint changed freely: port `35987` → `33197` across a single toggle. The
+*serial* stayed the same, and the same serial kept working after the port changed.
+
+Targeting by name therefore survives endpoint churn for free. Targeting by IP or port would have
+broken on the first toggle.
+
+**Caveat recorded alongside it:** the serial was stable across one reconnect and one toggle — but
+that is *not* proof of general stability. Persistence across a restart or re-pair is untested, and
+was flagged as the most consequential remaining unknown rather than assumed.
+
+**Recommended use:**
+Any system with service discovery (mDNS, DNS-SD, Kubernetes services) where addresses are ephemeral.
+
+**Avoid when:**
+Never — but do not let a single stability observation become an assumption. State the sample size.
+
+---
+
 ## T-029 — Check whether the platform already solves the problem before designing a solution
 
 **Technique:**

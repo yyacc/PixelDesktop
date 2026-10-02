@@ -684,6 +684,15 @@
       "task_id": "wireless-adb-design",
       "purpose": "Wireless ADB persistence design investigation (design only)",
       "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/wireless-serial-transport-verification.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "wireless-serial-verification",
+      "purpose": "Wireless serial transport verification (device-verified)",
+      "status": "complete"
     }
   ],
   "evidence_artifacts_outside_repo": [

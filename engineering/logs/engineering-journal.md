@@ -1243,3 +1243,68 @@ classification type + TransportState, valuable on its own merits because today t
 the Pixel?", not "where should a workload run?".
 
 **Artifacts:** `design/wireless-adb-persistence-design.md`. No production code changed.
+
+---
+
+## 2026-10-02 — Wireless serial transport VERIFIED on the physical Pixel 7a
+
+**Phase:** none — verification of the single architectural unknown from `a2c0858`.
+**Task:** Does `adb -s <serial>` work when the Pixel is connected through wireless debugging / ADB TLS?
+**Result: YES — but the architectural conclusion is NOT "the abstraction works unchanged".**
+
+**THE CRITICAL FINDING — the wireless serial is NOT the USB serial**
+    3C261JEHN25632                                      device usb:...    <- USB
+    adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp     device            <- WIRELESS
+Two INDEPENDENT device entries with DIFFERENT serials. Confirmed by `adb disconnect`: the wireless
+entry vanished while the USB entry survived. Format is
+`adb-<hardware-serial>-<random6>._adb-tls-connect._tcp`.
+
+So `-s <serial>` itself works fine with EITHER serial. The real consequence is a DUPLICATION
+problem: a discovery pass over `adb devices` sees TWO entries for ONE physical phone, and code
+keying on `serialNumber` would treat them as two devices. That is a MODELLING problem, not a
+manager problem — no TransportManager is proposed.
+
+**COMMAND PATTERN COMPARISON — byte-identical across both transports**
+  getprop ro.product.model        Pixel 7a  ==  Pixel 7a     OK
+  getprop ro.build.version.sdk    36        ==  36           OK
+  getprop ro.product.manufacturer Google    ==  Google       OK
+  shell echo round trip           correct   ==  correct      OK
+  shell pidof com.pixeldesktop.worker  4251 ==  4251         OK
+  ls model dir                    same      ==  same         OK
+Plus a WRITE: `push` of a 24-byte file over wireless succeeded, read back correctly, cleaned up.
+No difference was observed in ANY command tested.
+
+**T-029 CONFIRMED ON HARDWARE — adb auto-discovers and auto-reconnects**
+Advertisement appeared within ~5 s. adb connected with NO manual `adb connect`. After a forced
+`adb disconnect`, the wireless entry reappeared AUTOMATICALLY within <=5 s with the SAME serial.
+Only `transport_id` changed (20 -> 40). **No custom mDNS layer is needed.**
+
+**SERIAL STABILITY — stable where it matters, port changes freely**
+  initial enable            serial=...laKyZz   port=35987
+  after forced disconnect   same serial        port=35987   (auto-recovered)
+  after toggle OFF -> ON    SAME suffix        port=33197   (CHANGED)
+The port changed and the same serial kept working — that is the payoff of name-based targeting over
+endpoint-based. **But one toggle is not proof of general stability**; persistence across a device
+restart, Wi-Fi reconnect, or re-pair is UNTESTED and flagged as the most consequential unknown (U1).
+
+**SETUP — no pairing was required.** `settings put global adb_wifi_enabled 1` succeeded (0 -> 1),
+confirming the design's section 12 claim that the shell's WRITE_SECURE_SETTINGS grant makes the
+toggle programmable when a transport already exists. The Mac's existing ADB key was already
+authorized — the same key store serves USB authorization and wireless pairing, as predicted.
+No pairing code was used; no key material read, copied, or displayed. TLS throughout
+(`ro.adb.secure=1`); no unauthenticated TCP ADB.
+
+**ARCHITECTURE INSPECTION (requirement 1):** `deviceSerial` is passed through as adb's `-s` in 6
+places; `parseDeviceList` takes `parts[0]`; a search for usb|wired|cable|physical across
+Transport/ and Device/ returned ZERO functional matches. **No USB assumption exists.** The
+practical way to tell the transports apart is the `usb:` token — which `parseDeviceList` currently
+discards.
+
+**Remaining unknowns (7), U1 most consequential:** suffix stability across restart/re-pair; behaviour
+on IP change; Mac sleep/wake; targeting the USB serial when USB is physically absent; wireless
+throughput; `.local` name variants; `adb_allowed_connection_time=0` semantics.
+
+**Device state left behind:** wireless debugging left ON (the deliberate setup the task required);
+both transports reachable; probe file removed; no production code changed.
+
+**Artifacts:** `testing/wireless-serial-transport-verification.md`.

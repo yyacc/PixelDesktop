@@ -90,6 +90,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [FAIL-006: USB Connection Drops (Mac ↔ Pixel 7a)](failures/FAIL-006-usb-connection-drops.md) — investigation: macOS USB port teardown, not PixelDesktop
 - [USB-Aware Transport Design](design/usb-aware-transport-design.md) — **design only**: IOKit presence events, `wiredDegraded` state, not yet implementable
 - [Wireless ADB Persistence Design](design/wireless-adb-persistence-design.md) — **design only**: the manual-intervention boundary is *re-enabling wireless debugging*, not reconnecting
+- [Wireless Serial Transport Verification](testing/wireless-serial-transport-verification.md) — **verified on device**: `-s` works over TLS, but the wireless serial is NOT the USB serial
 
 ## Device
 
