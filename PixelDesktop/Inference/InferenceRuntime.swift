@@ -126,6 +126,17 @@ struct InferenceResult: Equatable, Codable, Sendable {
     let modelFile: String
     let modelSha256: String
 
+    /// Context window the runtime actually allocated, reported back from the live context.
+    ///
+    /// Optional because it is a Phase 7 addition to the envelope: an older worker build omits it,
+    /// and an absent value must not be read as zero. The capability contract falls back to a
+    /// `.declared` value when this is nil, and says so.
+    let contextSizeTokens: Int?
+
+    /// The model's own maximum trained context. A property of the model, not of our
+    /// configuration — the two differ (2048 allocated vs 32768 trained) and both are useful.
+    let trainedContextSizeTokens: Int?
+
     enum Status: String, Codable, Sendable {
         case ok = "OK"
         case failed = "FAILED"
@@ -145,6 +156,8 @@ struct InferenceResult: Equatable, Codable, Sendable {
         case runtime
         case modelFile = "model_file"
         case modelSha256 = "model_sha256"
+        case contextSizeTokens = "context_size_tokens"
+        case trainedContextSizeTokens = "trained_context_size_tokens"
     }
 
     /// Tokens per second, derived from generation time only.

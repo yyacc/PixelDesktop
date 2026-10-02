@@ -258,6 +258,37 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-023 — Enumerate a library's limits; guard the FATAL ones first
+
+**Technique:**
+When using a library, list every bound it enforces and classify each by what happens when it is
+violated: returned error, or process abort. Guard the fatal ones explicitly, and never assume a
+guard on one bound covers another.
+
+**Worked:**
+No — it was violated, and the violation was invisible to 224 passing tests.
+
+**Evidence:**
+Phase 7 Step 1. `llama.cpp` enforces two independent bounds:
+- `n_ctx` (2048) — violation returns an error. **Guarded** in Phase 6, tested, documented.
+- `n_batch` (256) — violation calls `ggml_abort()` and **SIGABRTs the process**. It was a bare
+  literal three lines away in a `cparams` assignment, **unguarded**.
+
+A ~660-token prompt therefore killed the worker with no result file, which the Mac could not
+distinguish from a crash-loop or a timeout. Fixed by chunking the decode.
+
+**Why the tests missed it:** every test used a 22–32 token prompt. The failure needs >256. The macOS
+suite cannot reach the native layer at all.
+
+**Recommended use:**
+Any native or C library with configurable limits — especially where one bound is graceful and
+another is fatal. Read the abort paths, not just the return values.
+
+**Avoid when:**
+Never. The enumeration costs minutes; the failure cost a phase's verification run.
+
+---
+
 ## T-021 — When the evidence says "no component", propose no component
 
 **Technique:**

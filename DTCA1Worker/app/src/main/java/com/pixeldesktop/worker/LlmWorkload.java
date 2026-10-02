@@ -158,6 +158,26 @@ final class LlmWorkload {
             result.put("total_ms", totalMs);
 
             result.put("runtime", LlamaBridge.nativeRuntimeInfo());
+
+            // Context size ACTUALLY allocated, read back from the live runtime rather than
+            // restated. This is what makes the capability contract's preferred provenance
+            // (.runtimeReported) real instead of aspirational: kContextSize in llama_jni.cpp
+            // stays the single definition, and this is how it is observed from outside.
+            //
+            // Guarded: a metadata read must never turn a successful inference into a failure.
+            // On failure the field is simply absent, and the Mac-side contract falls back to a
+            // .declared value that says so.
+            try {
+                JSONObject modelInfo = new JSONObject(LlamaBridge.nativeModelInfo(handle));
+                if (modelInfo.has("n_ctx_in_use")) {
+                    result.put("context_size_tokens", modelInfo.getInt("n_ctx_in_use"));
+                }
+                if (modelInfo.has("n_ctx_train")) {
+                    result.put("trained_context_size_tokens", modelInfo.getInt("n_ctx_train"));
+                }
+            } catch (Exception metaError) {
+                Log.w(TAG, "model metadata unavailable: " + metaError.getMessage());
+            }
             result.put("model_file", modelFile.getName());
             result.put("model_bytes", modelFile.length());
 

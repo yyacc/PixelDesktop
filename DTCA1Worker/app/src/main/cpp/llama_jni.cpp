@@ -21,6 +21,7 @@
 #include <jni.h>
 #include <android/log.h>
 
+#include <algorithm>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -35,6 +36,13 @@
 namespace {
 
 constexpr int kContextSize = 2048;
+
+// Maximum tokens per llama_decode() call. MUST stay in step with cparams.n_batch below.
+//
+// Exceeding it is FATAL, not reportable: llama_decode() calls ggml_abort() and SIGABRTs the
+// process (measured on the real device — see FAIL-005). This is a separate and much smaller
+// bound than kContextSize, and violating the context bound is graceful by comparison.
+constexpr int kBatchSize = 256;
 
 struct Engine {
     llama_model   * model = nullptr;
@@ -131,7 +139,7 @@ Java_com_pixeldesktop_worker_LlamaBridge_nativeLoadModel(JNIEnv * env, jclass, j
 
     llama_context_params cparams = llama_context_default_params();
     cparams.n_ctx     = kContextSize;
-    cparams.n_batch   = 256;
+    cparams.n_batch   = kBatchSize;
     cparams.n_threads = 4;  // Tensor G2: 4 big cores. Deliberately not 8 — the little cores
                             // would add contention without throughput, and 4 leaves headroom
                             // for the system while the screen is off.
@@ -162,6 +170,11 @@ Java_com_pixeldesktop_worker_LlamaBridge_nativeFree(JNIEnv *, jclass, jlong hand
 /**
  * Reports model metadata without generating. Used to prove the model actually loaded and to
  * record what it is, independently of any generated text.
+ *
+ * n_ctx is the context size the runtime ACTUALLY allocated, read back from the live context via
+ * llama_n_ctx(). It is reported rather than assumed so that the value published in the capability
+ * contract describes what is in use, not what we intended. kContextSize remains the single
+ * definition; this is how it is observed from outside the native layer.
  */
 JNIEXPORT jstring JNICALL
 Java_com_pixeldesktop_worker_LlamaBridge_nativeModelInfo(JNIEnv * env, jclass, jlong handle) {
@@ -171,14 +184,19 @@ Java_com_pixeldesktop_worker_LlamaBridge_nativeModelInfo(JNIEnv * env, jclass, j
     char desc[256] = {0};
     llama_model_desc(e->model, desc, sizeof(desc));
 
+    // Context size in use. Only meaningful when a context exists; reported as 0 otherwise so the
+    // absence is visible rather than substituted with the configured value.
+    unsigned int n_ctx_in_use = e->ctx ? llama_n_ctx(e->ctx) : 0u;
+
     char buf[1024];
     snprintf(buf, sizeof(buf),
              "{\"desc\":\"%s\",\"n_params\":%llu,\"size_bytes\":%llu,\"n_ctx_train\":%d,"
-             "\"model_load_ms\":%lld,\"backend\":\"cpu\"}",
+             "\"n_ctx_in_use\":%u,\"model_load_ms\":%lld,\"backend\":\"cpu\"}",
              json_escape(desc).c_str(),
              (unsigned long long) llama_model_n_params(e->model),
              (unsigned long long) llama_model_size(e->model),
              llama_model_n_ctx_train(e->model),
+             n_ctx_in_use,
              (long long) e->model_load_ms);
     return env->NewStringUTF(buf);
 }
@@ -237,10 +255,25 @@ Java_com_pixeldesktop_worker_LlamaBridge_nativeGenerate(
     }
 
     // ---- prompt eval ----
+    //
+    // DECODED IN CHUNKS OF AT MOST kBatchSize. This is not an optimisation.
+    //
+    // MEASURED ON THE REAL DEVICE (FAIL-005): passing a prompt longer than n_batch to
+    // llama_decode() does NOT return an error — it calls ggml_abort() and SIGABRTs the whole
+    // process. The first version of this function decoded the entire prompt in one batch, so a
+    // ~600-token prompt against n_batch=256 killed the worker with no result file, which the Mac
+    // could not distinguish from a crash-loop or a timeout.
+    //
+    // The earlier guard above (n_prompt + max_tokens > kContextSize) does not catch this: 600 is
+    // well under the 2048 context. n_batch is a SEPARATE and much smaller bound, and violating it
+    // is fatal rather than reportable. Chunking is the documented llama.cpp pattern.
     const long long t_prompt0 = now_ms();
-    llama_batch batch = llama_batch_get_one(tokens.data(), n_prompt);
-    if (llama_decode(e->ctx, batch) != 0) {
-        return env->NewStringUTF("{\"error\":\"llama_decode failed on prompt\"}");
+    for (int i = 0; i < n_prompt; i += kBatchSize) {
+        const int n_chunk = std::min(kBatchSize, n_prompt - i);
+        llama_batch chunk = llama_batch_get_one(tokens.data() + i, n_chunk);
+        if (llama_decode(e->ctx, chunk) != 0) {
+            return env->NewStringUTF("{\"error\":\"llama_decode failed on prompt\"}");
+        }
     }
     const long long prompt_eval_ms = now_ms() - t_prompt0;
 

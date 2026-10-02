@@ -585,6 +585,42 @@
       "task_id": "phase-07-reeval",
       "purpose": "Phase 7 architecture re-evaluation (Hermes-owned planning)",
       "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-step-1-capability-contract.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-1",
+      "purpose": "Phase 7 Step 1 report: capability contract",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-005-prompt-exceeding-nbatch-aborts-worker.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-1",
+      "purpose": "Failure record: n_batch abort",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/PixelCapabilityContract.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-1",
+      "purpose": "The Pixel capability contract",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7CapabilityContractTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-1",
+      "purpose": "32 capability contract tests",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

@@ -112,7 +112,8 @@ final class InferenceResultTests: XCTestCase {
             jobId: "j", status: status, text: text, tokenIds: tokenIds,
             generatedTokens: generatedTokens, promptTokens: 10,
             modelLoadMs: 400, promptEvalMs: 200, generationMs: generationMs, totalMs: 1600,
-            runtime: .llamaCppCPU, modelFile: "m.gguf", modelSha256: "abc")
+            runtime: .llamaCppCPU, modelFile: "m.gguf", modelSha256: "abc",
+            contextSizeTokens: 2048, trainedContextSizeTokens: 32768)
     }
 
     func testTokensPerSecondIsDerivedFromGenerationTimeOnly() throws {
@@ -154,7 +155,8 @@ final class InferenceResultTests: XCTestCase {
          "generated_tokens":2,"prompt_tokens":32,"model_load_ms":437,
          "prompt_eval_ms":6709,"generation_ms":7251,"total_ms":14410,
          "runtime":{"name":"llama.cpp","version":"a868c3e","backend":"cpu"},
-         "model_file":"qwen2.5-1.5b-instruct-q4_k_m.gguf","model_sha256":"deadbeef"}
+         "model_file":"qwen2.5-1.5b-instruct-q4_k_m.gguf","model_sha256":"deadbeef",
+         "context_size_tokens":2048,"trained_context_size_tokens":32768}
         """
         let decoded = try JSONDecoder().decode(InferenceResult.self, from: Data(json.utf8))
         XCTAssertEqual(decoded.jobId, "j1")
@@ -165,6 +167,8 @@ final class InferenceResultTests: XCTestCase {
         XCTAssertEqual(decoded.generationMs, 7251)
         XCTAssertEqual(decoded.runtime.name, "llama.cpp")
         XCTAssertEqual(decoded.runtime.backend, "cpu")
+        XCTAssertEqual(decoded.contextSizeTokens, 2048)
+        XCTAssertEqual(decoded.trainedContextSizeTokens, 32768)
     }
 
     func testRuntimeIdentityPinsCpuBackend() {

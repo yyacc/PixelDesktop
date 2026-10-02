@@ -24,7 +24,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 4 — Android Application / Process Control:** COMPLETE
 **Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) IMPLEMENTED and verified on device
 **Phase 6 — Local AI Worker:** FIRST INFERENCE PROOF COMPLETE — real LLM inference on the Pixel 7a
-**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** redefined by **ADR-007 Amendment 1**; implementation BLOCKED pending review
+**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** **Step 1 COMPLETE** (capability contract published); Step 2 awaiting approval
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md) and its **Amendment 1**
@@ -53,7 +53,8 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 6 Reconnaissance — Local AI Worker](phases/phase-06-local-ai-reconnaissance.md) — reconnaissance + proposal
 - [Phase 6 Implementation — Local AI Worker](phases/phase-06-local-ai-implementation.md) — **first inference proof complete**, measured results, evidence chain
 - [Phase 7 Reconnaissance — Resource-Aware Routing](phases/phase-07-routing-reconnaissance.md) — reconnaissance; **its router proposal was withdrawn**
-- [Phase 7 Architecture Re-Evaluation](phases/phase-07-architecture-reevaluation.md) — **current**: Hermes owns planning; PixelDesktop publishes a capability contract
+- [Phase 7 Architecture Re-Evaluation](phases/phase-07-architecture-reevaluation.md) — Hermes owns planning; PixelDesktop publishes a capability contract
+- [Phase 7 Step 1 — The Pixel Capability Contract](phases/phase-07-step-1-capability-contract.md) — **implemented**: contract, provenance model, real-device verification
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements
@@ -84,6 +85,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [FAIL-002: Runaway Field Duplication in Transport.swift](failures/FAIL-002-transport-swift-runaway-fields.md)
 - [FAIL-003: Worker Workspace Created World-Readable](failures/FAIL-003-workspace-world-readable.md)
 - [FAIL-004: Three Android Assumptions Falsified by Real-Device Execution](failures/FAIL-004-android-assumptions-falsified.md)
+- [FAIL-005: A Prompt Longer Than n_batch Aborts the Worker](failures/FAIL-005-prompt-exceeding-nbatch-aborts-worker.md)
 
 ## Device
 

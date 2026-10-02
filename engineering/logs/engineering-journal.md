@@ -947,3 +947,56 @@ that produced the correction.
 explicit approval.
 
 **Artifacts:** `ADR-007-authoritative-phase-sequence.md` (Amendment 1).
+
+---
+
+## 2026-10-02 — Phase 7 Step 1: the Pixel capability contract
+
+**Phase:** 7 (Step 1)
+**Task:** Publish the smallest stable contract letting Hermes learn what the Pixel can support,
+deriving every field from existing authoritative definitions rather than creating a new subsystem.
+
+**Result:**
+`PixelCapabilityContract.swift` — a versioned value type whose every field is DERIVED from an
+existing source: `AndroidDevice` (device), `InferenceRuntimeIdentity`/`LlamaCppRuntime` (runtime),
+`ModelContract` (model name/hash/size), `InferenceRequest` (limits), the worker dispatch
+(workloads). **No new capability subsystem was created.** 226 tests, 0 failures (was 194).
+
+**Context size resolved without a second source of truth.** `kContextSize` lived only in
+`llama_jni.cpp`. Rather than duplicate it as a Swift constant (which could drift), the native layer
+now reports the context it **actually allocated**, read back via `llama_n_ctx()`. Verified on the
+device: source 2048 = runtime 2048, with the model's trained maximum (32768) published separately
+because conflating them would misstate what a caller may send.
+
+**Provenance model:** every field carries `source` (.declared / .deviceReported / .runtimeReported),
+`observedAt` (nil for declared values — a constant is not an observation), and a `limitation` stating
+what the value does NOT establish. A test enforces that no field can omit its limitation, and another
+asserts the encoded contract contains **no performance field** — because reconnaissance measured a
+2.4× latency variance and a 12× load variance, and publishing a token rate would present an unstable
+observation as a constant.
+
+**DEFECT FOUND AND FIXED — FAIL-005.** Real-device verification of the context boundary uncovered
+that a prompt longer than `n_batch` (256) makes `llama_decode()` call `ggml_abort()` and **SIGABRT
+the worker** — no result file, indistinguishable from a crash-loop. **It compiled cleanly and passed
+all 224 tests.** The Phase 6 guard covered `n_ctx` (2048) but `n_batch` is a separate, smaller, and
+FATAL bound. Fixed by chunked decode; verified on the device — the identical input that previously
+aborted now completes **820 prompt tokens in 5.1 minutes** with `status=OK` and no new abort.
+
+This also **corrected the contract's own text**, which had claimed overflow is "refused by the
+runtime". That was wrong for the batch bound, and the limitation now states both behaviours
+accurately.
+
+**A planning fact this exposed:** prompt processing is ~2.7 tok/s, so **prompt size dominates the
+cost of a Pixel workload** — far more than generation. Recorded as measured evidence; deliberately
+NOT turned into a routing threshold.
+
+**Seventh defect of its family** (compiled, passed the suite, wrong on the device). Found only by
+sending a real oversized prompt to real hardware. Recorded as T-023.
+
+**Regressions:** `LOCAL-LLM-1` 3/3 runs with identical token IDs (greedy stable); `DTCA-1`
+`COMPLETED` with Mac re-computation matching; zero permissions retained.
+
+**Next action:** STOPPED at Step 1. Step 2 (measured performance evidence) awaits approval.
+
+**Artifacts:** `phases/phase-07-step-1-capability-contract.md`,
+`failures/FAIL-005-prompt-exceeding-nbatch-aborts-worker.md`.
