@@ -657,6 +657,15 @@
       "task_id": "phase-07-step-2",
       "purpose": "Real-device evidence verification",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-006-usb-connection-drops.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "usb-investigation",
+      "purpose": "USB disconnection investigation (Mac to Pixel 7a)",
+      "status": "complete"
     }
   ],
   "evidence_artifacts_outside_repo": [

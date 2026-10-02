@@ -258,6 +258,63 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-025 — Sample the layers independently, or "disconnected" will mislead you
+
+**Technique:**
+When a connection "drops", instrument each layer separately and timestamp them independently.
+Never let one layer's view stand in for another's — the phrase "ADB disconnected" collapses at
+least three different failures with three different fixes.
+
+**Worked:**
+Yes — it turned a vague recurring symptom into a specific kernel-level cause.
+
+**Evidence:**
+The reported symptom was "USB/ADB disconnects". Sampling `adb devices` **and**
+`ioreg -p IOUSB` **and** `log show` for the USB stack separately showed:
+- ADB server uptime was continuous across every disconnect → **ADB was a victim**
+- `ioreg` showed the device vanishing from the bus → the failure is at USB level
+- `log show` gave the kernel verdict: `AppleUSBHostPort::terminateDevice` with either
+  `hardware connection lost` or `hardware port disabled`, after `status 0xe00002ed`
+
+Those two kernel verdicts are *different failures* — one is the link dropping, the other is macOS
+disabling the port protectively. A single "disconnected" observation would have hidden both.
+
+**Recommended use:**
+Any layered stack — USB/ADB, network/TLS, driver/app. Sample each boundary separately.
+
+**Avoid when:**
+Never. It costs one extra command per sample.
+
+---
+
+## T-026 — Separate the trigger from the mechanism before proposing a fix
+
+**Technique:**
+A failure usually has a *mechanism* (what actually breaks) and one or more *triggers* (what makes it
+happen). Identify both, and do not let a plausible trigger stand in for the mechanism.
+
+**Worked:**
+Yes — it prevented a wrong fix.
+
+**Evidence:**
+The mechanism was constant: macOS tearing down the USB port after a physical-layer transaction
+error. The triggers differed by time of day: **92 system-sleep events explained the morning
+teardowns**, but the Mac did not sleep at all after 13:00, so sleep could not explain the afternoon
+ones — those correlated with **49 browser exclusive-USB-access events** instead. Two of seven
+afternoon teardowns had neither.
+
+Had only one trigger been found, the obvious "fix" would have been to disable sleep — which would
+have left the afternoon failures entirely unexplained and the user convinced the problem was solved.
+
+**Recommended use:**
+Any intermittent fault. Explicitly check whether the same mechanism has *multiple* triggers, and
+look for occurrences none of your triggers explain.
+
+**Avoid when:**
+Never — the unexplained residue is the most informative part of the data.
+
+---
+
 ## T-024 — Check whether the type you need already exists before designing one
 
 **Technique:**

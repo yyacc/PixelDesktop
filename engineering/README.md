@@ -87,6 +87,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [FAIL-003: Worker Workspace Created World-Readable](failures/FAIL-003-workspace-world-readable.md)
 - [FAIL-004: Three Android Assumptions Falsified by Real-Device Execution](failures/FAIL-004-android-assumptions-falsified.md)
 - [FAIL-005: A Prompt Longer Than n_batch Aborts the Worker](failures/FAIL-005-prompt-exceeding-nbatch-aborts-worker.md)
+- [FAIL-006: USB Connection Drops (Mac ↔ Pixel 7a)](failures/FAIL-006-usb-connection-drops.md) — investigation: macOS USB port teardown, not PixelDesktop
 
 ## Device
 

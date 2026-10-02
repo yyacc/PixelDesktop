@@ -1058,3 +1058,48 @@ identical token IDs; zero permissions retained.
 **Next action:** STOPPED at Step 2. Step 3 awaits approval.
 
 **Artifacts:** `phases/phase-07-step-2-evidence.md`, `PixelDesktop/Inference/PixelEvidence.swift`.
+
+---
+
+## 2026-10-02 — USB disconnection investigation (Phase 7 paused at user request)
+
+**Phase:** none — separate investigation, explicitly outside Phase 7 Step 3
+**Task:** Determine why the Mac ↔ Pixel 7a USB connection repeatedly drops on its own.
+
+**Result — root cause identified, PixelDesktop EXCLUDED.**
+
+The teardown is a **macOS kernel USB host-controller event**, strictly below ADB:
+`AppleUSBXHCIRequest ... status 0xe00002ed (transaction error)` followed by
+`AppleUSBHostPort::terminateDevice ... hardware connection lost` (11×) or `hardware port disabled`
+(13×). **24 teardowns today.**
+
+**Layers cleared by evidence:**
+- **ADB server** — pid 90509 up continuously 07:24 → present, through every 07:32–14:07 teardown.
+  Never restarted; `kill-server` never invoked.
+- **Pixel** — USB service up **1 day 13 hours**, `sys.usb.config=adb` stable,
+  `VIRTUAL-USB-THROTTLING=0`, usb_pwr_therm ~32 °C. Not disconnecting itself.
+- **PixelDesktop** — **not running during any teardown**. `ADBTransport` has no reconnect, retry,
+  poll-to-act, or kill-server logic; the sole `Task.sleep` is a command timeout. `DeviceManager`'s
+  5 s poll is read-only. **No code change warranted.**
+- **Hub** — excluded; the Pixel is attached **directly** to the XHCI controller.
+
+**Two contributing factors, quantified:**
+1. **System sleep** — `sleep 1` (one minute!), **92 sleep transitions + 91 DarkWakes today**. Direct
+   correlation: 07:07:13 Sleep → 07:07:26 Wake → 07:07:34 enumerate → 07:10:12 connection lost.
+2. **Browser USB contention** — Chrome and Brave both take **exclusive** USB access to the Pixel,
+   **49 events today**, peaking at 12 in the 13:00 hour. At 13:40:27 a contention event and a
+   port-disable occur **within the same second**, three times.
+
+**Honest limits, recorded not smoothed:** the failure **did not recur** during 7 minutes of
+continuous monitoring (84 samples, all `adb=1 usb=1`), so the root cause is inferred from the
+historical record rather than reproduced. **Two of seven afternoon teardowns (13:32, 14:07) have no
+identified trigger at all.** Cable vs port cannot be separated without a physical swap.
+
+**Recommended remedies, in order of evidence:** swap cable and port (the only test that separates
+cable from port); `sudo pmset -c sleep 0`; quit both browsers while using the Pixel.
+
+**Explicitly rejected:** an automatic reconnect loop in PixelDesktop. It would mask a
+physical-layer fault behind a software workaround — the exact outcome the investigation was asked
+to avoid. No reconnect mechanism is justified by this evidence.
+
+**Artifacts:** `failures/FAIL-006-usb-connection-drops.md`. No production code changed.
