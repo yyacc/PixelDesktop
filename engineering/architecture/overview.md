@@ -1,6 +1,6 @@
 # PixelDesktop Architecture — As Delivered
 
-**Last updated:** 2026-10-01 (end of Phase 2)
+**Last updated:** 2026-10-02 (end of Phase 6)
 **Scope:** This document describes what the code **actually implements**. It is not a
 target architecture. Anything not implemented is listed separately in
 [Not Yet Implemented](#not-yet-implemented).
@@ -283,6 +283,50 @@ Established mapping in Phase 2:
 - unknown serial → `adbCommandFailed` (adb exits 1)
 
 ---
+
+## 6b. Local AI Worker (Phase 6)
+
+A second workload now runs in the **same** one-shot Activity. The manifest and its
+zero-permission posture are unchanged.
+
+```
+Mac / Hermes  (planning, reasoning)          <- unchanged; Phase 9 for integration
+     │
+     │  PixelDesktop (macOS)  — does NOT link llama.cpp
+     ▼
+WorkerInstaller · WorkerLifecycle · WorkerOperations      <- reused from D8, unchanged
+     │
+     │  ADB: push job.json -> am start -> pull result.json
+     ▼
+Pixel 7a
+     │
+     ├── app external files:  model/qwen2.5-1.5b-instruct-q4_k_m.gguf   (1.04 GiB, data)
+     │                        job.json                                  (fixed path)
+     │                        result.json                               (fixed path)
+     │
+     └── WorkerActivity  ──►  LlmWorkload  ──►  LlamaBridge (JNI)
+                                                   │
+                                                   ▼
+                                            libpdllama.so  (APK native lib)
+                                            llama.cpp a868c3e, CPU only
+```
+
+**Boundaries, each deliberate:**
+
+| Boundary | Why |
+|---|---|
+| `InferenceRuntime` protocol, one concrete type | ADR-012 §2: replaceable runtime, not architecture-wide coupling. No plugin system, no registry. |
+| `llama_jni.cpp` is the ONLY file touching the C API | Replacing llama.cpp means replacing one file. |
+| The Mac does not link llama.cpp | Keeps the Mac structurally incapable of producing the result it verifies. |
+| `GGML_VULKAN=OFF` and `n_gpu_layers=0` forced in code | ADR-012 §11: CPU only. A GPU path cannot be enabled by accident. |
+| Model is data in app external storage | `/storage/emulated` is `noexec`; the model is unaffected because it is not code. The runtime ships as an APK native lib. |
+| The app creates its own model directory | D8/FAIL-004: an adb-created directory is owned by `shell` and the app cannot write it. |
+| Two workloads, one Activity | DTCA-1 keeps exact re-computation verification; `LOCAL-LLM-1` uses the evidence chain. Both coexist. |
+
+**Verification differs by workload, and that difference is the point.** DTCA-1 is deterministic,
+so the Mac recomputes and compares exactly. LLM generation is not, so it uses an evidence chain
+whose load-bearing links are attributable per-process CPU time and an **ablation test**. See
+ADR-012 §P7.
 
 ## 7. Testing Architecture
 

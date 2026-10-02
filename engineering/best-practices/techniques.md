@@ -258,6 +258,112 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-017 — Test the highest-risk assumption BEFORE building anything on it
+
+**Technique:**
+Identify the assumption that would invalidate the design if false, and falsify it with the
+cheapest possible probe before writing production code.
+
+**Worked:**
+Yes — and it is the only reason this phase had no falsified platform assumptions.
+
+**Evidence:**
+Phase 6. ADR-012 flagged R1 (does a multi-minute Activity survive locked/doze?) as the
+highest-risk item, because falsifying it would require a Service — an architecture change, not
+an implementation detail. A self-contained probe app (300 s CPU-bound Activity, zero
+permissions) answered it in ~15 minutes: PASS unlocked, PASS locked/dozing, PASS forced deep
+doze. No Service was needed, and the design proceeded unmodified.
+
+Compare Phase 5/D8, where three platform assumptions were falsified *after* the code was written,
+compiled cleanly, and passed 154 tests. Cost of finding out late: a rewrite of the manifest, the
+launcher check, and the workspace contract.
+
+**Recommended use:**
+Whenever a design decision depends on unverified external-system behaviour that would be
+expensive to change later.
+
+**Avoid when:**
+The assumption is cheap to change (a config value) or already pinned by an existing device test.
+
+---
+
+## T-018 — A measurement can be an artifact of your own harness
+
+**Technique:**
+Before believing a surprising result, check whether the *measurement* could have produced it.
+Specifically: reset the subject to a known state between runs, and verify the identity of what
+you sampled.
+
+**Worked:**
+Yes — it caught a wrong conclusion before it was recorded.
+
+**Evidence:**
+Phase 6, R1. A second launch was issued while the previous probe process was still alive. `pidof`
+returned the OLD pid, whose CPU time appeared frozen (`utime` stuck at 28751), and the log was
+silent. The obvious reading — "deep doze blocks the Activity" — was **wrong**. Adding
+`am force-stop` between tests showed deep doze passing cleanly.
+
+Also Phase 6: an external memory sampler running as a backgrounded shell subshell never sampled
+anything (30/30 samples "DEAD") while inference completed successfully. The process lived ~20 s
+and the sampler was not actually running. Fixed by having the worker read its OWN
+`/proc/self/status`, which is both reliable and genuinely worker-attributable.
+
+**Recommended use:**
+Any sampling of a short-lived process; any PID- or handle-based measurement; any A/B comparison
+where state carries over.
+
+**Avoid when:**
+Never avoid it — the failure mode is silent and produces confident wrong answers.
+
+---
+
+## T-019 — Prefer the subject's self-report over an external observer
+
+**Technique:**
+For short-lived processes, have the process record its own metrics at the moment of interest
+rather than sampling it from outside.
+
+**Worked:**
+Yes.
+
+**Evidence:**
+Phase 6. The worker lives 12–25 s. External sampling missed it entirely. Reading
+`/proc/self/status` (`VmHWM`, `VmRSS`) inside the process captured a 1279 MB peak that no
+external sample obtained. It is also more defensible: the value is unambiguously that process's,
+not a neighbour's.
+
+**Recommended use:**
+Peak memory, timings, and any quantity whose peak is brief.
+
+**Avoid when:**
+The metric must be independent of the subject (e.g. proving the subject did not lie). Here the
+external CPU-tick reading is the independent one, and it is used for exactly that reason — the
+two methods serve different purposes and both are used.
+
+---
+
+## T-020 — A refused request is better than a coerced one
+
+**Technique:**
+When the contract permits only one mode, reject other modes explicitly rather than silently
+converting them.
+
+**Worked:**
+Yes.
+
+**Evidence:**
+Phase 6 requires greedy decoding. A non-zero `temperature` is rejected with `INVALID_INPUT`
+rather than being clamped to 0. Had it been coerced, a non-greedy run would have been recorded
+as a greedy one, and the R4 stability measurement would have been measuring the wrong thing.
+
+**Recommended use:**
+Any parameter whose value appears in evidence or affects reproducibility.
+
+**Avoid when:**
+The coercion is lossless and unobservable.
+
+---
+
 ## T-013 — Separate "the tool refused" from "the OS refused"
 
 **Technique:**

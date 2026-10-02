@@ -622,3 +622,67 @@ all three involved an assumption that was reasonable but unmeasured.
     did not run
 13. Normalize output language before emission, not after
 
+
+
+---
+
+## Event 7 — Phase 6: Local AI Worker (real inference on the Pixel)
+
+**Agent:** Hermes (solo — no OpenCode or Multica delegation; the work was device-bound and
+strictly sequential, so delegating it would have added a context-transfer cost with no
+parallelism gain)
+
+**Model:** the session model, unchanged. No model change was required.
+
+**Task:** Prove a real language model performs inference on the physical Pixel 7a — without GPU,
+without routing, without Hermes integration, and without assuming the historical 3B-4B target.
+
+**Context provided:** the approved reconnaissance (ADR-012), the master prompt Phase 6
+requirements, the existing worker architecture, and an explicit list of what NOT to do.
+
+**Tools used:** ADB, xcodebuild/XCTest, Gradle, CMake, NDK 27.2, llama.cpp, the physical Pixel 7a,
+the filesystem.
+
+**Approach:** ran the highest-risk probe FIRST (R1), then built the runtime, then verified on the
+device. Deliberately did not begin with the model.
+
+**Result:** PASS. Real inference on the device, 3/3 repeatable with identical token ids,
+ablation-confirmed causality, 194 tests green.
+
+**Errors:** nine, every one a harness or toolchain defect — **none was a platform assumption.**
+
+**Two were measurement artifacts**, and they share a shape:
+1. **PID reuse** produced a false "deep doze blocks the Activity" reading. A second launch was
+   issued while the previous probe was still alive, so `pidof` returned the OLD pid whose CPU
+   time looked frozen. The conclusion was wrong and would have been recorded as a platform
+   finding.
+2. **A sampler that never ran.** A backgrounded shell subshell produced 30/30 "DEAD" samples
+   while inference completed successfully. The process lived ~20 s; the sampler was not actually
+   running.
+
+**Recovery:** each was diagnosed by disbelieving a surprising result and re-verifying the
+*instrument*, not by re-running the test hopefully. Both were fixed by changing the measurement
+method, not the code under test.
+
+**Human intervention:** none during implementation. The user supplied the reconnaissance approval
+and the decision boundaries; every measurement and code change was autonomous.
+
+**Efficiency:** ~2 hours wall clock, including a 1.04 GiB model download, a full llama.cpp Android
+cross-build, and ~12 device runs.
+
+**Quality:**
+- Correctly probed R1 before committing to a process model.
+- Correctly refused to enable Vulkan, though it was available and would have been faster.
+- Correctly replaced re-computation with an evidence chain, and stated the loss of exactness
+  rather than papering over it.
+- Incorrectly allowed a stale probe process to contaminate a measurement.
+- Incorrectly wrote an external sampler that silently did nothing.
+
+**Lesson:** the two failures are the same failure — a plausible-looking measurement that was
+actually an artifact of the instrument. **Disbelieving a surprising result and re-verifying the
+instrument is worth more than re-running the test.** This is the third instance of the family
+(after the D8 stale-binary false PASS), which is why it is now T-018 rather than an anecdote.
+
+**Notable positive:** this is the **first phase in which no Android platform assumption was
+falsified.** The plausible reason is T-017 — the highest-risk assumption was probed *before* the
+design was committed to, rather than discovered after the code compiled and the tests passed.
