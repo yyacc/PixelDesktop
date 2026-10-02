@@ -76,10 +76,14 @@ actor ADBTransport: TransportProtocol {
                 try? await Task.sleep(nanoseconds: UInt64(effectiveTimeout * 1_000_000_000))
                 if process.isRunning {
                     process.terminate()
-                    return TransportResult(
-                        exitCode: -1,
-                        stdout: "",
-                        stderr: "Command timed out after \(effectiveTimeout)s"
+                    // A timeout is a distinct condition from "the command ran and exited
+                    // non-zero", and it used to be indistinguishable from a launch failure:
+                    // both returned `exitCode: -1`, separated only by an English stderr string.
+                    // Throw the typed case at the point the condition is detected instead, so no
+                    // caller has to reconstruct it from prose. The `-1` sentinel is not used here.
+                    throw PixelDesktopError.timeout(
+                        operation: "adb \(command)",
+                        duration: effectiveTimeout
                     )
                 }
                 return nil

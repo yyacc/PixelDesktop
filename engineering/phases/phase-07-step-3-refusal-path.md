@@ -1,8 +1,10 @@
-# Phase 7 — Step 3 Reconnaissance: The Refusal Path
+# Phase 7 — Step 3: The Refusal Path
 
-**Status:** IN PROGRESS — reconnaissance complete, gate currently FAILS
-**Task classification:** BOUNDED (verification of existing behaviour; no new subsystem)
+**Status:** COMPLETE — S3-1..S3-4 resolved; Step 3 CLOSED
+**Task classification:** BOUNDED (verification + minimal corrections; no new subsystem)
 **Baseline:** 336 tests, 0 failures, 15 skipped (device-gated) @ `8419f6b`
+**Intermediate commit:** `c873676` (gate completion + 8 pinning tests)
+**Final:** 349 tests, 0 failures, 15 skipped
 
 ---
 
@@ -195,86 +197,217 @@ architectural choices (implement vs. remove) surfaced as decisions rather than t
 
 ---
 
-## Recommended corrections (for decision, not yet applied)
+## Resolved decisions (S3-1 .. S3-4)
 
-| # | Finding | Minimal correction | Needs a decision? |
-|---|---|---|---|
-| **S3-1** | Worker `error_type` flattened to prose | Add a structured case carrying the worker's `error_type` verbatim, so consumers can branch | **Yes** — new enum case |
-| **S3-2** | `.timeout` unreachable | Either type the transport timeout as `.timeout`, or document the case as reserved | **Yes** — behaviour change |
-| **S3-3** | `.cancelled` unimplemented | Document as reserved, or remove | **Yes** |
-| **S3-4** | `.deviceUnauthorized` unreachable | Determine discovery behaviour first, then either wire it or remove it | **Yes** — needs investigation |
-| **S3-5** | 3 worker `error_type` values unexercised | Add tests simulating those `FAILED` envelopes via `MockTransport` | **No** — pure gate work |
-| **S3-6** | `isRecoverable` inert | Correct as-is until a retry loop exists; document as declared-not-enforced | **No** — documentation |
+All four were authorized and implemented. Each entry records what changed, why, and the evidence.
 
-**S3-5 is unambiguous gate work and can proceed without a decision.** The rest are surfaced.
+### S3-1 — Preserve the typed worker refusal ✅ RESOLVED
+
+**Problem.** `WorkerResultEnvelope.asDTCA1Result()` interpolated the worker's structured `error_type`
+into a prose string:
+
+```swift
+throw PixelDesktopError.workerError(
+    "Worker reported status \(status): \(errorType ?? "?") \(errorMessage ?? "")"
+)
+```
+
+`MODEL_MISSING` and `INVALID_INPUT` — different causes, different fixes — became the same error case,
+distinguishable only by matching English. Nothing consumed `errorType` programmatically.
+
+**Change.** Added `case workerRefused(category: String, message: String)` carrying the worker's token
+**verbatim**, plus a `refusal` accessor on the envelope. `asDTCA1Result()` now throws `refusal`.
+
+**Why a `String`, not a mirrored Swift enum.** The worker is the authority on what it can refuse. A
+mirrored enum would silently drop any category a newer worker introduced — reintroducing the same class
+of defect (structure lost at a boundary) one layer up.
+
+**Fallback preserved.** An envelope with no `error_type` yields `workerError` — the category is never
+invented to fill the field. `workerError` is retained for exactly that case.
+
+**Retry classification.** `workerRefused` is **non-recoverable**: every category the worker can report
+(bad prompt, missing native library, missing/unloadable model, failed inference) describes a condition
+that will not change on retry. A future transient category must be classified explicitly.
+
+**Evidence.** `testResultEnvelopeFailedStatusCarriesTheStructuredCategory`,
+`testResultEnvelopeWithoutCategoryFallsBackToWorkerError`,
+`testDistinctWorkerCategoriesAreProgrammaticallyDistinguishable`, and the three worker-vocabulary tests
+(which now assert `workerRefused` and that the category survives verbatim).
+
+### S3-2 — Keep `.timeout` as a distinct typed concept ✅ RESOLVED
+
+**Traced semantics.** `ADBTransport.execute()` ran a two-task group. The watchdog terminated the
+process and **returned** `TransportResult(exitCode: -1, stderr: "Command timed out after Ns")`. A
+launch failure used the **same** `-1` sentinel with a different string. So a timeout surfaced upward as
+`.adbCommandFailed`, and the distinction lived only in prose.
+
+**Smallest correct place to preserve it.** The point of detection — the watchdog task — which is inside
+`execute()` and does not require re-plumbing. The watchdog now throws
+`PixelDesktopError.timeout(operation:duration:)`.
+
+**Why this is minimal and not a redesign.** `execute()` already had a throwing path in the same task
+group (`unknown` when no result arrives), so throwing from the watchdog is not a new mechanism.
+`TransportResult` was **not** given a new field — that would have touched 68 construction sites, and
+the transport's own contract explicitly states a non-zero exit is *returned* rather than thrown
+precisely because some callers (`pidof`) treat non-zero as a valid answer. Throwing from the watchdog
+preserves that: only the timeout path changed, and the "returned, not thrown" convention for ordinary
+non-zero exits is untouched.
+
+**Blast radius: zero.** No caller branched on `.adbCommandFailed` by case (verified by search).
+
+**Left alone.** The launch-failure `-1` remains. It is a genuinely different condition (ADB could not
+be started) and was not in scope.
+
+**Evidence.** `testTimeoutIsATypedCaseNotACommandFailure`; `ADBTransport:84` throws the typed case.
+
+### S3-3 — `.cancelled` preserved as reserved, not faked ✅ RESOLVED
+
+**Investigation.** Does PixelDesktop have a legitimate cancellation contract that can produce this
+state?
+
+**Finding: a mechanism exists, but it is deliberately external and must not flow through this path.**
+
+- Cancellation is `am force-stop`, issued **outside** the streaming session.
+- `WorkerStreamingTests` §13 (`testCancellationIsNotPerformedByTheStream`) asserts the streaming path
+  must **never** cancel — "in particular must not kill a worker whose stream died."
+- The reason is architectural: a worker that outlives its control channel is recoverable; one that was
+  killed is not. E1 F7 verified exactly this — the stream died, the worker kept running, and the
+  durable result was recovered (2098 bytes).
+- `Task.isCancelled` appears once (`DeviceManager.swift:31`), in a poll loop that exits rather than
+  throwing.
+
+**Decision: preserved as an explicitly reserved contract state. Not implemented, not deleted.**
+
+Implementing it would have required inventing an execution path that the architecture deliberately
+does not have — and would have risked a cancellation that kills a recoverable worker. The case is
+retained because its classification is correct for a cancellation signal whenever one is genuinely
+produced. **No production code throws it**, and none was added.
+
+**Evidence.** `testCancelledIsReservedAndCorrectlyClassified`, `testOnlyCancelledIsReserved`; the case
+documentation in `PixelDesktopError.swift` records the evidence; search confirms 0 files throw it.
+
+### S3-4 — Surface `.deviceUnauthorized` instead of discarding it ✅ RESOLVED
+
+**Traced path.** `ADBTransport.parseDeviceList` correctly parses the `unauthorized` wire token into
+`DeviceState.unauthorized` (`ADBTransport:142`). The information survived the transport — and was then
+**discarded by the consumer**: `AppState` selected devices with
+
+```swift
+devices.first(where: { $0.state == .device })?.serialNumber
+```
+
+…repeated at **five** sites. An unauthorized device matched nothing, so it was reported as
+`.deviceNotFound` — "No authorized Android device found" — even though the device *was* found and the
+user could fix it by accepting the prompt on screen. The enum's most actionable message was
+unreachable.
+
+**Smallest change.** Replaced the five duplicated predicates with one private helper,
+`connectedDeviceSerial()`, which checks the failure states **after** the success case:
+
+```
+device  →  unauthorized  →  offline  →  notFound
+```
+
+Precedence matters: a connected device always wins, and `unauthorized` is checked before `offline`
+because it is the actionable one — an offline device needs a cable check, an unauthorized one needs a
+tap the user can perform right now.
+
+**Why this is not a new state-management architecture.** It reads the `state` the transport already
+parses and maps it to the error case that describes it. No new state, no new type, no cache, no
+observer. It also removes five copies of a duplicated predicate.
+
+**Evidence.** `testUnauthorizedDeviceIsDistinguishedFromAnAbsentOne`,
+`testParserRecognisesTheUnauthorizedStateFromAdbOutput`,
+`testParserHandlesConnectedAndUnauthorizedTogether`; `AppState:91` throws `.deviceUnauthorized`; 0
+lossy predicates remain.
 
 ---
 
-## Results (implemented)
+## Real-device verification
 
-**S3-5 implemented. Suite: 336 → 344 tests, 0 failures, 15 skipped.** No regression; no test removed
-or weakened.
+**Result: NOT PERFORMED — the device was not available. Recorded, not worked around.**
 
-### New tests — 8
+At closeout, the Pixel 7a was not attached by any transport:
 
-**Worker vocabulary (3 new + 1 pin), `WorkerStreamingTests.swift` §5b:**
+```
+adb devices -l          -> "List of devices attached" (empty)
+system_profiler (USB)   -> no Google/Pixel USB device
+adb mdns services       -> no discovered services (no wireless ADB)
+```
 
-| Test | Covers |
+**Why no failure condition was induced.** Exercising `.deviceUnauthorized` on real hardware requires
+revoking the host's ADB key on the device — a state change to the user's phone, and one that would
+have to be undone by physically re-accepting the prompt. The instruction was explicit: *do not
+manufacture a failure condition.* It was not induced.
+
+**What was verified instead, and what that is worth.** Two parser tests were added using ADB's
+documented `adb devices -l` wire format for the `unauthorized` state — the same shape as the real
+Pixel 7a capture already in the suite, with the state token changed. These are **honest synthetic
+tests, labelled as such in their docstrings**. They verify that the parser populates
+`DeviceState.unauthorized` and that a mixed connected+unauthorized list selects correctly. They do
+**not** verify the live behaviour of an actually-unauthorized device.
+
+**Why the four decisions remain well-evidenced without a device.** All four are type-level or
+predicate-level changes: which error case is constructed, and which state is selected. Their
+verification is that the correct type is produced from the correct input — which unit tests with
+`MockTransport` establish directly. A real device would add confidence about ADB's *wire behaviour*,
+not about these four code paths. The one item a device would genuinely add — confirming the live
+`unauthorized` token from real hardware — is recorded as an open item below.
+
+**Open item (carried forward):** the live `unauthorized` wire format has not been observed from the
+Pixel 7a in this project. It is documented by ADB and handled by the parser, but it is not a captured
+observation. A future session with the device can confirm it by revoking the ADB key.
+
+---
+
+## Verification performed
+
+| Check | Result |
 |---|---|
-| `testNativeLibraryMissingIsExercised` | `NATIVE_LIBRARY_MISSING` |
-| `testModelLoadFailedIsExercised` | `MODEL_LOAD_FAILED` |
-| `testInferenceFailedIsExercised` | `INFERENCE_FAILED` |
-| `testWorkerErrorVocabularyIsFullyEnumerated` | pins all 5 values; fails if the vocabulary changes |
+| Targeted refusal-path tests | ✅ pass (S3-1..S3-4 tests + worker vocabulary + parser) |
+| Complete suite | ✅ **349 tests, 0 failures, 15 skipped**, ~14 s |
+| E1 streaming regression | ✅ intact — `WorkerStreamingTests` (incl. §13 cancellation) all pass |
+| `8419f6b` baseline | ✅ unmodified, still an ancestor |
+| Working tree | ✅ only intentional Step 3 files |
 
-Each drives a real `FAILED` envelope through the real reducer via `MockTransport`, asserts the
-structured `error_type` survives to the durable result, **and asserts the current flattening** — so
-the Mac-side contract is pinned and an S3-1 fix must be deliberate.
+**Test count journey:** 336 (baseline) → 344 (Step 3 pins, `c873676`) → **349** (four decisions
+implemented + parser tests). No test removed, skipped, or weakened to make anything pass.
 
-**Swift dead cases (4 new), `PixelDesktopTests.swift` §Step 3:**
+**The pins fired as designed.** Four tests written in `c873676` asserted the *old* behaviour
+(`workerError` flattening, `deviceNotFound` for an unauthorized device, the `-1` timeout). When the
+fixes landed, they failed — that failure was the signal to update them deliberately, and updating them
+was the act the pin existed to force. This is the mechanism working, not breakage.
 
-| Test | Covers | Asserts |
-|---|---|---|
-| `testUnauthorizedDeviceCurrentlySurfacesAsDeviceNotFound` | `.deviceUnauthorized` | state is preserved by the transport, discarded by the `state == .device` predicate |
-| `testTimeoutSurfacesAsAdbCommandFailedNotTimeout` | `.timeout` | the timeout arrives as `exitCode: -1`, never as `.timeout` |
-| `testCancelledCaseIsDeclaredAndClassifiedButNeverThrown` | `.cancelled` | the declaration is the whole implementation |
-| `testSwiftErrorVocabularyIsFullyEnumerated` | all 11 | count, distinct messages, and the 7/4 recoverable split |
+---
 
-**Why these pin rather than fix:** deleting the three dead cases would make the gate pass while
-destroying intent. These tests record the truth, guard it against silent drift, and **are designed to
-fail when S3-2/3/4 are fixed** — the failure is the signal to update them.
+## Final gate status
 
-### Gate status after this step
+| Vocabulary | Status |
+|---|---|
+| Worker `error_type` (5 values) | ✅ 5/5 exercised, category preserved verbatim |
+| Swift `PixelDesktopError` (12 cases) | ✅ 11 reachable + asserted; **1 reserved** (`.cancelled`), documented with evidence |
 
-| Vocabulary | Exercised | Status |
-|---|---|---|
-| Worker `error_type` (5) | 5/5 | ✅ **PASS** |
-| Swift `PixelDesktopError` (11) | 8 thrown+asserted, 3 pinned-as-unreachable | ⚠️ **PASS AS "ACCOUNTED FOR", with 3 defects recorded** |
-
-The gate as written — *"every `error_type` exercised"* — is now satisfied in the honest sense:
-**every error type is accounted for by a test.** Three are accounted for as *unreachable*, which is a
-finding, not a pass by deletion.
-
-### Honest limitation
-
-Three Swift cases remain **unreachable in production**. This step did not make them reachable; it made
-their unreachability **visible, tested, and documented**. Claiming Step 3 "hardened the refusal path"
-without that qualifier would overstate the work: the refusal path was already bounded and largely
-machine-readable, and the real defects found are S3-1 (structure erased at the boundary) and S3-2/3/4
-(three dead cases).
+Step 3's gate — *"every `error_type` exercised"* — is satisfied in the honest sense: **every error type
+is accounted for**, and the one that is not reachable is recorded as reserved with its reason rather
+than deleted or faked.
 
 ---
 
 ## Provenance of this document
 
-**Measured (this session):** baseline 336 tests / 0 failures @ `8419f6b`; post-change 344 tests /
-0 failures; every throw-site count and test-coverage count via `grep` on the working tree; the
-`state == .device` predicate read from `AppState.swift`; the timeout branch read from
-`ADBTransport.swift`; the worker vocabulary read from `LlmWorkload.java`.
+**Measured (this session):** baseline 336 tests / 0 failures @ `8419f6b`; intermediate 344 @ `c873676`;
+final **349 tests / 0 failures**; every throw-site count and test-coverage count by search on the
+working tree; the `state == .device` predicate read from `AppState`; the watchdog branch read from
+`ADBTransport`; the worker vocabulary read from `LlmWorkload.java`; the absence of a device from
+`adb devices -l`, `system_profiler`, and `adb mdns services`.
 
-**Not measured:** whether `.deviceUnauthorized` is reachable through any path other than `AppState`
-(only `AppState` was inspected); thermal/load behaviour (out of scope).
+**Not measured:** the live `unauthorized` wire format from real hardware (device unavailable — see
+above). Whether `.deviceUnauthorized` is reachable through any path other than `AppState` (only
+`AppState` was inspected; it is the only consumer of the device list for operations).
 
-**Hypothesis (not tested):** that a consumer would benefit from a typed worker-refusal case (S3-1).
-Reasoned from "nothing consumes `errorType` programmatically" plus the `isRecoverable` conflation, but
-no consumer exists yet to demonstrate the need — so it is surfaced as a decision, not implemented.
+**Hypothesis (not tested):** that a downstream consumer will branch on `workerRefused.category`. The
+type now makes it possible; no consumer exists yet to demonstrate the need. This is why the change
+preserves structure rather than adding behaviour — it removes an obstacle to a future consumer without
+inventing one.
+
 

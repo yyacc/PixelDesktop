@@ -220,15 +220,21 @@ final class WorkerStreamingTests: XCTestCase {
             file: file, line: line
         )
 
-        // The Mac-side flattening: this is the current contract, asserted so a change is deliberate.
+        // The Mac-side contract after S3-1: the category is **preserved**, not flattened.
+        // This assertion previously read `workerError` — it was the pin that detected S3-1
+        // being fixed, and updating it is the deliberate act the pin was designed to force.
         let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
         XCTAssertEqual(envelope.errorType, errorType, file: file, line: line)
         XCTAssertFalse(envelope.isCompleted, file: file, line: line)
         XCTAssertThrowsError(try envelope.asDTCA1Result(), file: file, line: line) { error in
-            guard case PixelDesktopError.workerError(let message) = error else {
-                return XCTFail("Expected workerError, got \(error)", file: file, line: line)
+            guard case PixelDesktopError.workerRefused(let category, let message) = error else {
+                return XCTFail("Expected workerRefused, got \(error)", file: file, line: line)
             }
-            XCTAssertTrue(message.contains(errorType), file: file, line: line)
+            XCTAssertEqual(category, errorType, "the worker's category must survive verbatim",
+                           file: file, line: line)
+            XCTAssertEqual(message, errorMessage, file: file, line: line)
+            XCTAssertFalse(PixelDesktopError.workerRefused(category: category, message: message).isRecoverable,
+                           "a worker refusal is not retryable as-is", file: file, line: line)
         }
     }
 

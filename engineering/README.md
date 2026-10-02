@@ -24,7 +24,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 4 — Android Application / Process Control:** COMPLETE
 **Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) IMPLEMENTED and verified on device
 **Phase 6 — Local AI Worker:** FIRST INFERENCE PROOF COMPLETE — real LLM inference on the Pixel 7a
-**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** **Steps 1–3 COMPLETE** (capability contract + measured evidence + refusal path); Step 3 found 3 dead error cases and 1 erased structure — open decisions S3-1..S3-4
+**Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** **Steps 1–3 COMPLETE** (capability contract + measured evidence + refusal path). Step 3 resolved S3-1..S3-4: typed worker refusal, typed `.timeout`, `.cancelled` reserved (not faked), `.deviceUnauthorized` surfaced. 349 tests, 0 failures. Real-device verification NOT performed — no device attached (recorded)
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md) and its **Amendment 1**

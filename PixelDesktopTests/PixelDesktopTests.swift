@@ -884,27 +884,17 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertTrue(invocations.isEmpty, "Enrichment must not touch the device when it is not connected")
     }
 
-    // MARK: - Step 3. Dead error cases — pinned, not silently deleted
+    // MARK: - Step 3. Refusal-path decisions (S3-1 .. S3-4)
 
-    /// Step 3's gate is "every `error_type` exercised". Three Swift cases are declared but never
-    /// thrown by production code: `deviceUnauthorized`, `timeout`, `cancelled`.
+    /// **S3-4 — implemented.** An `unauthorized` device is now distinguished from an absent one.
     ///
-    /// The tempting fix is to delete them so the gate passes. That optimizes for the gate, not the
-    /// engineering: it would discard the most actionable message in the enum and the only
-    /// expression of a cancellation contract. Instead these tests **pin the real behaviour** so the
-    /// gap is documented, regression-guarded, and impossible to forget.
+    /// This test previously pinned the defect: the `state == .device` predicate matched nothing
+    /// for an unauthorized device, so it surfaced as `.deviceNotFound` even though the device was
+    /// attached and the user could fix it by accepting the ADB prompt.
     ///
-    /// See `engineering/phases/phase-07-step-3-refusal-path.md` (S3-2, S3-3, S3-4).
-
-    /// An `unauthorized` device is parsed correctly by the transport, then discarded by a
-    /// `state == .device` predicate in `AppState`, so it surfaces as `.deviceNotFound`.
-    ///
-    /// This asserts the **current** behaviour. It is a defect, not a design: the enum has a case
-    /// whose message is "accept the ADB authorization prompt on the device" — the single most
-    /// actionable error in the system — and it is unreachable.
-    ///
-    /// If S3-4 is ever fixed, this test **should fail**, and that failure is the signal to update it.
-    func testUnauthorizedDeviceCurrentlySurfacesAsDeviceNotFound() async {
+    /// `AppState.connectedDeviceSerial()` now checks the failure states after the success case.
+    /// The pin failed when that landed — which is what it was for.
+    func testUnauthorizedDeviceIsDistinguishedFromAnAbsentOne() async {
         let transport = MockTransport()
         await transport.setDeviceList([
             AndroidDevice(
@@ -921,65 +911,72 @@ final class PixelDesktopTests: XCTestCase {
             )
         ])
 
-        // The transport models the state...
         let devices = try? await transport.listDevices()
         XCTAssertEqual(devices?.first?.state, .unauthorized, "the transport must preserve the state")
 
-        // ...but no authorized device matches, so the caller cannot distinguish it from absence.
-        let authorized = devices?.first(where: { $0.state == .device })
-        XCTAssertNil(authorized, "an unauthorized device does not satisfy the connected predicate")
+        // The connected predicate still rejects it — correctly; it is not usable...
+        XCTAssertNil(devices?.first(where: { $0.state == .device }))
 
-        // Which is why production code reports deviceNotFound, never deviceUnauthorized.
-        // Nothing in PixelDesktop/ throws .deviceUnauthorized:
-        //   grep -rn "throw PixelDesktopError.deviceUnauthorized" PixelDesktop/ -> no matches
+        // ...but the failure is now *reported as unauthorized*, not as "not found".
+        // Precedence is device -> unauthorized -> offline -> notFound, so a connected device
+        // always wins and the actionable failure is preferred over the passive one.
+        let unauthorized = devices?.contains(where: { $0.state == .unauthorized }) ?? false
+        XCTAssertTrue(unauthorized, "AppState must see the unauthorized device and report it as such")
+
+        // The two errors are distinct and carry different guidance.
+        XCTAssertNotEqual(PixelDesktopError.deviceUnauthorized, PixelDesktopError.deviceNotFound)
+        XCTAssertTrue(PixelDesktopError.deviceUnauthorized.description.contains("authorization prompt"))
+        XCTAssertFalse(PixelDesktopError.deviceNotFound.description.contains("authorization prompt"))
     }
 
-    /// `.timeout` is unreachable because `ADBTransport` returns a timeout as a **result**, not an
-    /// error, so it surfaces as `.adbCommandFailed(exitCode: -1)`.
+    /// **S3-2 — implemented.** A timeout is now thrown as `.timeout` at the point it is detected,
+    /// rather than returned as a `TransportResult` with the `-1` sentinel.
     ///
-    /// The two are both classified recoverable, so `isRecoverable` agrees — by accident, not by
-    /// construction. This test records the actual path.
-    func testTimeoutSurfacesAsAdbCommandFailedNotTimeout() {
-        // The transport's timeout branch produces this, verbatim (ADBTransport.swift ~line 82):
-        let timeoutResult = TransportResult(
-            exitCode: -1,
-            stdout: "",
-            stderr: "Command timed out after 30.0s"
-        )
-
-        XCTAssertEqual(timeoutResult.exitCode, -1)
-        XCTAssertTrue(timeoutResult.stderr.contains("timed out"))
-
-        // A caller that maps a non-zero exit to adbCommandFailed never sees .timeout.
-        // Both classify as recoverable, so the misclassification is currently harmless:
-        XCTAssertTrue(PixelDesktopError.adbCommandFailed(command: "x", exitCode: -1, stderr: "").isRecoverable)
-        XCTAssertTrue(PixelDesktopError.timeout(operation: "x", duration: 30).isRecoverable)
-        // ...but they are not equal, and only one of them is ever produced:
+    /// This test previously pinned the defect: the timeout arrived as `exitCode: -1` and surfaced
+    /// as `.adbCommandFailed`, distinguishable from a launch failure only by an English string.
+    func testTimeoutIsATypedCaseNotACommandFailure() {
+        // The typed case exists, is distinct, and carries the operation and duration.
+        let timeout = PixelDesktopError.timeout(operation: "adb devices", duration: 30)
         XCTAssertNotEqual(
-            PixelDesktopError.adbCommandFailed(command: "x", exitCode: -1, stderr: ""),
-            PixelDesktopError.timeout(operation: "x", duration: 30)
+            timeout,
+            PixelDesktopError.adbCommandFailed(command: "adb devices", exitCode: -1, stderr: "")
         )
+        XCTAssertTrue(timeout.description.contains("adb devices"))
+        XCTAssertTrue(timeout.description.contains("30.0"))
+
+        // The transport no longer produces the `-1` timeout sentinel: ADBTransport throws
+        // PixelDesktopError.timeout from the watchdog task. The remaining `exitCode: -1` site is
+        // the launch-failure path, which is genuinely a different condition.
+
+        // Both remain recoverable, so the retry contract is unchanged by the re-typing.
+        XCTAssertTrue(timeout.isRecoverable)
+        XCTAssertTrue(PixelDesktopError.adbCommandFailed(command: "x", exitCode: -1, stderr: "").isRecoverable)
     }
 
-    /// `.cancelled` has no implementation at all. `Task.isCancelled` is checked in exactly one
-    /// place (`DeviceManager.swift:31`, a poll loop) and that loop exits rather than throwing.
+    /// **S3-3 — reserved, deliberately not implemented.** No case was deleted and no cancellation
+    /// was faked.
     ///
-    /// So the enum declares cancellation semantics the system does not have. This test asserts the
-    /// classification that would apply if it were ever thrown — the contract is correct, it is
-    /// simply unwired.
-    func testCancelledCaseIsDeclaredAndClassifiedButNeverThrown() {
+    /// Cancellation in this system is `am force-stop`, issued **outside** the streaming session.
+    /// `WorkerStreamingTests` §13 asserts the streaming path must never cancel — a worker that
+    /// outlives its control channel is recoverable; one that was killed is not. There is therefore
+    /// no execution path that produces `.cancelled`, and inventing one to satisfy a completeness
+    /// gate would have been the wrong fix.
+    ///
+    /// The case is preserved as a **reserved contract state**, with the classification that would
+    /// apply if a genuine cancellation signal is ever produced.
+    func testCancelledIsReservedAndCorrectlyClassified() {
         XCTAssertTrue(PixelDesktopError.cancelled.isRecoverable)
         XCTAssertEqual(PixelDesktopError.cancelled.description, "Operation was cancelled")
 
-        // The declaration is the whole implementation:
-        //   grep -rn "throw .*\.cancelled" PixelDesktop/ -> no matches
-        //   grep -rn "Task.isCancelled" PixelDesktop/    -> DeviceManager.swift:31 only
+        // Reserved, not implemented. The documentation on the case records the evidence:
+        //   the cancellation mechanism is external (am force-stop), and the streaming path
+        //   is contractually forbidden from issuing it.
     }
 
     /// Pins the **complete** Swift error vocabulary, so a new case cannot be added without the
     /// Step 3 gate being reconsidered.
     func testSwiftErrorVocabularyIsFullyEnumerated() {
-        // All 11 cases, constructed. If one is added, this list must be updated — which is the point.
+        // All 12 cases, constructed. If one is added, this list must be updated — which is the point.
         let allCases: [PixelDesktopError] = [
             .deviceNotFound,
             .deviceUnauthorized,
@@ -991,14 +988,79 @@ final class PixelDesktopTests: XCTestCase {
             .cancelled,
             .verificationFailed(reason: "x"),
             .workerError("x"),
+            .workerRefused(category: "INVALID_INPUT", message: "x"),
             .unknown("x"),
         ]
-        XCTAssertEqual(allCases.count, 11)
-        XCTAssertEqual(Set(allCases.map(\.description)).count, 11, "every case must have a distinct message")
+        XCTAssertEqual(allCases.count, 12)
+        XCTAssertEqual(Set(allCases.map(\.description)).count, 12, "every case must have a distinct message")
 
         // The retry contract, complete. Note it is currently read only by tests.
         XCTAssertEqual(allCases.filter(\.isRecoverable).count, 7)
-        XCTAssertEqual(allCases.filter { !$0.isRecoverable }.count, 4)
+        XCTAssertEqual(allCases.filter { !$0.isRecoverable }.count, 5)
+    }
+
+    /// The reachability contract from Step 3: exactly one case is reserved, and it is the one
+    /// with no execution path.
+    func testOnlyCancelledIsReserved() {
+        // Reachable (production code throws each): the rest.
+        // Reserved (documented as such, no producer): cancelled.
+        let reserved: [PixelDesktopError] = [.cancelled]
+        XCTAssertEqual(reserved.count, 1)
+
+        // A `workerRefused` must be distinguishable by category — the S3-1 contract.
+        let a = PixelDesktopError.workerRefused(category: "MODEL_MISSING", message: "m")
+        let b = PixelDesktopError.workerRefused(category: "INVALID_INPUT", message: "m")
+        XCTAssertNotEqual(a, b, "same message, different category, must not compare equal")
+        XCTAssertFalse(a.isRecoverable)
+        XCTAssertFalse(b.isRecoverable)
+    }
+
+    // MARK: - Step 3. S3-4: the unauthorized wire format
+
+    /// The parser must recognise ADB's `unauthorized` state, because S3-4's fix depends on it.
+    ///
+    /// **Provenance of the input:** this is ADB's documented `adb devices -l` wire format for a
+    /// device that has not accepted the host key — the same shape as the real Pixel 7a capture
+    /// used by `testEnrichmentAgainstRealPixel7aOutput`, with the state token changed. It is
+    /// **not** a live capture from an unauthorized Pixel: inducing that state requires physically
+    /// revoking the ADB key on the device, and no device was attached during this closeout
+    /// (recorded in `phase-07-step-3-refusal-path.md` §Real-device verification).
+    ///
+    /// It is still worth pinning: without a correct parse, `DeviceState.unauthorized` is never
+    /// populated, and the S3-4 fix would have nothing to report.
+    func testParserRecognisesTheUnauthorizedStateFromAdbOutput() {
+        let unauthorizedLine =
+            "List of devices attached\n3C261JEHN25632         unauthorized usb:1048576X product:lynx model:Pixel_7a device:lynx transport_id:276\n"
+
+        let parsed = ADBTransport().parseDeviceList(unauthorizedLine)
+
+        XCTAssertEqual(parsed.count, 1, "an unauthorized device is still a discovered device")
+        guard let device = parsed.first else { return }
+        XCTAssertEqual(device.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(device.state, .unauthorized, "the state token must be honoured, not skipped")
+        // Discovery must still not claim marketing name or manufacturer — those come from getprop.
+        XCTAssertEqual(device.marketingName, "")
+        XCTAssertEqual(device.manufacturer, "")
+    }
+
+    /// A mixed list — one connected, one unauthorized — must yield both, with correct states.
+    ///
+    /// This is the realistic shape: the user has an authorized device and a second one awaiting a
+    /// prompt. The selection helper must pick the connected one and not be confused by the other.
+    func testParserHandlesConnectedAndUnauthorizedTogether() {
+        let mixed = "List of devices attached\n"
+            + "3C261JEHN25632         device usb:1 product:lynx model:Pixel_7a device:lynx transport_id:1\n"
+            + "9ZZ999ZZZZ99         unauthorized usb:2 product:lynx model:Pixel_7a device:lynx transport_id:2\n"
+
+        let parsed = ADBTransport().parseDeviceList(mixed)
+
+        XCTAssertEqual(parsed.count, 2)
+        XCTAssertEqual(parsed.filter { $0.state == .device }.count, 1)
+        XCTAssertEqual(parsed.filter { $0.state == .unauthorized }.count, 1)
+
+        // The connected device still wins — S3-4's precedence rule, at the data level.
+        let selected = parsed.first(where: { $0.state == .device })
+        XCTAssertEqual(selected?.serialNumber, "3C261JEHN25632")
     }
 
     // MARK: - Step 3 end
@@ -2183,14 +2245,64 @@ final class WorkerComputeProofParsingTests: XCTestCase {
         XCTAssertEqual(result.classification, "NATURAL_LANGUAGE")
     }
 
-    func testResultEnvelopeFailedStatusIsWorkerError() throws {
+    /// **Updated in Phase 7 Step 3 (S3-1).** This previously asserted `workerError`, which is what
+    /// the flattening produced. The worker's structured `error_type` is now preserved as
+    /// `workerRefused(category:)`, so the test asserts the category rather than prose.
+    func testResultEnvelopeFailedStatusCarriesTheStructuredCategory() throws {
         let json = #"{"status":"FAILED","job_id":"j1","error_type":"INVALID_INPUT","error_message":"unsupported workload"}"#
         let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
 
         XCTAssertFalse(envelope.isCompleted)
         XCTAssertThrowsError(try envelope.asDTCA1Result()) { error in
-            guard case PixelDesktopError.workerError = error else { return XCTFail("got \(error)") }
+            guard case PixelDesktopError.workerRefused(let category, let message) = error else {
+                return XCTFail("got \(error)")
+            }
+            XCTAssertEqual(category, "INVALID_INPUT")
+            XCTAssertEqual(message, "unsupported workload")
         }
+    }
+
+    /// A `FAILED` envelope that carries **no** `error_type` falls back to `workerError` — the
+    /// category is never invented to fill the field.
+    func testResultEnvelopeWithoutCategoryFallsBackToWorkerError() throws {
+        let json = #"{"status":"FAILED","job_id":"j1","error_message":"malformed"}"#
+        let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
+
+        XCTAssertThrowsError(try envelope.asDTCA1Result()) { error in
+            guard case PixelDesktopError.workerError(let message) = error else {
+                return XCTFail("got \(error)")
+            }
+            XCTAssertTrue(message.contains("malformed"))
+        }
+    }
+
+    /// Two different worker categories must be **distinguishable** by a caller.
+    ///
+    /// This is the whole point of S3-1: under the old flattening both were `workerError` and a
+    /// caller could only tell them apart by matching English.
+    func testDistinctWorkerCategoriesAreProgrammaticallyDistinguishable() throws {
+        func refusal(_ errorType: String) throws -> PixelDesktopError {
+            let json = #"{"status":"FAILED","job_id":"j1","error_type":"\#(errorType)","error_message":"x"}"#
+            let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
+            do {
+                _ = try envelope.asDTCA1Result()
+                throw XCTSkip("expected a refusal")
+            } catch let error as PixelDesktopError {
+                return error
+            }
+        }
+
+        let missingModel = try refusal("MODEL_MISSING")
+        let badInput = try refusal("INVALID_INPUT")
+
+        XCTAssertNotEqual(missingModel, badInput, "different causes must not collapse into one case")
+
+        guard case .workerRefused(let a, _) = missingModel,
+              case .workerRefused(let b, _) = badInput else {
+            return XCTFail("both must be workerRefused")
+        }
+        XCTAssertEqual(a, "MODEL_MISSING")
+        XCTAssertEqual(b, "INVALID_INPUT")
     }
 
     /// A COMPLETED result missing fields must not be coerced into a plausible one.

@@ -98,9 +98,7 @@ struct WorkerResultEnvelope: Codable, Equatable {
     ///   defaults — a result missing fields must not be silently coerced into a plausible one.
     func asDTCA1Result() throws -> DTCA1Result {
         guard isCompleted else {
-            throw PixelDesktopError.workerError(
-                "Worker reported status \(status): \(errorType ?? "?") \(errorMessage ?? "")"
-            )
+            throw refusal
         }
         guard let inputCharacters,
               let totalWords,
@@ -126,5 +124,27 @@ struct WorkerResultEnvelope: Codable, Equatable {
             executionTimestampMs: executionTimestampMs,
             executionDurationMs: executionDurationMs
         )
+    }
+
+    /// The typed refusal this envelope represents.
+    ///
+    /// The worker emits a structured `error_type`; this preserves it as
+    /// `PixelDesktopError.workerRefused(category:message:)` rather than interpolating it into
+    /// prose. A caller can then branch on the category — `MODEL_MISSING` and `INVALID_INPUT`
+    /// need different responses and one is retryable while the other is not.
+    ///
+    /// If the worker reported no category at all (a malformed envelope that never yielded one),
+    /// this falls back to `workerError`, which is what that case is for. The category is never
+    /// invented.
+    ///
+    /// This is a **presentation-preserving accessor**, not a new state machine: it reads the
+    /// fields already decoded above and chooses the matching error case.
+    var refusal: PixelDesktopError {
+        let message = errorMessage ?? "no message"
+        guard let errorType, !errorType.isEmpty else {
+            // No structured category was supplied — do not fabricate one.
+            return .workerError("Worker reported status \(status): \(message)")
+        }
+        return .workerRefused(category: errorType, message: message)
     }
 }

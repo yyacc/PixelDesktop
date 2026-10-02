@@ -1794,3 +1794,63 @@ them. Only one of those is engineering. The gate needed the qualifier *"and acco
 honestly"*.
 
 **Artifacts:** `phases/phase-07-step-3-refusal-path.md`.
+
+---
+
+## 2026-10-02 — Phase 7 Step 3: Closeout (S3-1 .. S3-4 resolved)
+
+**Phase:** 7 — Step 3 · **Classification:** BOUNDED
+**Baseline:** `8419f6b` (336 tests) → intermediate `c873676` (344) → **final 349 tests, 0 failures**
+
+**Action:** Implemented the four authorized decisions, each with the smallest change that preserved
+the information being lost. Traced each path to its actual loss point before editing.
+
+**S3-1 — typed worker refusal.** The worker emitted a structured `error_type`; `asDTCA1Result()`
+interpolated it into prose, collapsing `MODEL_MISSING` and `INVALID_INPUT` into one case. Added
+`workerRefused(category:message:)` carrying the worker's token **verbatim**. Kept it a `String`, not a
+mirrored enum, because the worker is the authority and a mirror would drop a newer category — the same
+defect class one layer up. `workerError` is retained for envelopes with no category; the category is
+never invented. Classified non-recoverable: no worker category describes a retryable condition.
+
+**S3-2 — `.timeout` typed.** Traced the semantics: the watchdog **returned** `exitCode: -1` with a
+stderr string, and a launch failure used the same sentinel — the distinction lived only in prose. Fixed
+at the point of detection: the watchdog now throws `PixelDesktopError.timeout(operation:duration:)`.
+Did **not** add a field to `TransportResult` — that would have touched 68 construction sites and would
+have broken the transport's documented "non-zero is returned, not thrown" convention that `pidof`
+relies on. Blast radius was zero: no caller branched on `.adbCommandFailed` by case. The launch-failure
+`-1` was left alone; it is a genuinely different condition.
+
+**S3-3 — `.cancelled` reserved, not faked.** Investigated whether a legitimate cancellation contract
+exists. It does — but it is `am force-stop`, issued **outside** the streaming session, and
+`WorkerStreamingTests` §13 asserts the streaming path must never cancel (a worker that outlives its
+control channel is recoverable; a killed one is not — E1 F7 proved this). There is therefore no
+execution path that produces `.cancelled`. **Preserved as an explicitly reserved contract state. No
+production code throws it, and none was added.** Faking it would have satisfied the gate and violated
+the architecture.
+
+**S3-4 — `.deviceUnauthorized` surfaced.** The transport parsed the `unauthorized` token correctly; the
+**consumer discarded it** — five copies of `first(where: { $0.state == .device })`, so an unauthorized
+device surfaced as `.deviceNotFound`. Replaced all five with `connectedDeviceSerial()`, checking
+`device → unauthorized → offline → notFound`. Precedence matters: connected wins, and `unauthorized`
+before `offline` because it is the actionable one. No new state management — it reads the state the
+transport already parses.
+
+**The pins fired.** Four tests written in `c873676` asserted the old behaviour and **failed when the
+fixes landed**. That was the design: the failure is the signal to update the test deliberately, and
+updating it was the act the pin existed to force. Not breakage — the mechanism working.
+
+**Real-device verification: NOT PERFORMED.** No device attached (`adb devices -l` empty;
+`system_profiler` shows no Pixel; `adb mdns services` empty). Exercising `.deviceUnauthorized` live
+requires revoking the ADB key on the user's phone — a destructive state change. **Not induced.** Two
+parser tests were added against ADB's documented wire format instead, labelled honestly as synthetic in
+their docstrings. Open item carried forward: the live `unauthorized` token has not been observed from
+this hardware.
+
+**Tests:** 336 → 344 → **349**, 0 failures, 15 skipped. No test removed, skipped, or weakened.
+**Regression:** E1 streaming path intact, including §13 cancellation.
+
+**Lesson:** a completeness gate has two exits — do the work, or delete what fails it. Only one is
+engineering. And a pin that fails on schedule is evidence the test is doing its job; the temptation to
+"fix" the test rather than confirm the fix is the failure mode to guard against.
+
+**Artifacts:** `phases/phase-07-step-3-refusal-path.md` (now marked COMPLETE).
