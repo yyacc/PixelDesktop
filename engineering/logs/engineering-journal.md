@@ -1308,3 +1308,85 @@ throughput; `.local` name variants; `adb_allowed_connection_time=0` semantics.
 both transports reachable; probe file removed; no production code changed.
 
 **Artifacts:** `testing/wireless-serial-transport-verification.md`.
+
+---
+
+## 2026-10-02 — Communication architecture reconnaissance (comparative design study)
+
+**Phase:** none — architecture reconnaissance. **No production code modified. Nothing implemented.**
+**Question:** can a different Mac↔Pixel channel give PixelDesktop materially more capability than ADB?
+
+**EXECUTIVE FINDING: no alternative is justified today.** Three measured findings carry it.
+
+**FINDING A — the overhead is real but small relative to the work.**
+Measured fixed orchestration per job: **~1,257 ms** (push 231 + am start 267 + wait 758). Measured
+Phase 6 LLM inference: **12-26 s**. So orchestration is **~5-10%** of an LLM job. Eliminating it
+entirely would not change what the system can do.
+
+**FINDING B — adb shell ALREADY streams and ALREADY holds a persistent bidirectional session.**
+Verified by running both: a long-lived adb shell emitting progress lines delivered each line as
+produced; a multi-command adb shell ran as one bidirectional channel. **Our file-exchange-plus-
+polling design is a CHOICE, not an ADB limitation.** This removes two of the main claimed reasons to
+replace ADB.
+
+**FINDING C — the privilege gap runs the wrong way, and it is decisive.**
+ADB runs as uid=2000(shell) with readproc, ext_data_rw and WRITE_SECURE_SETTINGS. Our worker runs as
+u0_a45 with ZERO permissions. The privileged operations the system depends on — am start,
+am force-stop, pidof, /proc/<pid>/stat of another uid, settings put global — are ONLY available
+through ADB. A Service running as the app's own uid has NONE of them.
+**So RPC cannot replace ADB; it can only supplement it — which is strictly more system, not less.**
+
+**CANDIDATES REVERSE-ENGINEERED**
+- ADB: persistent, bidirectional, streams, host-initiated only. Holds ALL privileges.
+- WebSocket/gRPC: genuinely adds device-INITIATED events — the one real gap — at the cost of
+  INTERNET + FOREGROUND_SERVICE + POST_NOTIFICATIONS, a mandatory notification, a Mac-side listener,
+  a custom protocol, TLS and auth. Gains ZERO privilege.
+- gRPC vs WebSocket: identical capability here; gRPC adds protobuf, codegen and APK size for a
+  176-byte job envelope with ONE consumer. No capability is reachable via gRPC that a plain socket
+  does not provide — the difference is developer ergonomics.
+- **adb forward to a local abstract socket: the strongest candidate.** Reaches an APP-OWNED socket
+  over the existing authenticated ADB connection. Adds NO permission, NO LAN listener, inherits ADB
+  auth and TLS. Still host-initiated. This is the only alternative that adds capability without
+  adding a network surface or a permission.
+- USB custom protocol: INFEASIBLE for a non-root app — /config/usb_gadget is Permission denied and
+  the gadget is owned by init/usbd (11210000.dwc3). Would also contend with ADB for the same
+  interface, which FAIL-006 already documented Chrome/Brave fighting over. Adds no capability.
+- Bluetooth: present (bluetooth, bluetooth_le) but slower, adds BLUETOOTH_CONNECT, adds no capability.
+
+**THE ONE GENUINE GAP:** device-initiated (unsolicited) events. ADB is host-initiated; the Pixel
+cannot speak first. Everything else commonly cited — streaming, sessions, progress — ADB already
+does. **And no phase to date has needed device-initiated telemetry.**
+
+**RELIABILITY: in EVERY RPC failure row, ADB is still required for recovery.** The worker app can
+only be STARTED by ADB (am start), STOPPED by ADB (force-stop), and its liveness only observed via
+ADB (pidof). So the honest architecture is not "ADB or RPC" but "ADB + RPC" — ADB is the mandatory
+bootstrap.
+
+**PERFORMANCE: no RPC figure is measured and none is claimed.** For DTCA-1 (~1 ms compute)
+orchestration is ~99.9% of wall time, so RPC would help enormously in relative terms. For LLM
+(12-26 s) it is ~5-10%. **The LLM workload is the one the project exists for.** DTCA-1 is a proof
+workload, not a product feature.
+
+**SECURITY asymmetry:** a network RPC endpoint is a new, discoverable, unauthenticated-by-default
+LAN surface — on a subnet FAIL-006 already showed is shared with two browsers. adb forward avoids
+this entirely. **An unauthenticated HTTP/WebSocket service is not recommended under any variant.**
+
+**RECOMMENDATION: keep ADB; add no second channel; add no Service.** Instead two zero-permission,
+zero-network improvements that capture most of the claimed benefit: (1) use adb shell as a STREAMING
+session for long jobs — already available, removes the polling and the 758 ms wait; (2) if an
+app-owned channel is ever needed, use adb forward, which adds no permission and no network surface.
+
+**ANSWER TO THE BRIEF'S CLOSING QUESTION: No.** No candidate is both more capable AND simpler. Every
+alternative that adds capability adds a Service, permissions and a failure surface — so it is MORE
+complex. Every alternative that is simpler adds NO capability. **The correct action is to use ADB
+better, not to replace it.**
+
+**REQUIRED EXPERIMENTS (5). E5 is the gate:** identify a concrete workload requiring device-initiated
+telemetry. Without one there is no justification for a second channel. **E1 should be done first** —
+stream a long job over a single adb shell — cheapest, needs no new architecture, may capture most of
+the benefit.
+
+**Phase 7-9 impact: NONE.** The capability contract, evidence layer and transport state are all
+transport-agnostic. Keeping ONE channel keeps the Hermes→PixelDesktop→Pixel interface stable.
+
+**Artifacts:** `design/communication-architecture-reconnaissance.md`.

@@ -258,6 +258,92 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-033 — Measure the thing you are about to replace before replacing it
+
+**Technique:**
+Before adopting a new mechanism to fix a problem, measure the problem's actual size relative to the
+work it affects. A cost that dominates a trivial workload can be irrelevant to the real one.
+
+**Worked:**
+Yes — it inverted the recommendation.
+
+**Evidence:**
+The proposal was to replace ADB with a persistent RPC channel, partly to "reduce repeated ADB
+invocation". Measured: ADB orchestration is **~1,257 ms** per job (push 231 + `am start` 267 + wait
+758). Measured LLM inference: **12–26 s**. So orchestration is **~5–10%** of the workload the project
+exists for.
+
+For a DTCA-1 job (~1 ms compute) orchestration is ~99.9% of wall time — so a benchmark on DTCA-1
+would have made RPC look transformative. **The workload chosen for measurement decides the
+conclusion**, and the cheap workload is not the product.
+
+**Recommended use:**
+Whenever a rewrite is motivated by overhead, measure the overhead against the *dominant* workload,
+not the most convenient one.
+
+**Avoid when:**
+Never. It is one timing run.
+
+---
+
+## T-034 — Test whether the capability you are buying already exists
+
+**Technique:**
+Before adding a component to obtain a capability, test whether the tool underneath already provides
+it. Capabilities are often present but unused because nobody checked.
+
+**Worked:**
+Yes — it removed two of three justifications for a new subsystem.
+
+**Evidence:**
+A persistent RPC channel was proposed to provide (a) streaming and (b) persistent bidirectional
+sessions. Both were tested against the existing `adb` binary:
+- a long-lived `adb shell` emitting progress lines delivered **each line as produced**;
+- a multi-command `adb shell` ran as **one persistent bidirectional session**.
+
+Both capabilities already existed. **The current architecture's file-exchange-plus-polling design
+was a choice, not a limitation of the transport** — and that had never been stated.
+
+The one capability ADB genuinely lacks (device-initiated events) was isolated and kept, rather than
+being bundled with two that were already free.
+
+**Recommended use:**
+When writing a justification list for a new component, test each item against the incumbent before
+building anything.
+
+**Avoid when:**
+Never. It is a few minutes of probing.
+
+---
+
+## T-035 — When the incumbent holds privileges the replacement cannot, you are adding a channel, not replacing one
+
+**Technique:**
+Check whether the component you intend to supersede holds *privileges* rather than just *mechanism*.
+If it does, the replacement cannot supersede it — only supplement it, and the system grows.
+
+**Worked:**
+Yes — it reframed the architecture question entirely.
+
+**Evidence:**
+The question was framed as "ADB **or** a persistent RPC channel". But ADB runs as `uid=2000(shell)`
+with `readproc`, `ext_data_rw` and `WRITE_SECURE_SETTINGS`; the worker app runs as `u0_a45` with
+**zero permissions**. The operations the system depends on — `am start`, `am force-stop`, `pidof`,
+`/proc/<pid>/stat` of another uid, `settings put global` — are **only** reachable through ADB.
+
+So a Service-based RPC channel could never start, stop, or observe itself without ADB. The honest
+architecture is **ADB + RPC**, where ADB is mandatory bootstrap — strictly more system, not less.
+Every RPC failure row in the matrix confirmed it: **ADB remained the recovery channel.**
+
+**Recommended use:**
+Any "replace X with Y" proposal where X runs with elevated privilege (a root agent, a sidecar with a
+service account, a daemon with capabilities).
+
+**Avoid when:**
+Never. Compare privilege sets, not just feature lists.
+
+---
+
 ## T-031 — Verify the identifier, not just the operation
 
 **Technique:**

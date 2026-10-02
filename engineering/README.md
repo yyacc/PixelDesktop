@@ -91,6 +91,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [USB-Aware Transport Design](design/usb-aware-transport-design.md) — **design only**: IOKit presence events, `wiredDegraded` state, not yet implementable
 - [Wireless ADB Persistence Design](design/wireless-adb-persistence-design.md) — **design only**: the manual-intervention boundary is *re-enabling wireless debugging*, not reconnecting
 - [Wireless Serial Transport Verification](testing/wireless-serial-transport-verification.md) — **verified on device**: `-s` works over TLS, but the wireless serial is NOT the USB serial
+- [Communication Architecture Reconnaissance](design/communication-architecture-reconnaissance.md) — **recon only**: no alternative channel is justified; ADB already streams and already holds sessions
 
 ## Device
 
