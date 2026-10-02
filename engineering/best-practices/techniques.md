@@ -258,6 +258,36 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-024 — Check whether the type you need already exists before designing one
+
+**Technique:**
+Before introducing a new abstraction, re-read what the previous step produced and ask whether it
+already satisfies the requirement. A new type that duplicates an existing one's shape is a second
+place for the same invariant to drift.
+
+**Worked:**
+Yes — and it cut the step's surface area substantially.
+
+**Evidence:**
+Phase 7 Step 2 required "a simple immutable observation structure: value, source, observedAt,
+limitation". Step 1 had already introduced `CapabilityValue` with **exactly those four fields**.
+Introducing a parallel `Observation` type would have created two representations of provenance,
+two places to keep the limitation text honest, and two serialisation shapes for a consumer to
+handle.
+
+Recognising this reduced Step 2 to three value types and one reader — and meant the provenance
+guarantees already enforced by Step 1's tests automatically covered the new evidence.
+
+**Recommended use:**
+Every step that follows a step which introduced a type. Ask what the previous step built before
+designing anything.
+
+**Avoid when:**
+Never — though be careful not to force a fit. Here the shapes genuinely matched; a forced reuse
+would be worse than a new type.
+
+---
+
 ## T-023 — Enumerate a library's limits; guard the FATAL ones first
 
 **Technique:**

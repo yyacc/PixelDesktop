@@ -621,6 +621,42 @@
       "task_id": "phase-07-step-1",
       "purpose": "32 capability contract tests",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-step-2-evidence.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-2",
+      "purpose": "Phase 7 Step 2 report: measured evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/PixelEvidence.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-2",
+      "purpose": "Device state, execution evidence, freshness",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7EvidenceTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-2",
+      "purpose": "35 evidence tests",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7DeviceEvidenceHarness.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-step-2",
+      "purpose": "Real-device evidence verification",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

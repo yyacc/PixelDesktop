@@ -1000,3 +1000,61 @@ sending a real oversized prompt to real hardware. Recorded as T-023.
 
 **Artifacts:** `phases/phase-07-step-1-capability-contract.md`,
 `failures/FAIL-005-prompt-exceeding-nbatch-aborts-worker.md`.
+
+---
+
+## 2026-10-02 — Phase 7 Step 2: measured evidence with provenance and freshness
+
+**Phase:** 7 (Step 2)
+**Task:** Publish measured/dynamic evidence so a consumer can distinguish "the Pixel is capable" from
+"the Pixel is capable AND this observation is current enough to matter".
+
+**Key finding on reuse:** **`CapabilityValue` from Step 1 already WAS the observation shape this
+step required** — value + source + observedAt + limitation. Creating a second observation type would
+have been the "duplicate information" failure the brief warns about. Step 2 therefore adds three
+value types and one reader, and nothing else. **No ResourceMonitor, no polling daemon, no cache, no
+scheduler, no reservation system, no refresh loop.**
+
+**Deliberately NOT collected** despite being available: per-core CPU utilisation (not readable for
+other processes without root), battery level (no worker attribution), GPU state (no path exists),
+load average (no consumer yet). The brief's "do not create measurements merely because they are
+technically available" was applied literally.
+
+**Freshness has NO default threshold.** PixelDesktop has no defensible basis for declaring "memory
+readings older than N seconds are stale" — that depends on what the consumer intends. `maxAge` is a
+required parameter; PixelDesktop does the arithmetic and the caller supplies the window. A future
+timestamp returns `unknown`, NOT `current`, because that means the clock is wrong and calling it
+current would hide a real problem.
+
+**Snapshot ≠ reservation, demonstrated for real.** The failure chain was exercised end-to-end on the
+device: an observation showed the model present → the model was renamed → a workload was submitted →
+**PixelDesktop REFUSED with `MODEL_MISSING`** → the model was restored. A stale observation produced
+a **rejected request, not unsafe execution** — the exact claim of ADR-007 Amendment 1 §A1.6,
+verified rather than asserted.
+
+**Page-cache state is always `.unknown`.** The reconnaissance PROVED it matters (393 ms → 4,954 ms
+model load) but there is no non-root way to determine it. Modelled as a field that is always unknown
+so the gap is visible. Inventing a value would have been worse than omitting it.
+
+**An unreachable device yields an observation, not an error** — every field `.unknown` with no
+timestamp. Throwing would discard the one fact available. **This path was exercised for real**: the
+device disconnected mid-verification and the reader handled it.
+
+**Real-device results:** reachable, memory 2,451,505,152 bytes, storage 58,859,884,544 bytes, worker
+`installed(versionCode: 2)`, model `present(byteCount: 1117320736)` matching `ModelContract`
+exactly, thermal 0 — all `[deviceReported]`. Freshness `current` at a 60 s window and `stale` at 0 s,
+proving it is computed rather than fixed. All 12 execution-evidence fields present in a real result.
+
+**Refusal path verified:** unsupported workload, non-greedy temperature, max_tokens over ceiling,
+and model absent all return bounded `error_type` failures.
+
+**261 tests, 0 failures** (was 226; Step 2 adds 35). Two of my own tests were wrong and were
+corrected rather than worked around — one needed `try XCTUnwrap`, the other zeroed generation but
+left a 27-token prompt so the prompt rate was legitimately non-nil.
+
+**Regressions:** `DTCA-1` COMPLETED with Mac re-computation matching; `LOCAL-LLM-1` 3/3 runs with
+identical token IDs; zero permissions retained.
+
+**Next action:** STOPPED at Step 2. Step 3 awaits approval.
+
+**Artifacts:** `phases/phase-07-step-2-evidence.md`, `PixelDesktop/Inference/PixelEvidence.swift`.
