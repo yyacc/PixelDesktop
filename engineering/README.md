@@ -92,6 +92,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Wireless ADB Persistence Design](design/wireless-adb-persistence-design.md) — **design only**: the manual-intervention boundary is *re-enabling wireless debugging*, not reconnecting
 - [Wireless Serial Transport Verification](testing/wireless-serial-transport-verification.md) — **verified on device**: `-s` works over TLS, but the wireless serial is NOT the USB serial
 - [Communication Architecture Reconnaissance](design/communication-architecture-reconnaissance.md) — **recon only**: no alternative channel is justified; ADB already streams and already holds sessions
+- [E1 — Persistent ADB Shell Streaming Experiment](phases/phase-07-e1-adb-streaming-experiment.md) — **verified on device**: one session drives a whole job; streaming is ADDITIVE, not a replacement for the durable result file
 
 ## Device
 

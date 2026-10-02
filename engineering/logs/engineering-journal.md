@@ -1390,3 +1390,66 @@ the benefit.
 transport-agnostic. Keeping ONE channel keeps the Hermes→PixelDesktop→Pixel interface stable.
 
 **Artifacts:** `design/communication-architecture-reconnaissance.md`.
+
+---
+
+## 2026-10-02 — E1: persistent ADB shell as a streaming control channel (experiment)
+
+**Phase:** 7 (experiment). **Disposable. No production code modified. No experimental files left in
+the repo or on the device.**
+
+**RESULT: ADB is not limited to one-shot host commands.** A single persistent adb shell drove a
+complete long-running worker job - delivering the payload on stdin, launching the worker, streaming
+progress, and returning the structured result - in ONE session.
+
+**MEASURED (happy path, 32-token LLM job)**
+  time to first output        0.06 s
+  time to launch ack          0.17 s
+  progress                    26 heartbeats, ~1.00 s apart, across a 27.6 s job
+  buffering                   NONE - lines arrived as produced (not batched at the end)
+  completion detection        via the stream; NO separate polling loop
+  result                      full 176-byte structured JSON, inline
+  stdout/stderr separation    preserved (stderr empty)
+  -> this removes the 758 ms poll cycle from the critical path.
+
+**FAILURE / EDGE CASES**
+  F1 model missing      FAILED MODEL_MISSING in 1.2 s
+  F2 malformed job      FAILED INVALID_INPUT in 0.17 s
+  F3 cancellation       EXTERNAL only - am force-stop took 69 ms. Streaming adds NO cancellation.
+  F4 worker died        heartbeat DETECTED the death (pid -> none at n=7) but the naive loop KEPT
+                        GOING. The signal exists; the script must act on it. Most important lesson.
+  F5 256-token output   still running past 90 s - a HARNESS cap, not a streaming limit.
+                        => a fixed heartbeat cap is wrong; bound the wait by a real timeout.
+  F6 locked / Dozing    streamed NORMALLY - 25 lines, result OK in 19.33 s (mWakefulness=Dozing)
+  F7 transport died     worker SURVIVED (pid 17751 alive); result.json later written and retrievable
+                        (2983 bytes, status=OK, 256 tokens, total_ms=313946)
+
+**THE CENTRAL DESIGN FINDING (F7)**
+The streaming session ended at ~8 s. The worker kept running and the result was still written to
+disk. **The stream carries PROGRESS; the file carries the RESULT. They are not interchangeable.**
+A streaming design that dropped result.json would be LESS robust than what exists today.
+
+**DECISION: A - persistent ADB shell is viable and should replace the POLLING mechanism**, with the
+qualification that it is ADDITIVE. It replaces the polling loop (758 ms -> ~0 s) and adds progress
+observability; it does NOT replace the durable result file. Not B (benefit is measured and
+concrete). Not C (no blocking limitation found - F4 is a scripting mistake with an obvious fix).
+
+**WHAT CAN GO:** the Mac-side polling loop; the separate adb push (payload rides stdin); the
+separate adb pull for the result.
+**WHAT MUST STAY:** the durable result.json (F7); am force-stop cancellation (F3); pidof liveness
+(F4); the one-shot Activity (no Service needed); the fixed-path size-capped contract.
+
+**LIMITATIONS (7), L6 most consequential for future work**
+  L1 a session that dies loses the STREAM (progress is not durable)
+  L2 cancellation is external to the session
+  L3 worker death is invisible to a naive loop
+  L4 job duration is unbounded in practice
+  L5 one session = one job
+  L6 ** progress granularity is what the SCRIPT emits. The worker currently emits NO progress, so
+     real progress requires a WORKER-SIDE change - a separate decision, not a transport property. **
+  L7 the session is host-initiated; the Pixel still cannot speak first
+
+**This is a change to HOW PixelDesktop uses ADB - not a new channel.** It is the improvement the
+communication reconnaissance recommended as improvement #1, now verified on hardware.
+
+**Artifacts:** `phases/phase-07-e1-adb-streaming-experiment.md`.

@@ -258,6 +258,65 @@ The build system already guarantees a fresh artifact.
 
 ---
 
+## T-036 — Separate what the transport carries from what must survive the transport
+
+**Technique:**
+When adding a live/streaming channel, ask separately (a) what it delivers and (b) what must still
+exist if it dies. Do not let a live channel absorb responsibility for durable state.
+
+**Worked:**
+Yes — it changed the recommendation from "replace" to "add".
+
+**Evidence:**
+The experiment proved a single `adb shell` could stream progress and return a result inline. The
+obvious conclusion was "replace the polling loop and the file exchange".
+
+Then the session was killed mid-job (F7). The worker **kept running** and the result **was still
+written to disk** — `result.json`, 2983 bytes, `status=OK`, 256 tokens, `total_ms=313946`. The
+stream was gone; the result was not.
+
+So the stream carries **progress** and the file carries the **result**. A design that dropped
+`result.json` in favour of pure streaming would have been **less** robust than the thing it
+replaced — while looking more modern.
+
+**Recommended use:**
+Any substitution of a live channel for a durable store — websockets for files, events for
+databases, caches for sources of truth.
+
+**Avoid when:**
+Never. One deliberate kill test answers it.
+
+---
+
+## T-037 — Probe the failure path with the same care as the success path
+
+**Technique:**
+After proving a mechanism works, deliberately break each dependency and read what the mechanism
+actually reports. The success path rarely reveals the design constraint.
+
+**Worked:**
+Yes — three of the four findings that shaped the decision came from failure probes, not the happy
+path.
+
+**Evidence:**
+The happy path was clean: 0.06 s to first output, 26 heartbeats, result inline. It suggested a
+straightforward replacement.
+
+The failure probes found the constraints:
+- **F7** (transport killed): the stream died, the result survived → streaming must be additive.
+- **F4** (worker killed): the heartbeat **detected** the death (`pid` → `none`) and the naive loop
+  **kept heartbeating anyway** → the signal existed but nothing acted on it.
+- **F3** (cancellation): `am force-stop` is **external** to the session → streaming adds no
+  cancellation, contrary to the natural assumption.
+
+**Recommended use:**
+Any "this mechanism can replace that one" proposal. Break each dependency in turn and read the output.
+
+**Avoid when:**
+Never.
+
+---
+
 ## T-033 — Measure the thing you are about to replace before replacing it
 
 **Technique:**
