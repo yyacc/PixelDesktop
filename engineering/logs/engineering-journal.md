@@ -798,3 +798,53 @@ model, no routing, no Hermes integration, no optimization.
 
 **Artifacts:** `phases/phase-06-local-ai-implementation.md`, ADR-012 (updated to approved and
 implemented), `Inference/` (3 Swift files), `DTCA1Worker/` (JNI + native runtime).
+
+---
+
+## 2026-10-02 — Phase 7 reconnaissance: resource-aware routing (no code changed)
+
+**Phase:** 7 (reconnaissance + proposal only)
+**Task:** Determine whether PixelDesktop should route workloads between the Mac and the Pixel, and
+on what evidence. **No production source modified.**
+
+**Result — the finding that reframes the phase:**
+
+**There is only one executor.** Phase 6 deliberately ensured the Mac does **not** link llama.cpp
+(ADR-012 §P7), verified by source inspection. `ollama` happens to be installed on this Mac, but it
+is an unrelated user install and nothing in PixelDesktop can call it. **So "Mac or Pixel?" currently
+has one real answer for inference workloads, because the Mac option does not exist as an
+implementation.** This is the blocking open question.
+
+**Four assumptions a reasonable router would have encoded, all falsified by measurement:**
+
+1. **Pixel latency is predictable — FALSIFIED.** Identical 8-token generation took 5,084 ms warm and
+   **14,793 ms** after idle: **2.4× variance**. Model load varied **12×** (393 ms → 4,954 ms).
+   Latency cannot be a routing input.
+2. **`finish()` destroys the worker process — FALSIFIED.** The process was still alive *minutes*
+   later; Android caches it. But the model is **not** resident (freed every run), so **warm process
+   ≠ warm model**. True warm execution needs ~1.3 GB resident — an architectural question, not
+   implemented.
+3. **A Mac executor exists to fall back to — FALSIFIED.** None exists.
+4. **Thermal state is comparable across platforms — FALSIFIED.** macOS exposes a 4-level
+   `ProcessInfo.thermalState`; Android exposes only a system-wide numeric reading with no worker
+   attribution. Incommensurable.
+
+**Cost measurements:** ADB round-trip 226 ms; job+result ~600 bytes (**transfer is not a routing
+cost**). Mac 8 tokens with a 4B model in **4.9 s**; Pixel 8 tokens with a 1.5B model in
+**16.2–25.8 s** — the Mac ~3–5× faster on a ~2.7× larger model. **Caveat: the Mac figure used
+`ollama`, which is not a project component.** It is evidence about the hardware, not about an
+executor that exists.
+
+**Decision:** propose three small value types and one **pure function** — descriptor, snapshot,
+evaluator, decision — and explicitly **not** a scheduler, queue, `ResourceMonitor`, or fleet
+abstraction. Routing inputs limited to four (workload type, model requirement, memory requirement,
+availability), each justified by an existing workload. Fail and report; **no retries** — each
+attempt costs 16–26 s of sustained device load, and deterministic failures cannot be retried into
+success.
+
+**Recommendation:** **resolve the Mac-executor question before implementing anything.** If there is
+no Mac executor, the router can only ever choose the Pixel, and a feasibility gate is a
+*validation* concern better expressed as an extension of the existing `InferenceRequest.validate()`
+than as a new subsystem.
+
+**Artifacts:** `phases/phase-07-routing-reconnaissance.md`, ADR-013 (PROPOSED, not approved).

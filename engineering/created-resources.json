@@ -558,6 +558,24 @@
       "task_id": "phase-06-impl",
       "purpose": "Model artifact (Apache-2.0); not committed - too large",
       "status": "external"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-routing-reconnaissance.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-recon",
+      "purpose": "Phase 7 reconnaissance report (blocked pending review)",
+      "status": "proposal"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-013-resource-aware-routing.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-recon",
+      "purpose": "ADR-013 resource-aware routing (PROPOSED, not approved)",
+      "status": "proposal"
     }
   ],
   "evidence_artifacts_outside_repo": [
