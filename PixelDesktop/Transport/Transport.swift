@@ -28,6 +28,36 @@ protocol TransportProtocol: AnyObject, Sendable {
     ///   thrown, because some callers (e.g. `pidof`) treat non-zero as a valid answer.
     func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult
 
+    /// Runs a command in the device shell and delivers **stdout incrementally**, line by line.
+    ///
+    /// Unlike `shell`, which buffers until the process exits, this exposes each line as it is
+    /// produced and keeps stderr separate. It exists because a worker job can run for minutes:
+    /// E1 measured a 27.6 s job whose progress was observable only through a live stream, and a
+    /// 256-token job still running past 90 s. A buffered call cannot report either.
+    ///
+    /// **Transport primitive**, with the same posture as `shell`: any string handed to it runs on
+    /// the device. It stays below the operations layer and is never exposed to the UI or Hermes.
+    ///
+    /// The session persists for the life of the command. `stdin` is written and then closed before
+    /// reading begins, which is what lets the device script receive its payload through `cat > file`
+    /// instead of a separate `push`.
+    ///
+    /// - Parameters:
+    ///   - stdin: written to the device process, then closed. `nil` sends nothing and closes
+    ///     immediately.
+    ///   - onLine: invoked for each stdout line, in order, as it arrives.
+    ///   - onStderrLine: invoked for each stderr line. Kept separate so transport diagnostics can
+    ///     never be mistaken for protocol events.
+    /// - Returns: the process exit code. A non-zero code is returned rather than thrown, matching
+    ///   `shell`'s convention that some callers treat non-zero as a valid answer.
+    func shellStreaming(
+        deviceSerial: String,
+        command: String,
+        stdin: String?,
+        onLine: @Sendable @escaping (String) -> Void,
+        onStderrLine: @Sendable @escaping (String) -> Void
+    ) async throws -> Int32
+
     /// Copies a local file to the device via `adb -s <serial> push`.
     ///
     /// **Transport primitive.** It takes already-validated absolute paths and performs no
@@ -77,6 +107,50 @@ struct TransportResult: Equatable {
 
     var isSuccess: Bool {
         exitCode == 0
+    }
+}
+
+/// Guards a streaming read against being resumed twice.
+///
+/// The reader thread and the stall watchdog can both finish the continuation — the reader when the
+/// pipe closes, the watchdog when it tears the session down. `CheckedContinuation` traps on a
+/// double resume, so exactly one path is allowed to win.
+final class StreamReadState: @unchecked Sendable {
+    private let lock = NSLock()
+    private var finished = false
+    private var cancelledFlag = false
+
+    var isCancelled: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return cancelledFlag
+    }
+
+    /// Whether the continuation has already been resumed.
+    ///
+    /// The watchdog checks this before acting, so a session that completed normally is never torn
+    /// down by a timer that fired late.
+    var isFinished: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return finished
+    }
+
+    func cancel() {
+        lock.lock()
+        cancelledFlag = true
+        lock.unlock()
+    }
+
+    func finish(_ continuation: CheckedContinuation<Void, Never>) {
+        lock.lock()
+        let alreadyFinished = finished
+        finished = true
+        lock.unlock()
+
+        if !alreadyFinished {
+            continuation.resume()
+        }
     }
 }
 

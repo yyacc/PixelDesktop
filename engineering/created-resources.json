@@ -711,6 +711,69 @@
       "task_id": "e1-streaming-experiment",
       "purpose": "E1 persistent adb shell streaming experiment result",
       "status": "complete"
+    },
+    {
+      "path": "engineering/phases/phase-07-e1-streaming-implementation.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-streaming-implementation",
+      "purpose": "E1 streaming implementation log",
+      "status": "complete"
+    },
+    {
+      "path": "PixelDesktop/Worker/WorkerStreamProtocol.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-streaming-implementation",
+      "purpose": "Event protocol, parser, stream state, outcome model",
+      "status": "active"
+    },
+    {
+      "path": "PixelDesktop/Worker/WorkerStreamReducer.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-streaming-implementation",
+      "purpose": "Pure streaming state machine (F4/F7)",
+      "status": "active"
+    },
+    {
+      "path": "PixelDesktop/Worker/WorkerStreamScript.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-streaming-implementation",
+      "purpose": "Device-side streaming script builder",
+      "status": "active"
+    },
+    {
+      "path": "PixelDesktop/Worker/WorkerStreamRunner.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-streaming-implementation",
+      "purpose": "Streaming session orchestration and recovery",
+      "status": "active"
+    },
+    {
+      "path": "PixelDesktopTests/WorkerStreamingTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-streaming-implementation",
+      "purpose": "41 unit tests for streaming",
+      "status": "active"
+    },
+    {
+      "path": "PixelDesktopTests/Phase7StreamingDeviceHarness.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-02T00:00:00Z",
+      "phase": 7,
+      "task_id": "e1-streaming-implementation",
+      "purpose": "6 live-device streaming tests",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

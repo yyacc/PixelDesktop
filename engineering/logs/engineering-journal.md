@@ -1453,3 +1453,116 @@ separate adb pull for the result.
 communication reconnaissance recommended as improvement #1, now verified on hardware.
 
 **Artifacts:** `phases/phase-07-e1-adb-streaming-experiment.md`.
+
+---
+
+## 2026-10-02 — E1 streaming IMPLEMENTATION (production)
+
+**Phase:** 7. **Implementation, not reconnaissance.** Verified on the physical Pixel 7a.
+
+**WHAT CHANGED:** worker orchestration moved from file exchange + Mac-side polling to a SINGLE
+persistent adb shell that streams events, with the durable result file kept as the record of truth.
+The OLD path is NOT deleted - it remains for the Phase 5/6 flows and its tests still pass. The
+streaming path is ADDITIVE, exactly as E1 required.
+
+**FILES**
+  new  Worker/WorkerStreamProtocol.swift   event protocol, parser, stream state, outcome model
+  new  Worker/WorkerStreamReducer.swift    the pure state machine (F4 + F7 logic)
+  new  Worker/WorkerStreamScript.swift     device-side script builder + job-id containment
+  new  Worker/WorkerStreamRunner.swift     session orchestration, durability, recovery
+  mod  Transport/Transport.swift           shellStreaming added; StreamReadState added
+  mod  Transport/ADBTransport.swift        shellStreaming implemented (incremental, bounded)
+  new  PixelDesktopTests/WorkerStreamingTests.swift            41 unit tests
+  new  PixelDesktopTests/Phase7StreamingDeviceHarness.swift    6 live-device tests
+  mod  PixelDesktopTests/PixelDesktopTests.swift               MockTransport extended
+  ** No Android source changed. APK, manifest and worker Java untouched. **
+
+**EVENT PROTOCOL (line-oriented, not an RPC framework)**
+  PDE1 START job_id= / JOB_WRITTEN bytes= / LAUNCHED / HEARTBEAT n= pid= / WORKER_EXITED n=
+  PDE1 RESULT_BEGIN / <opaque JSON> / RESULT_END bytes= / ERROR code= message=
+
+**THE EVENTS COME FROM THE SCRIPT, NOT THE WORKER.** The Android worker emits NOTHING to stdout - it
+logs to logcat only (verified: grep for System.out/System.err across its Java returns no matches),
+and it is launched by am start, so its stdout belongs to the app runtime. This is E1's L6 and it
+bounds the protocol's claims: **HEARTBEAT is process liveness, NEVER model-generation progress.**
+Real progress needs a worker-side change - a separate decision, NOT made here.
+
+**F4 FIXED - worker death is now an explicit transition.** A run of consecutive liveness misses with
+no result present moves to .streamAliveWorkerExited and sets a terminal outcome; the script makes the
+same determination independently and exits. A single miss is NOT death (the process can be mid-exit
+after writing its result); misses before launch and after a result do not count.
+  VERIFIED ON HARDWARE: killing the worker gave workerExitedUnexpectedly(sequence: 4) and the run
+  TERMINATED IN 3.3 s instead of heartbeating indefinitely.
+
+**F7 FIXED - stream loss is not job failure.** When the session ends with no terminal event the
+runner asks the DEVICE: is the worker running (pidof)? does a durable result exist (stat + cat)? If
+so it recovers it as .recoveredFromDevice. **The worker is never killed because its session died.**
+  VERIFIED ON HARDWARE: with no session watching, the worker ran to completion and wrote a
+  2389-byte durable result that was recovered afterwards.
+
+**LONG-RUNNING JOBS: no fixed heartbeat count, no job timeout.** E1 F5 showed a job may exceed 90 s.
+The only time bounds are stall detectors, never duration limits: streamStallTimeout 120 s (a live
+worker heartbeats every 0.5 s) and a 5 s reap deadline so a stuck adb child cannot block the caller.
+
+**JOB INPUT: adb push REMOVED from the streaming path.** The payload rides stdin via cat > job.json.
+The job id is the only value interpolated into a device command and is validated against [A-Za-z0-9-]
+with a 64-char cap.
+
+**RESULT: result.json remains the durable source of truth.** Durability is CONFIRMED against the
+device, never assumed - .completed requires a positive device-reported size that is at least what
+the stream carried; missing/empty/shorter yields .completedButDurabilityUnverified. The brief's rule
+("stream completion does not mean result durability") is enforced by the type system.
+
+**CANCELLATION: unchanged - am force-stop, external to the session.** Measured 140-144 ms on
+hardware. A unit test asserts the streaming path never issues one.
+
+**TESTS: 310 total, 0 failures.** 41 new unit tests covering the brief's list 1-19, plus 6
+live-device tests (skipped unless PIXELDESKTOP_DEVICE_SERIAL is set). Unit and live tests are
+deliberately separate so a passing unit suite is never mistaken for device verification.
+  LIVE: 6/6 PASS - raw primitive (stdout/stderr/stdin), streamed DTCA-1 job, F4 death detection,
+  F7 session loss, cancellation, performance.
+
+**PERFORMANCE (same E1 workload: LOCAL-LLM-1, 32 tokens - DTCA-1 deliberately NOT used)**
+  OLD: first output 0.060 s, launch ack 0.170 s, wall 27.600 s, 758 ms poll cycle, 26 heartbeats
+  NEW: first output 0.036 s, launch ack 0.196 s, wall 20.985 s, completion via the stream, 37 heartbeats
+  ** The 6.6 s wall difference is NOT attributed to the change ** - this workload's variance is large
+  (Phase 6 measured a 2.4x spread; worker-reported total_ms varied ~12x). What IS attributable:
+  completion detection moved from a 758 ms poll cycle to the stream, and progress is now observable
+  at all. ** The win is architectural, not a throughput claim. **
+
+**FOUR DEFECTS FOUND BY LIVE EXECUTION - none by the unit suite**
+  1. ** do; SHELL SYNTAX ERROR ** The script was assembled with joined(separator: "; "), emitting
+     `while ...; do; i=0`. `do;` is a syntax error, so the ENTIRE script failed to parse and the
+     stream produced NO OUTPUT AT ALL. Confirmed on the device: "/system/bin/sh: syntax error:
+     unexpected ';'". Fixed; a unit test now asserts the assembled script's structure.
+  2. The stall watchdog resumed the continuation only when the child was alive; a child that had
+     already exited while the reader was blocked left the continuation NEVER resumed.
+  3. process.waitUntilExit() blocked forever - with the transport dead the adb child stayed alive
+     and the run sat for 15 minutes. Replaced with a bounded reap.
+  4. Unbounded waits in the device harness: each probe cost 30 s on a dead transport, so 240
+     iterations became a 2-hour wait. Replaced with wall-clock deadlines.
+  ** Defect 1 is the notable one: a pure string-assembly error that only appeared on hardware. **
+
+**ENVIRONMENTAL NOTE:** the USB link dropped THREE times during this work (FAIL-006 recurring), and
+the wireless entry once. Verification was completed over both transports. This is a known
+environmental fault, not a PixelDesktop defect.
+
+**LIMITATIONS (7), L3 most consequential**
+  L1 a session that dies loses the STREAM (progress is not durable; only the file is)
+  L2 cancellation remains external
+  L3 ** progress is LIVENESS ONLY - real generation progress needs a worker-side change **
+  L4 one session = one job
+  L5 the session is host-initiated
+  L6 the old polling path still exists for Phase 5/6 flows; the two coexist
+  L7 the stall detector assumes a 0.5 s heartbeat cadence
+
+**ARCHITECTURAL DISTINCTION RECORDED**
+  ADB remains the transport and privileged control boundary.
+  Persistent adb shell provides the live execution stream.
+  result.json remains the durable job record.
+  Worker liveness, connection state, and result state are independent.
+And from E1, now implemented: ADB itself was capable of the required streaming behaviour, eliminating
+the need for a second communication architecture. No WebSocket, gRPC, Service, custom USB transport,
+adb forward RPC, TransportManager, scheduler or custom mDNS was added.
+
+**Artifacts:** `phases/phase-07-e1-streaming-implementation.md`.

@@ -317,6 +317,73 @@ Never.
 
 ---
 
+## T-038 — A string-assembled script must be asserted structurally, not behaviourally
+
+**Technique:**
+When a command is assembled by joining fragments with a separator, assert the *assembled* text's
+structure in a unit test. A separator inserted at the wrong boundary produces a syntactically invalid
+program that no behavioural test can reach, because it never runs.
+
+**Worked:**
+Yes — it caught a defect that had already reached a live device.
+
+**Evidence:**
+The device script was built with `joined(separator: "; ")`, which puts a semicolon between every
+element. One element was `"while [ ! -f $R ]; do"`, so the output was:
+
+```
+while [ ! -f $R ]; do; i=$((i+1)); ...
+```
+
+`do;` is a shell syntax error. **The entire script failed to parse, so the stream produced no output
+at all** — the job appeared to hang rather than fail, because a stream that never starts looks
+identical to a slow one.
+
+The unit suite passed, because the tests fed *events* into the reducer and never inspected the
+generated script. The defect surfaced only against the real device, where the shell reported:
+
+```
+/system/bin/sh: syntax error: unexpected ';'
+```
+
+**Recommended use:**
+Any generated shell/script/SQL/DSL text. Assert on the assembled string: no doubled separators, no
+separator adjacent to a keyword that must not take one, balanced block delimiters.
+
+**Avoid when:**
+Never. It is one string assertion.
+
+---
+
+## T-039 — A blocking wait needs a deadline on every path, not just the obvious one
+
+**Technique:**
+When making a read interruptible, audit *every* blocking call in the path — including the one after
+the interrupt. An interrupt that unblocks the reader but then waits unbounded on the child has moved
+the hang rather than removed it.
+
+**Worked:**
+Yes — it found three separate hangs in one code path.
+
+**Evidence:**
+Three distinct unbounded waits were found, each only visible on real hardware:
+
+1. `availableData` blocked forever when the transport died mid-session.
+2. The watchdog resumed the continuation **only if the child was still alive** — so a child that had
+   already exited while the reader was blocked left the continuation never resumed.
+3. After fixing both, `process.waitUntilExit()` still blocked: the `adb` child stayed alive and
+   blocked, and the run sat for **15 minutes** with the watchdog already fired.
+
+Each fix looked complete. Only running it against a genuinely dead transport exposed the next one.
+
+**Recommended use:**
+Any interruptible-read design: pipes, sockets, subprocess reaping, async continuations.
+
+**Avoid when:**
+Never. Count the blocking calls and bound each one.
+
+---
+
 ## T-033 — Measure the thing you are about to replace before replacing it
 
 **Technique:**

@@ -4,6 +4,13 @@ actor ADBTransport: TransportProtocol {
     private let adbPath: String
     private let defaultTimeout: TimeInterval
 
+    /// How long a streaming session may go without the child exiting before it is torn down.
+    ///
+    /// This is **not** a job timeout — it is a *stall* detector. A live worker reports a heartbeat
+    /// every 0.5 s, so silence of this length means the transport is gone, not that the job is long.
+    /// E1 F5 proved a job may legitimately exceed 90 s, so the bound is on quiet, not duration.
+    static let streamStallTimeout: TimeInterval = 120.0
+
     init(adbPath: String = "/opt/homebrew/bin/adb", defaultTimeout: TimeInterval = 30.0) {
         self.adbPath = adbPath
         self.defaultTimeout = defaultTimeout
@@ -206,6 +213,171 @@ actor ADBTransport: TransportProtocol {
             arguments: [deviceSerial, "shell", command],
             timeout: timeout
         )
+    }
+
+    /// Runs a command in the device shell, delivering stdout incrementally.
+    ///
+    /// Reads stdout on a dedicated thread so lines are surfaced **as produced** rather than at
+    /// exit. `readabilityHandler` is deliberately not used: it delivers arbitrary byte chunks, not
+    /// lines, which would push line assembly onto every caller and make the "arrives incrementally"
+    /// property harder to reason about.
+    ///
+    /// stdin is written and closed **before** reading begins. `cat > file` on the device blocks
+    /// until EOF, so a script that reads stdin and then emits protocol lines only starts producing
+    /// output once the write side is closed.
+    ///
+    /// - Note: There is intentionally **no timeout parameter**. E1 F5 showed a job can exceed 90 s,
+    ///   so an arbitrary deadline here would be a fabricated failure. The caller owns termination,
+    ///   and a transport that dies ends the stream by itself.
+    func shellStreaming(
+        deviceSerial: String,
+        command: String,
+        stdin: String?,
+        onLine: @Sendable @escaping (String) -> Void,
+        onStderrLine: @Sendable @escaping (String) -> Void
+    ) async throws -> Int32 {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: adbPath)
+        process.arguments = ["-s", deviceSerial, "shell", command]
+
+        let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
+        let stdinPipe = Pipe()
+        process.standardOutput = stdoutPipe
+        process.standardError = stderrPipe
+        process.standardInput = stdinPipe
+
+        do {
+            try process.run()
+        } catch {
+            throw PixelDesktopError.adbTransportError(
+                "Failed to launch ADB for streaming: \(error.localizedDescription)"
+            )
+        }
+
+        // Write the payload, then close. Doing this before the read loop is what unblocks the
+        // device-side `cat`.
+        if let stdin, let data = stdin.data(using: .utf8) {
+            do {
+                try stdinPipe.fileHandleForWriting.write(contentsOf: data)
+            } catch {
+                // A failed write means the session died before the payload landed. Close and let
+                // the read loop observe the exit rather than reporting a write error as the cause.
+            }
+        }
+        try? stdinPipe.fileHandleForWriting.close()
+
+        // Drain stderr concurrently. A device script can produce enough stderr to fill the pipe
+        // buffer and deadlock the child if nobody reads it.
+        let stderrHandle = stderrPipe.fileHandleForReading
+        let stderrQueue = DispatchQueue(label: "pixeldesktop.adb.stderr")
+        stderrQueue.async {
+            var buffer = Data()
+            while true {
+                let chunk = stderrHandle.availableData
+                if chunk.isEmpty { break }
+                buffer.append(chunk)
+                while let newline = buffer.firstIndex(of: 0x0A) {
+                    let lineData = buffer[buffer.startIndex..<newline]
+                    buffer.removeSubrange(buffer.startIndex...newline)
+                    if let line = String(data: lineData, encoding: .utf8) {
+                        onStderrLine(line)
+                    }
+                }
+            }
+            if !buffer.isEmpty, let line = String(data: buffer, encoding: .utf8) {
+                onStderrLine(line)
+            }
+        }
+
+        // Read stdout incrementally on a separate thread; the async context awaits its completion.
+        //
+        // The read must be **interruptible**, and the continuation must be resumed on **every**
+        // path. Two distinct hangs were observed on the real device during implementation:
+        //
+        //  1. `availableData` can block forever when the transport dies mid-session — `adb` does
+        //     not always tear its pipes down when the device disappears.
+        //  2. The child can exit while the reader thread is still blocked in `availableData`. If
+        //     the watchdog only acts when `process.isRunning`, nothing ever resumes the
+        //     continuation and the caller waits forever.
+        //
+        // So the watchdog runs unconditionally: it reaps the child, closes the read end to unblock
+        // the reader, and resumes. `StreamReadState` guarantees exactly one resume wins.
+        let stdoutHandle = stdoutPipe.fileHandleForReading
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let state = StreamReadState()
+            let queue = DispatchQueue(label: "pixeldesktop.adb.stdout")
+
+            queue.async {
+                var buffer = Data()
+                while true {
+                    let chunk = stdoutHandle.availableData
+                    if chunk.isEmpty { break }
+                    if state.isCancelled { break }
+                    buffer.append(chunk)
+                    while let newline = buffer.firstIndex(of: 0x0A) {
+                        let lineData = buffer[buffer.startIndex..<newline]
+                        buffer.removeSubrange(buffer.startIndex...newline)
+                        // Drop a trailing CR so CRLF output cannot smuggle a stray character into
+                        // the protocol parser.
+                        var line = String(data: lineData, encoding: .utf8) ?? ""
+                        if line.hasSuffix("\r") { line.removeLast() }
+                        onLine(line)
+                    }
+                }
+                if !state.isCancelled, !buffer.isEmpty {
+                    var line = String(data: buffer, encoding: .utf8) ?? ""
+                    if line.hasSuffix("\r") { line.removeLast() }
+                    onLine(line)
+                }
+                state.finish(continuation)
+            }
+
+            // Watchdog: unconditional. A live worker reports a heartbeat every 0.5 s, so silence of
+            // `streamStallTimeout` means the transport is gone — not that the job is long. This is
+            // a stall detector, never a job-duration limit (E1 F5).
+            let watchdog = DispatchQueue(label: "pixeldesktop.adb.watchdog")
+            watchdog.asyncAfter(deadline: .now() + Self.streamStallTimeout) {
+                guard !state.isFinished else { return }
+
+                if process.isRunning {
+                    process.terminate()
+                    Thread.sleep(forTimeInterval: 0.5)
+                    if process.isRunning {
+                        kill(process.processIdentifier, SIGKILL)
+                    }
+                }
+                // Closing the read end is what unblocks a reader stuck in `availableData`.
+                try? stdoutHandle.close()
+                state.cancel()
+                state.finish(continuation)
+            }
+        }
+
+        // Reap the child without blocking indefinitely.
+        //
+        // `waitUntilExit()` was the last unbounded wait in this path: when the transport dies, the
+        // `adb` child can remain alive and blocked even after the read end is closed, so the
+        // caller would never return. Observed on the real device — the wireless entry vanished
+        // mid-session and the run sat for 15 minutes with the watchdog already fired. The child is
+        // therefore polled with a deadline and killed if it does not exit.
+        let reapDeadline = Date().addingTimeInterval(5.0)
+        while process.isRunning, Date() < reapDeadline {
+            Thread.sleep(forTimeInterval: 0.05)
+        }
+
+        if process.isRunning {
+            process.terminate()
+            Thread.sleep(forTimeInterval: 0.3)
+            if process.isRunning {
+                kill(process.processIdentifier, SIGKILL)
+            }
+            // The session ended without a clean exit. Reported as a failure exit so the caller
+            // treats it as a lost session rather than a completed job.
+            return -1
+        }
+
+        return process.terminationStatus
     }
 
     func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {

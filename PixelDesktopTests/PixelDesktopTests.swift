@@ -2102,6 +2102,8 @@ actor MockTransport: TransportProtocol {
     private var properties: [String: String] = [:]
     private var batchedResult: TransportResult?
     private var shellResponses: [String: TransportResult] = [:]
+    private var shellResponseSequences: [String: [TransportResult]] = [:]
+    private var shellResponseCursor: [String: Int] = [:]
     private var defaultShellResult = TransportResult(exitCode: 0, stdout: "", stderr: "")
     private var pushResult: TransportResult?
     private var pullResult: TransportResult?
@@ -2117,6 +2119,15 @@ actor MockTransport: TransportProtocol {
     /// Canned response for an exact shell command string.
     func setShellResponse(_ command: String, _ result: TransportResult) {
         shellResponses[command] = result
+    }
+
+    /// Canned responses consumed in order for a repeated shell command.
+    ///
+    /// Needed for commands that are legitimately polled — `WorkerLifecycle.stopIfRunning` reads
+    /// `pidof` until the process disappears, so a single canned answer cannot model it.
+    func setShellResponses(for command: String, _ results: [TransportResult]) {
+        shellResponseSequences[command] = results
+        shellResponseCursor[command] = 0
     }
 
     func setDefaultShellResult(_ result: TransportResult) {
@@ -2189,10 +2200,53 @@ actor MockTransport: TransportProtocol {
     func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {
         invocations.append(Invocation(command: "-s", arguments: [deviceSerial, "shell", command]))
 
+        // A sequence takes precedence: it models a command whose answer changes between reads.
+        if let sequence = shellResponseSequences[command], !sequence.isEmpty {
+            let index = shellResponseCursor[command] ?? 0
+            shellResponseCursor[command] = index + 1
+            return sequence[min(index, sequence.count - 1)]
+        }
+
         if let result = shellResponses[command] {
             return result
         }
         return defaultShellResult
+    }
+
+    // MARK: - Streaming
+
+    private var streamingLines: [String] = []
+    private var streamingStderrLines: [String] = []
+    private var streamingExitCode: Int32 = 0
+    private var streamingError: Error?
+    private(set) var streamingInvocations: [String] = []
+    private(set) var lastStreamingStdin: String?
+
+    /// Configures the canned stream: lines are delivered in order, then stderr, then the exit code.
+    func setStreamingLines(_ lines: [String], stderr: [String] = [], exitCode: Int32 = 0) {
+        streamingLines = lines
+        streamingStderrLines = stderr
+        streamingExitCode = exitCode
+    }
+
+    /// Makes the streaming call throw, modelling a transport that never established.
+    func setStreamingError(_ error: Error) { streamingError = error }
+
+    func shellStreaming(
+        deviceSerial: String,
+        command: String,
+        stdin: String?,
+        onLine: @Sendable @escaping (String) -> Void,
+        onStderrLine: @Sendable @escaping (String) -> Void
+    ) async throws -> Int32 {
+        streamingInvocations.append(command)
+        lastStreamingStdin = stdin
+
+        if let streamingError { throw streamingError }
+
+        for line in streamingLines { onLine(line) }
+        for line in streamingStderrLines { onStderrLine(line) }
+        return streamingExitCode
     }
 
     func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {
