@@ -791,6 +791,105 @@
       "task_id": "phase-07-step-3",
       "purpose": "Step 3 refusal-path reconnaissance, findings, and results",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "CLI target source directory \u2014 read-only publication interface (Phase 9 Step 1)",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/main.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "CLI entry point: argument dispatch, exit statuses",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIInvocation.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "CLI argument parsing and usage text",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIEnvelope.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "Publication envelope shape, structured error, error-to-token mapping",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIEnvelopeRenderer.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "Envelope serialisation: encode, transform, pretty-print",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIJSONPresentation.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "The two presentation rules (Foundation-only, unit-testable)",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLICommands.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "The two commands: capability and observe",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIDeviceSelection.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "Device selection precedence, mirroring AppState",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase9CLITests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "Phase 9 Step 1 tests: presentation rules + black-box command surface",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-1-publication-interface.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "Phase 9 Step 1 engineering log",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-014-read-only-publication-interface.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-1",
+      "purpose": "ADR-014: the publication interface decision",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

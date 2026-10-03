@@ -25,6 +25,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) IMPLEMENTED and verified on device
 **Phase 6 — Local AI Worker:** FIRST INFERENCE PROOF COMPLETE — real LLM inference on the Pixel 7a
 **Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** **Steps 1–3 COMPLETE** (capability contract + measured evidence + refusal path). Step 3 resolved S3-1..S3-4: typed worker refusal, typed `.timeout`, `.cancelled` reserved (not faked), `.deviceUnauthorized` surfaced. 349 tests, 0 failures. Real-device verification NOT performed — no device attached (recorded)
+**Phase 9 — Hermes Integration:** **Step 1 COMPLETE** — read-only publication interface. A third target (`pixel-desktop`) publishes the existing capability contract and evidence as JSON. `capability` needs no device and performs no device I/O; `observe` reads device state read-only. No execution, no listener, no daemon. 372 tests, 0 failures. Real-device verification NOT RUN — no device attached (recorded)
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md) and its **Amendment 1**
@@ -56,7 +57,8 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 7 Architecture Re-Evaluation](phases/phase-07-architecture-reevaluation.md) — Hermes owns planning; PixelDesktop publishes a capability contract
 - [Phase 7 Step 1 — The Pixel Capability Contract](phases/phase-07-step-1-capability-contract.md) — **implemented**: contract, provenance model, real-device verification
 - [Phase 7 Step 2 — Measured Evidence](phases/phase-07-step-2-evidence.md) — **implemented**: device state, execution evidence, freshness, snapshot-not-reservation
-- [Phase 7 Step 3 — The Refusal Path](phases/phase-07-step-3-refusal-path.md) — **implemented**: 8 tests; found 3 unreachable error cases + 1 erased structure; open decisions S3-1..S3-4
+- [Phase 7 Step 3 — The Refusal Path](phases/phase-07-step-3-refusal-path.md) — **implemented**: 8 tests; found 3 unreachable error cases + 1 erased structure; open decisions S3-1..S3-4 resolved
+- [Phase 9 Step 1 — The Read-Only Publication Interface](phases/phase-09-step-1-publication-interface.md) — **implemented**: `pixel-desktop` CLI, two commands, 23 tests, absent-never-zero presentation rule
 
 ### Architecture
 - [Architecture Overview (as delivered)](architecture/overview.md) — what the code actually implements
@@ -75,6 +77,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [ADR-011: Pixel Compute Worker Contract](decisions/ADR-011-pixel-compute-worker-contract.md)
 - [ADR-012: Local AI Worker (approved and implemented)](decisions/ADR-012-local-ai-worker.md)
 - [ADR-013: Resource-Aware Routing (**SUPERSEDED**, not implemented)](decisions/ADR-013-resource-aware-routing.md) — measurements retained, router withdrawn
+- [ADR-014: A Read-Only Local CLI as the Publication Interface](decisions/ADR-014-read-only-publication-interface.md) — **implemented**: how Hermes reaches PixelDesktop (six alternatives assessed and rejected)
 
 ### Records
 - [Engineering Journal](logs/engineering-journal.md) — Chronological build history

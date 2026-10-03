@@ -35,6 +35,20 @@
                ReferencedContainer = "container:PixelDesktop.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3D25A11B07E7C5CF753CF190"
+               BuildableName = "pixel-desktop"
+               BlueprintName = "pixel-desktop"
+               ReferencedContainer = "container:PixelDesktop.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

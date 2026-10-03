@@ -33,12 +33,41 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: YES
         SWIFT_VERSION: "5.0"
 
+  # Phase 9 Step 1 — read-only publication interface.
+  #
+  # It compiles the SAME `PixelDesktop/` sources as the application target, excluding only the
+  # SwiftUI entry point (`App/`), the app's Info.plist, and its asset catalog. That is the whole
+  # point: there is one shared implementation, and the two targets are two consumers of it —
+  # the app executes, the CLI publishes. Neither re-implements anything.
+  pixel-desktop:
+    type: tool
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: PixelDesktop
+        excludes:
+          - "App/**"
+          - "Info.plist"
+          - "Assets.xcassets/**"
+      - path: PixelDesktopCLI
+    settings:
+      base:
+        PRODUCT_NAME: pixel-desktop
+        PRODUCT_BUNDLE_IDENTIFIER: com.pixeldesktop.cli
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+
   PixelDesktopTests:
     type: bundle.unit-test
     platform: macOS
     deploymentTarget: "15.0"
     sources:
       - path: PixelDesktopTests
+      # `CLIJSONPresentation` is Foundation-only by design, so it can be compiled straight into
+      # the test bundle for unit testing. The tool target is deliberately NOT a dependency: it
+      # compiles the same `PixelDesktop/` sources, so linking both would put two copies of every
+      # shared type in one module and make every bare type reference ambiguous.
+      - path: PixelDesktopCLI/CLIJSONPresentation.swift
     dependencies:
       - target: PixelDesktop
     settings:
@@ -52,11 +81,22 @@ schemes:
     build:
       targets:
         PixelDesktop: all
+        # Built alongside the tests so the black-box CLI suite has a real binary to invoke.
+        pixel-desktop: all
         PixelDesktopTests: [test]
     test:
       targets:
         - PixelDesktopTests
       gatherCoverageData: false
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+  pixel-desktop:
+    build:
+      targets:
+        pixel-desktop: all
     run:
       config: Debug
     archive:

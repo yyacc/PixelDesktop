@@ -1854,3 +1854,100 @@ engineering. And a pin that fails on schedule is evidence the test is doing its 
 "fix" the test rather than confirm the fix is the failure mode to guard against.
 
 **Artifacts:** `phases/phase-07-step-3-refusal-path.md` (now marked COMPLETE).
+
+---
+
+## 2026-10-03 — Phase 9 Step 1: the read-only publication interface
+
+**Phase:** 9 (Hermes Integration) — first bounded step, per ADR-007 Amendment 1 §A1.10
+**Task:** close the gap Phase 7 Step 2 recorded as U1 — *"the contract and the evidence both exist
+as Swift types; nothing exposes them over a transport, so Hermes cannot read either yet."*
+**Baseline:** `32cd021` · 349 tests, 0 failures, 15 skipped.
+
+### What was decided
+
+Six interface families were assessed against the actual codebase (narrow CLI · unix domain socket ·
+MCP server · versioned file publication · ADB-mediated publication · localhost HTTP). ADB-mediated
+was rejected as **backwards** — the contract describes the Pixel but is produced on the Mac, so
+routing a host-local read through the device adds a hop and couples it to device availability.
+HTTP was rejected on the record of ADR-011/ADR-012 and the communication reconnaissance, which
+refuses an unauthenticated HTTP service "under any variant". File publication was rejected because
+it contradicts Step 2's own stated design: *"nothing here holds state between calls or runs in the
+background."* MCP and unix socket were deferred, not refused.
+
+**Chosen: a narrow local CLI** — the only option that adds a delivery path while adding no running
+component. Recorded as **ADR-014**.
+
+### What was built
+
+A third target, `pixel-desktop`, with two commands: `capability --json` (no device, no device I/O)
+and `observe --json` (read-only device reads through the existing `PixelEvidenceReader`).
+
+The CLI compiles **the same `PixelDesktop/` sources** as the app, excluding only the SwiftUI entry
+point. There is one implementation and two consumers of it — the app executes, the CLI publishes.
+No type was duplicated and no DTO was created.
+
+### The one design decision worth recording
+
+`PixelCapabilityContract.build` requires an `AndroidDevice`, and the contract marks
+`contract.device` as `.deviceReported` — a read. But `capability` promises no device I/O.
+Publishing that field would need either the I/O it promises not to do, or a fabricated `.declared`
+provenance. **It is omitted, and the omission is stated in a `not_read` list with its reason.**
+The remaining device-independent fields are republished as `.declared` with `observedAt: nil` —
+their honest provenance, and what the contract's own doc comment already says.
+
+`observe` is the command that reads. That split is why there are two commands.
+
+### Absent, never zero
+
+`CapabilityValue` has a non-optional `value`, so an unreadable field encodes as `value: 0,
+source: "unknown"`. A consumer reading `value` first is told *"zero bytes of memory are
+available"* — the most damaging possible misreading. The CLI therefore publishes an unknown-source
+value **without its `value` key at all**, uniformly, at every depth, including inside arrays.
+
+### Failures encountered and corrected
+
+Three, all mine, all found by running the thing:
+
+1. **`Result<_, String>`** — `String` is not an `Error`. Replaced with a dedicated `UsageError`.
+2. **Dual-module ambiguity.** The test bundle linked the tool target, which compiles the same
+   sources as the app, so every shared type existed twice and a bare `PixelDesktopError` was
+   ambiguous. Fixed by **not** linking the tool: `CLIJSONPresentation` is deliberately Foundation-only
+   so it compiles into the test bundle for unit tests, and the CLI's own behaviour is tested
+   **black-box through the built binary** — which is the stronger test anyway, because it exercises
+   the real serialisation path.
+3. **Four black-box tests silently skipped.** The app-hosted bundle sits at
+   `.../Debug/PixelDesktop.app/Contents/PlugIns/…`, so the one-level-up binary lookup returned the
+   wrong directory and every test skipped while reporting green. Fixed by walking ancestors. A
+   green suite that proves nothing is worse than a red one.
+4. **`XCTAssertNil` on JSON `null`.** `JSONSerialization` maps `null` to `NSNull`, not Swift `nil`.
+   Also corrected the opposite case: device identity must be **absent entirely**, not published as
+   `null` — the two are different claims.
+
+### Verification
+
+- **372 tests, 0 failures, 15 skipped** (from 349). The 15 skips are the pre-existing device-gated
+  harnesses, unchanged. No test removed, skipped, or weakened.
+- `capability --json` verified against the real detached state — succeeds, exit 0, correct JSON.
+- `observe --json` verified against the real detached state — correct structured failure
+  (`device_not_found`), exit 1, no partial observation.
+- All four usage errors exit 2 with usage text and nothing on stdout.
+
+### Real-device verification: NOT RUN
+
+No device attached (`adb devices -l` empty). The detached path is real behaviour, not a simulation,
+but the **populated** observation path was not exercised on hardware. Two items carried forward:
+that `observe` populates real values through the CLI on a connected Pixel, and that the absence rule
+behaves correctly against a live device with a reachable-but-unreadable field. The reader itself was
+verified on hardware in Phase 7 Step 2; the CLI is a thin pass-through, but pass-through is not
+proof.
+
+### Lesson
+
+**A promise not to touch the device is only credible if the code cannot touch it.** `capability`
+takes no `TransportProtocol` at all — it has no device handle to misuse. Passing a transport and
+relying on discipline would have looked identical and been weaker. The same reasoning produced the
+`not_read` list: an omission with a stated reason is honest; an omission with no explanation is
+indistinguishable from a bug.
+
+**Artifacts:** `phases/phase-09-step-1-publication-interface.md`, `decisions/ADR-014-read-only-publication-interface.md`.
