@@ -316,6 +316,53 @@ final class Phase9CLIBinaryTests: XCTestCase {
         XCTAssertEqual(llm["exactlyVerifiable"] as? Bool, false)
     }
 
+    /// Phase 7 Amendment 2 — the per-workload input bound must survive to JSON, and the
+    /// contract-wide limit must not be readable as applying to every workload.
+    func testCapabilityExposesPerWorkloadInputLimitsDistinctFromTheGlobalLimit() throws {
+        let result = try CLIRunner.run(["capability", "--json"])
+        let json = try XCTUnwrap(result.json)
+        let contract = try XCTUnwrap(json["contract"] as? [String: Any])
+        let workloads = try XCTUnwrap(contract["workloads"] as? [[String: Any]])
+
+        let dtca = try XCTUnwrap(workloads.first { ($0["name"] as? String) == "DTCA-1" })
+        let llm = try XCTUnwrap(workloads.first { ($0["name"] as? String) == "LOCAL-LLM-1" })
+
+        let dtcaBound = try XCTUnwrap(dtca["maximumInputCharacters"] as? [String: Any])
+        let llmBound = try XCTUnwrap(llm["maximumInputCharacters"] as? [String: Any])
+
+        // Provenance survives publication, and no timestamp is invented for a build constant.
+        XCTAssertEqual(dtcaBound["source"] as? String, "declared")
+        XCTAssertNil(dtcaBound["observedAt"])
+        XCTAssertNotNil(dtcaBound["limitation"] as? String)
+
+        // The bounds are the ones their own validators enforce.
+        XCTAssertEqual(dtcaBound["value"] as? Int, DTCA1Worker.maximumInputCharacters)
+        XCTAssertEqual(llmBound["value"] as? Int, InferenceRequest.maximumPromptCharacters)
+
+        // And they differ — the defect this amendment fixed. A consumer that read the global
+        // limit as a workload-wide bound would be wrong by this margin.
+        XCTAssertNotEqual(dtcaBound["value"] as? Int, llmBound["value"] as? Int)
+    }
+
+    func testContractWideLimitIsDocumentedAsLLMSpecific() throws {
+        let result = try CLIRunner.run(["capability", "--json"])
+        let json = try XCTUnwrap(result.json)
+        let contract = try XCTUnwrap(json["contract"] as? [String: Any])
+        let limits = try XCTUnwrap(contract["limits"] as? [String: Any])
+
+        let limitation = try XCTUnwrap(limits["limitation"] as? String)
+        XCTAssertTrue(limitation.contains("NOT to every workload"),
+                      "the published limitation must deny workload-wide scope")
+    }
+
+    func testContractVersionIsTwoInPublishedJSON() throws {
+        let result = try CLIRunner.run(["capability", "--json"])
+        let json = try XCTUnwrap(result.json)
+        let contract = try XCTUnwrap(json["contract"] as? [String: Any])
+
+        XCTAssertEqual(contract["contractVersion"] as? Int, 2)
+    }
+
     func testCapabilityPreservesProvenanceAndLimitations() throws {
         // Static facts are build constants: `.declared`, and NO timestamp — a constant was never
         // observed, and a timestamp would claim otherwise. The limitation is the load-bearing

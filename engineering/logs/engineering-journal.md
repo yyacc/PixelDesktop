@@ -1951,3 +1951,67 @@ relying on discipline would have looked identical and been weaker. The same reas
 indistinguishable from a bug.
 
 **Artifacts:** `phases/phase-09-step-1-publication-interface.md`, `decisions/ADR-014-read-only-publication-interface.md`.
+
+---
+
+## 2026-10-03 — Phase 9 Step 3A: contract fidelity, corrected as Phase 7 Amendment 2
+
+**Discovered by:** Phase 9 Step 3 execution-boundary reconnaissance.
+**Corrected as:** Phase 7 Amendment 2 — ADR-007 §A1.11 assigns contract changes to Phase 7.
+**Baseline:** 372 tests @ `ca766b4` → **390 tests, 0 failures, 15 skipped.**
+
+### The defect
+
+`contract.limits.maximumPromptCharacters` published **4096**, derived from `InferenceRequest` — the
+**LLM runtime**. `DTCA1Worker.validateInput` accepts **10,000**. DTCA-1 is the workload the project
+intends to expose first, and the contract understated its input capacity by more than half.
+
+Not a safety defect: PixelDesktop validated every request anyway. A **planning** defect — the field
+exists "so a planner can respect them rather than discover them by refusal", and for DTCA-1 it did
+the opposite.
+
+### What the field is
+
+Established from three independent sources, not inferred: its declaration site (`InferenceRequest`,
+*"a single bounded generation request"*), the contract's own provenance table
+(`phase-07-step-1-capability-contract.md`), and the contract's own doc comment. All three agree it is
+the **LLM runtime's** limit and never a workload-wide bound. That ruled out the tempting fix —
+redefining the field — because its derivation is already asserted by an existing test.
+
+### The correction
+
+`Workload.maximumInputCharacters: CapabilityValue<Int>?` — each bound on the workload that owns it.
+DTCA-1 ← `DTCA1Worker.maximumInputCharacters` (new named constant); LOCAL-LLM-1 ←
+`InferenceRequest.maximumPromptCharacters`. `contractVersion` 1 → 2. `RequestLimits` keeps its
+meaning; its `limitation` now states its scope explicitly, because the defect was as much a
+documentation failure as a data one.
+
+The DTCA-1 validator's bare `10_000` became a named constant so the **published** value and the
+**enforced** value are the same symbol — divergence is now a compile error rather than a silent
+drift. That is the whole point of the amendment: the contract must describe the system, not a
+restatement of it.
+
+### One pre-existing test corrected, after inspecting the evidence
+
+`testContractIsIndependentOfTheUIAndOfHermes` hardcoded `contractVersion == 1`. That literal
+duplicated `currentVersion` and was not a guarantee about the behaviour the test names ("independent
+of the UI and of Hermes"). It now derives from `currentVersion`; the version's *value* is asserted in
+`testContractCarriesItsVersion`. **No test was weakened, skipped, or deleted.** Every existing
+assertion on `limits` still passes unchanged — which is the strongest argument for this option over
+redefining the field.
+
+### Lesson
+
+**A published limit that is restated rather than derived will eventually describe a system that no
+longer exists.** The DTCA-1 bound was correct in the validator and wrong in the contract, and
+nothing failed — because no test compared them. The fix that matters is not the new field; it is
+that the field is now sourced from the same symbol the validator uses, so the two cannot disagree.
+
+**Artifacts:** `phases/phase-09-step-3a-contract-fidelity.md`,
+`ADR-007` Amendment 2, `Phase7Amendment2Tests.swift`.
+
+### Phase boundary
+
+The correction is **Phase 7** work. **Phase 9 remains the consumer phase.** This amendment does not
+authorise execution — no `run` command, no E1 change, no `WorkerStreamRunner` change. **Phase 9
+Step 4 has NOT started.**

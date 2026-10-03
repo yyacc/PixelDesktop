@@ -890,6 +890,24 @@
       "task_id": "phase-09-step-1",
       "purpose": "ADR-014: the publication interface decision",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7Amendment2Tests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 7,
+      "task_id": "phase-07-amendment-2",
+      "purpose": "Phase 7 Amendment 2 tests: workload-owned input limits",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-3a-contract-fidelity.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-3a",
+      "purpose": "Phase 9 Step 3A recon + Phase 7 Amendment 2 record",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

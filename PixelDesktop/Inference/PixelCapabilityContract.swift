@@ -133,7 +133,13 @@ struct PixelCapabilityContract: Codable, Equatable, Sendable {
     ///
     /// Bumped when a field is added, removed, or changes meaning, so a consumer can detect a
     /// contract it does not understand rather than silently misreading it.
-    static let currentVersion = 1
+    ///
+    /// - 1 → initial shape (Phase 7 Step 1).
+    /// - 2 → `Workload.maximumInputCharacters` added (Phase 7 Amendment 2). A consumer that reads
+    ///   workload input bounds must check for version 2; under version 1 those bounds are not
+    ///   published, and the contract-wide `limits.maximumPromptCharacters` is the LLM's limit
+    ///   rather than a bound that applies to every workload.
+    static let currentVersion = 2
 
     let contractVersion: Int
 
@@ -211,6 +217,27 @@ struct PixelCapabilityContract: Codable, Equatable, Sendable {
         /// evidence chain (ADR-012 §P7). A consumer that assumed exact verification for every
         /// workload would be wrong, so the contract states it per workload.
         let exactlyVerifiable: Bool
+
+        /// The maximum input characters **this workload's own validator** accepts.
+        ///
+        /// ## Why this is per workload and not a contract-wide field
+        ///
+        /// The workloads do not share an input bound. `DTCA-1` is a deterministic text workload
+        /// whose specification caps input at 10,000 characters; `LOCAL-LLM-1` is a bounded
+        /// generation request capped at 4,096. Those are different components' constraints, and
+        /// neither is derived from the other.
+        ///
+        /// `RequestLimits.maximumPromptCharacters` is the **LLM runtime's** request limit
+        /// (`InferenceRequest`). Reading it as a bound that applies to every workload would
+        /// understate DTCA-1's real capacity by more than half — a planner would be needlessly
+        /// restrictive for no reason. That is why the bound lives here, on the workload that owns
+        /// it, and why the two must not be conflated.
+        ///
+        /// Optional: a workload whose validator does not expose a bound publishes `.unknown`, and
+        /// the value key is then absent rather than zero (see the absence rule). A workload that
+        /// genuinely accepts unbounded input would be a different and more serious statement than
+        /// "the bound is not published", so the two are kept distinct.
+        let maximumInputCharacters: CapabilityValue<Int>?
     }
 
     let device: CapabilityValue<DeviceIdentity>
@@ -282,13 +309,24 @@ struct PixelCapabilityContract: Codable, Equatable, Sendable {
                 "Describes the artifact this build expects. It does NOT establish that the model "
                 + "is present on the device — provisioning is verified separately."),
             limits: .declared(requestLimits, limitation:
-                "Enforced by PixelDesktop at request time. Published so a planner can respect "
-                + "them rather than discover them by refusal."),
+                "The LLM runtime's own request limits (InferenceRequest). They apply to "
+                + "LOCAL-LLM-1, NOT to every workload — each workload's input bound is published "
+                + "on that workload as maximumInputCharacters. Reading this as a bound that "
+                + "applies to DTCA-1 would understate its real capacity."),
             workloads: [
                 Workload(name: DTCA1Job.workloadName, requiresModel: false,
-                         requiresRuntime: false, exactlyVerifiable: true),
+                         requiresRuntime: false, exactlyVerifiable: true,
+                         maximumInputCharacters: .declared(
+                            DTCA1Worker.maximumInputCharacters,
+                            limitation: "Owned by the DTCA-1 validator that enforces it "
+                                + "(DTCA1Worker.validateInput), not restated here. DTCA-1 also "
+                                + "rejects null bytes, which this bound does not express.")),
                 Workload(name: LlamaCppInferenceRuntime().workloadName, requiresModel: true,
-                         requiresRuntime: true, exactlyVerifiable: false),
+                         requiresRuntime: true, exactlyVerifiable: false,
+                         maximumInputCharacters: .declared(
+                            InferenceRequest.maximumPromptCharacters,
+                            limitation: "Owned by InferenceRequest.validate(), which also caps "
+                                + "generated tokens separately (see limits.maximumTokensCeiling).")),
             ]
         )
     }

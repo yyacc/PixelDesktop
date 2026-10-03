@@ -70,9 +70,23 @@ enum DTCA1Worker {
         "without"
     ]
 
+    /// The maximum input this workload accepts, owned here because this validator is what
+    /// enforces it.
+    ///
+    /// Named rather than a bare literal so the capability contract can publish **this** value
+    /// instead of restating it. A restated limit can drift from the validator that enforces it,
+    /// and the drift is silent: the contract would advertise a bound the worker does not honour,
+    /// or understate one it does. Publishing the same constant makes divergence a compile error.
+    ///
+    /// DTCA-1's own specification caps input at 10,000 characters (10 KB) — see
+    /// `phase-05-transfer-contract-proposal.md`. That is this workload's limit and is unrelated
+    /// to the LLM runtime's prompt ceiling, which is a different component's constraint.
+    static let maximumInputCharacters = 10_000
+
     static func validateInput(_ text: String) throws {
-        if text.count > 10_000 {
-            throw PixelDesktopError.invalidInput("Input exceeds maximum size of 10,000 characters (got \(text.count))")
+        if text.count > maximumInputCharacters {
+            throw PixelDesktopError.invalidInput(
+                "Input exceeds maximum size of \(maximumInputCharacters) characters (got \(text.count))")
         }
         if text.contains("\0") {
             throw PixelDesktopError.invalidInput("Input contains null bytes")

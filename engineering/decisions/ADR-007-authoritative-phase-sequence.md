@@ -520,3 +520,119 @@ The architecture overview already states this. This amendment **reaffirms** it:
 - **If the master prompt is formally amended** → this amendment must be revisited explicitly, per
   the same rule that authorised it.
 
+
+
+---
+
+# Amendment 2 — Workload-owned input limits
+
+**Status:** Accepted and implemented.
+**Date:** 2026-10-03
+**Triggered by:** Phase 9 Step 3A (contract fidelity reconnaissance).
+**Nature:** A **Phase 7 contract revision**, made under §A1.11's rule that *"Phase 9 does not
+redefine the contract's contents; if it needs a change, that change is a Phase 7 revision."*
+
+## A2.1 The defect
+
+The contract published exactly one input bound:
+
+```
+limits.maximumPromptCharacters = 4096      ← InferenceRequest (the LLM runtime)
+```
+
+`DTCA-1`'s validator accepts **10,000** (`DTCA1Worker.validateInput`; the DTCA-1 specification in
+`phase-05-transfer-contract-proposal.md` caps input at "10,000 characters (10 KB)").
+
+**Nothing in the contract expressed that the published limit applied only to the LLM, and nothing
+published DTCA-1's own bound.** A planner reading the contract would cap DTCA-1 input at 4,096 —
+understating the workload's real capacity by more than half, for no reason.
+
+The direction of the error matters: it was **under-permissive, not falsely permissive**. No
+workload advertised a bound it would not honour. PixelDesktop still validated every request, so
+nothing unsafe was reachable — but the field's stated purpose (*"published so a planner can respect
+them rather than discover them by refusal"*) was defeated for the workload the project intends to
+expose first.
+
+## A2.2 What the field actually is
+
+Established from three independent sources, not inferred:
+
+| Source | Evidence |
+|---|---|
+| Declaration site | The constants live inside `InferenceRequest`, documented as *"A single bounded generation request… ADR-012 §6: no conversation, no tools, no memory, no RAG, no network."* |
+| The contract's own provenance table | `phase-07-step-1-capability-contract.md` records `limits.maximumPromptCharacters` ← **`InferenceRequest`** |
+| The contract's own doc comment | `RequestLimits` is *"the existing `InferenceRequest` validation limits"* |
+
+**`maximumPromptCharacters` is the LLM runtime's request limit.** It was never a device-wide or
+workload-wide bound, and it is not applicable to DTCA-1.
+
+## A2.3 The correction
+
+Each bound moves to the workload that owns it.
+
+```swift
+struct Workload {
+    let name: String
+    let requiresModel: Bool
+    let requiresRuntime: Bool
+    let exactlyVerifiable: Bool
+    let maximumInputCharacters: CapabilityValue<Int>?   // NEW
+}
+```
+
+| Workload | Bound | Derived from |
+|---|---|---|
+| `DTCA-1` | 10,000 | `DTCA1Worker.maximumInputCharacters` (new named constant) |
+| `LOCAL-LLM-1` | 4,096 | `InferenceRequest.maximumPromptCharacters` |
+
+`RequestLimits.maximumPromptCharacters` **keeps its existing meaning** and was not redefined. Its
+`limitation` string now states its scope explicitly, because the defect was as much a documentation
+failure as a data one.
+
+The DTCA-1 validator's bare `10_000` literal was replaced by the named constant so the published
+value and the enforced value are the *same* symbol. A restated limit can drift silently; a shared
+constant makes divergence a compile error.
+
+`contractVersion` bumped **1 → 2**, per the contract's own rule: *"Bumped when a field is added,
+removed, or changes meaning."*
+
+## A2.4 Options rejected, with reasons
+
+| Option | Verdict | Reason |
+|---|---|---|
+| **Redefine `maximumPromptCharacters` as workload-wide** | Rejected | Falsifies its documented derivation from `InferenceRequest`. The existing test `testRequestLimitsComeFromInferenceRequestNotFromNewPolicy` asserts that derivation and would have had to be falsified, not updated. |
+| **Change DTCA-1's validator to 4,096** | Rejected | Would falsify the DTCA-1 specification to make the contract pass. The contract must describe the system, not constrain it to a wrong value. |
+| **Have the future execution command accept 10,000 quietly** | Rejected | Makes the CLI the authority over the contract — the inversion §A1.4 exists to prevent. |
+| **Hardcode the limit into the Hermes skill** | Rejected | The skill must read the contract, never restate it. |
+| **A general constraint structure** | Rejected | Over-general for one real constraint. ADR-013 already withdrew `WorkloadDescriptor` with the instruction *"do not add a parallel type"*; adding a constraint hierarchy would be the same mistake with a new name. |
+| **No change; document the mismatch** | Rejected | The contract would keep publishing a bound a planner cannot use, and the defect would recur at the next workload. |
+
+## A2.5 Consequences
+
+- A planner can now read the correct input bound for the workload it intends to use, and can detect
+  a version-1 contract where those bounds do not exist.
+- The contract-wide `limits` remains truthful for the LLM and is explicitly scoped in its
+  limitation.
+- **No existing assertion was weakened.** The three pinning assertions on `limits` still pass
+  unchanged, because nothing about the LLM limit changed. That is the strongest argument for this
+  option over the alternatives.
+- One pre-existing test did require correction: `testContractIsIndependentOfTheUIAndOfHermes`
+  hardcoded `contractVersion == 1`. That literal duplicated `currentVersion` and was not a
+  guarantee about the behaviour the test names. It now derives from `currentVersion`, so it cannot
+  go stale again. The version's *value* is asserted in `testContractCarriesItsVersion`.
+
+## A2.6 What this amendment does not authorise
+
+This is a **contract correction only**. It does not authorise execution. No `run` command, no
+exposure of DTCA-1 execution, no change to the E1 transport, no change to `WorkerStreamRunner`,
+no change to cancellation, and no change to either workload's real behaviour (DTCA-1 still accepts
+10,000; the LLM still accepts 4,096).
+
+## A2.7 Future reconsideration conditions
+
+- **If a third workload is added** → it must publish its own bound, derived from its own validator.
+  A workload whose validator exposes no bound publishes `.unknown`, and the value key is absent.
+- **If a workload genuinely accepts unbounded input** → that is a different and more serious
+  statement than "the bound is not published", and must not be expressed as `nil`.
+- **If more than one constraint per workload appears** (e.g. a byte cap alongside a character cap)
+  → reconsider a per-workload constraint structure *then*, with evidence, rather than now.

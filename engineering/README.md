@@ -25,7 +25,8 @@ This directory contains all engineering documentation for the PixelDesktop proje
 **Phase 5 — Pixel Compute Worker:** transfer contract COMPLETE; worker APK (D8) IMPLEMENTED and verified on device
 **Phase 6 — Local AI Worker:** FIRST INFERENCE PROOF COMPLETE — real LLM inference on the Pixel 7a
 **Phase 7 — Pixel Capability Contract & Hermes Workload Planning:** **Steps 1–3 COMPLETE** (capability contract + measured evidence + refusal path). Step 3 resolved S3-1..S3-4: typed worker refusal, typed `.timeout`, `.cancelled` reserved (not faked), `.deviceUnauthorized` surfaced. 349 tests, 0 failures. Real-device verification NOT performed — no device attached (recorded)
-**Phase 9 — Hermes Integration:** **Step 1 COMPLETE** — read-only publication interface. A third target (`pixel-desktop`) publishes the existing capability contract and evidence as JSON. `capability` needs no device and performs no device I/O; `observe` reads device state read-only. No execution, no listener, no daemon. 372 tests, 0 failures. Real-device verification NOT RUN — no device attached (recorded)
+**Phase 7 Amendment 2 — Workload-owned input limits:** **IMPLEMENTED** (discovered by Phase 9 Step 3A). Each workload now publishes its own input bound (`Workload.maximumInputCharacters`), derived from the validator that enforces it. `contractVersion` 1 → 2. `RequestLimits.maximumPromptCharacters` unchanged in meaning — it is the LLM's limit, not a workload-wide bound. 390 tests, 0 failures.
+**Phase 9 — Hermes Integration:** **Steps 1–2 COMPLETE; Step 3 recon complete** — read-only publication interface. A third target (`pixel-desktop`) publishes the existing capability contract and evidence as JSON. `capability` needs no device and performs no device I/O; `observe` reads device state read-only. No execution, no listener, no daemon. 372 tests, 0 failures. Real-device verification NOT RUN — no device attached (recorded)
 
 > Phase numbering follows the master engineering prompt §16 — see
 > [ADR-007](decisions/ADR-007-authoritative-phase-sequence.md) and its **Amendment 1**
@@ -58,6 +59,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 7 Step 1 — The Pixel Capability Contract](phases/phase-07-step-1-capability-contract.md) — **implemented**: contract, provenance model, real-device verification
 - [Phase 7 Step 2 — Measured Evidence](phases/phase-07-step-2-evidence.md) — **implemented**: device state, execution evidence, freshness, snapshot-not-reservation
 - [Phase 7 Step 3 — The Refusal Path](phases/phase-07-step-3-refusal-path.md) — **implemented**: 8 tests; found 3 unreachable error cases + 1 erased structure; open decisions S3-1..S3-4 resolved
+- [Phase 9 Step 3A — Contract Fidelity + Phase 7 Amendment 2](phases/phase-09-step-3a-contract-fidelity.md) — **implemented**: per-workload input bounds, contractVersion 2
 - [Phase 9 Step 1 — The Read-Only Publication Interface](phases/phase-09-step-1-publication-interface.md) — **implemented**: `pixel-desktop` CLI, two commands, 23 tests, absent-never-zero presentation rule
 
 ### Architecture

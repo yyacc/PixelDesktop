@@ -334,7 +334,11 @@ final class PixelCapabilityContractTests: XCTestCase {
         // The contract must be constructible and serialisable with no UI, no AppState, and no
         // Hermes present. This test passing at all is the proof: it imports nothing else.
         let c = contract()
-        XCTAssertEqual(c.contractVersion, 1)
+        // Derived, not a literal. This assertion previously hardcoded `1`, which duplicated
+        // `currentVersion` and went stale the moment the version was legitimately bumped
+        // (Phase 7 Amendment 2). The version's value is asserted in
+        // `testContractCarriesItsVersion`; what belongs *here* is that it is populated at all.
+        XCTAssertEqual(c.contractVersion, PixelCapabilityContract.currentVersion)
         XCTAssertFalse(c.workloads.isEmpty)
     }
 
