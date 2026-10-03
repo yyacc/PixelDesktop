@@ -68,6 +68,14 @@ targets:
       # compiles the same `PixelDesktop/` sources, so linking both would put two copies of every
       # shared type in one module and make every bare type reference ambiguous.
       - path: PixelDesktopCLI/CLIJSONPresentation.swift
+      # Also compiled into the test bundle so the `run` command's outcome mapping and its path
+      # through `WorkerStreamRunner` can be exercised against the existing E1 test seam, rather
+      # than mocked with a parallel execution architecture.
+      - path: PixelDesktopCLI/CLIRunResult.swift
+      - path: PixelDesktopCLI/CLIRunCommand.swift
+      - path: PixelDesktopCLI/CLIDeviceSelection.swift
+      - path: PixelDesktopCLI/CLIEnvelope.swift
+      - path: PixelDesktopCLI/CLIInvocation.swift
     dependencies:
       - target: PixelDesktop
     settings:

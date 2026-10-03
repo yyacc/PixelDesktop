@@ -908,6 +908,42 @@
       "task_id": "phase-09-step-3a",
       "purpose": "Phase 9 Step 3A recon + Phase 7 Amendment 2 record",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIRunCommand.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-4",
+      "purpose": "The run command: workload resolution, input validation, E1 invocation",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIRunResult.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-4",
+      "purpose": "Structured execution result and evidence",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase9RunTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-4",
+      "purpose": "Phase 9 Step 4 tests incl. execution-integration via the E1 seam",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-4-execution-boundary.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-03T00:00:00Z",
+      "phase": 9,
+      "task_id": "phase-09-step-4",
+      "purpose": "Phase 9 Step 4 engineering log",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [

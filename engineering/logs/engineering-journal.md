@@ -2015,3 +2015,72 @@ that the field is now sourced from the same symbol the validator uses, so the tw
 The correction is **Phase 7** work. **Phase 9 remains the consumer phase.** This amendment does not
 authorise execution — no `run` command, no E1 change, no `WorkerStreamRunner` change. **Phase 9
 Step 4 has NOT started.**
+
+---
+
+## 2026-10-03 — Phase 9 Step 4: the DTCA-1 execution boundary
+
+**Baseline:** 390 tests @ `c6d1cd4` → **416 tests, 0 failures, 15 skipped.**
+**Scope:** DTCA-1 only. `LOCAL-LLM-1` deferred.
+
+### What was built
+
+One command: `pixel-desktop run --workload DTCA-1 --input-file <path> --json`. A thin invocation
+boundary over the **existing** E1 machinery — no new execution path, no new transport, no polling.
+
+### The seam, found by reading before writing
+
+`WorkerStreamRunner.run(deviceSerial:jobId:payload:)` was already the proven entry point. The new
+code is resolution, validation, and presentation; **nothing in the execution path was written for
+this step**. `WorkerComputeProof` was deliberately not used — it is the older push-and-poll path.
+
+### Three defects the tests caught
+
+All three would have shipped against a purpose-built mock, which is why the tests drive the
+**existing E1 `MockTransport` seam** rather than a parallel double:
+
+1. **A worker refusal was reported as success.** The E1 reducer never inspects the payload, so a
+   worker `FAILED` envelope arrives as a *cleanly completed stream*. The first version returned
+   `ok: true`. Fixed: a decoded refusal takes precedence over the stream outcome.
+2. **`outcome` could read `completed` alongside `ok: false`** — two contradictory claims in one
+   envelope. Fixed: a refusal names the outcome `failed`; stream detail stays in `evidence`.
+3. **The mock echoed a hardcoded job id**, so the ownership check rejected the result as foreign.
+   That was the check *working* — and it confirmed `resultBelongsToJob` is load-bearing.
+
+### Design choices worth recording
+
+- **Validation is delegated, not restated.** The CLI calls `DTCA1Worker.validateInput`. Restating
+  DTCA-1's rules would recreate the drift Phase 7 Amendment 2 had just corrected.
+- **Input is read verbatim.** Not trimmed or normalised, so a result stays verifiable against what
+  was submitted.
+- **Forbidden flags are rejected by name.** Silently ignoring `--device` would leave a caller
+  believing it had selected a device — worse than a refusal.
+- **No `--timeout`.** The existing 120 s stall detector applies; it bounds *quiet*, not duration.
+- **Cancellation untouched.** `.cancelled` remains reserved; E1 §8 stands.
+
+### Verification
+
+- `capability` exit 0 (contract v2), `observe` exit 1 `device_not_found`, `run` exit 1
+  `device_not_found` with `result: null` — real behaviour against the real detached state.
+- Input boundary verified against the **contract's published** bound, not a literal: exactly 10,000
+  accepted, 10,001 rejected naming the bound.
+- **Hermes consumption: PASS.** A clean-context probe discovered the CLI with no path supplied,
+  inspected capability and observe, selected DTCA-1, checked the input against the Amendment 2
+  field, invoked `run`, and consumed the structured result — citing `error.type` and distinguishing
+  a deterministic refusal from a transport failure. It did not parse prose as truth.
+
+### Real device: NOT RUN
+
+`adb devices -l` and `adb mdns services` both empty. The device-absent path is real; the populated
+execution path, independent Mac re-verification of a real result, and the live worker-refusal path
+are **unverified on hardware** and carried forward.
+
+### Lesson
+
+**A test double that agrees with your assumptions proves nothing.** All three defects were found by
+driving the real E1 machinery through its existing seam. The mock that "worked" was the one echoing
+a job id the code never sent — and the ownership check caught it, which is exactly what it is for.
+
+**Artifacts:** `phases/phase-09-step-4-execution-boundary.md`, `Phase9RunTests.swift`.
+
+**Phase 9 Step 5 is NOT authorized.**

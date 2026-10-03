@@ -16,6 +16,17 @@
 
 import Foundation
 
+// This file is compiled into two different modules: the `pixel-desktop` tool (where the shared
+// PixelDesktop sources are in the *same* module, so no import is needed) and the test bundle
+// (where they are a separate module). The conditional keeps both compiling from one source file
+// rather than forking a test-only copy that could drift.
+#if canImport(PixelDesktop)
+// `@testable` rather than a plain import: the shared types are `internal`, so a plain import
+// would find the module but not the types. In the tool target this branch is not compiled at all
+// (the shared sources are in the same module there).
+@testable import PixelDesktop
+#endif
+
 enum CLIDeviceSelection {
 
     /// Selects the serial of a connected device, or throws the error that describes why not.

@@ -21,6 +21,12 @@
 
 import Foundation
 
+// Compiled into both the `pixel-desktop` tool (same module as the shared sources) and the test
+// bundle (separate module), from one file.
+#if canImport(PixelDesktop)
+@testable import PixelDesktop
+#endif
+
 /// The publication envelope for every `pixel-desktop` command.
 ///
 /// `contract` and `observation` are deliberately separate fields rather than one merged
@@ -42,6 +48,13 @@ struct CLIEnvelope {
     let contract: PixelCapabilityContract?
     let observation: PixelStateObservation?
 
+    /// The structured result of one `run` invocation.
+    ///
+    /// Present only for the `run` command. Like `contract` and `observation`, the key is always
+    /// emitted (`null` when it does not apply) so a consumer never has to guess whether a missing
+    /// key means "not applicable" or "something went wrong".
+    let result: CLIRunResult?
+
     /// Fields deliberately not read, with the reason.
     ///
     /// Present so an omission is *stated* rather than left for the consumer to infer from a
@@ -57,6 +70,7 @@ struct CLIEnvelope {
         producedAt: Date = Date(),
         contract: PixelCapabilityContract? = nil,
         observation: PixelStateObservation? = nil,
+        result: CLIRunResult? = nil,
         notRead: [CLINotRead] = [],
         error: CLIErrorPayload? = nil
     ) {
@@ -66,6 +80,7 @@ struct CLIEnvelope {
         self.producedAt = producedAt
         self.contract = contract
         self.observation = observation
+        self.result = result
         self.notRead = notRead
         self.error = error
     }
@@ -88,12 +103,13 @@ extension CLIEnvelope: Encodable {
         case producedAt = "produced_at"
         case contract
         case observation
+        case result
         case notRead = "not_read"
         case error
     }
 
-    /// Encoded by hand so that `contract`, `observation`, `error` and `not_read` are always
-    /// **present** keys — `null` / `[]` when empty.
+    /// Encoded by hand so that `contract`, `observation`, `result`, `error` and `not_read` are
+    /// always **present** keys — `null` / `[]` when empty.
     ///
     /// Swift's synthesized conformance omits `nil` optionals entirely, which would make
     /// "no observation because this is the capability command" indistinguishable from
@@ -107,6 +123,7 @@ extension CLIEnvelope: Encodable {
         try container.encode(producedAt, forKey: .producedAt)
         try container.encode(contract, forKey: .contract)
         try container.encode(observation, forKey: .observation)
+        try container.encode(result, forKey: .result)
         try container.encode(notRead, forKey: .notRead)
         try container.encode(error, forKey: .error)
     }
