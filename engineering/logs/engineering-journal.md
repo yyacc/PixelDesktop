@@ -2084,3 +2084,63 @@ a job id the code never sent — and the ownership check caught it, which is exa
 **Artifacts:** `phases/phase-09-step-4-execution-boundary.md`, `Phase9RunTests.swift`.
 
 **Phase 9 Step 5 is NOT authorized.**
+
+---
+
+## 2026-10-03 — Phase 9 Step 4: real-device verification (hardware)
+
+**Verdict: PASS**, including independent Mac-side re-computation. HEAD `ac737875`.
+
+### Device
+
+`3C261JEHN25632`, authorized, **USB** (determined from the `usb:` token; `adb mdns services` empty,
+so not wireless). Serial read from `adb devices -l` and passed through the CLI's own selection —
+never hardcoded into the interface.
+
+### What ran
+
+`capability --json` exit 0 (contractVersion 2; DTCA-1 `maximumInputCharacters: 10000`, **distinct
+from** the global LLM limit of 4096 — Amendment 2 confirmed on a live contract). `observe --json`
+exit 0, fully populated, every snapshot field flagged NOT A RESERVATION.
+`run --workload DTCA-1 --input-file <179 chars> --json` exit 0, outcome `completed`, job
+`958CDD68-…`, 33 total / 23 unique words, top words the=6 fox=3 brown=2 dog=2 quick=2, wall 0.287 s.
+
+**Independent verification:** `ResultVerifier.verify` against `DTCA1Worker.execute` returned
+`verified: true`, `mismatches: []`. The CLI's `ok` field was not trusted, and the values were
+asserted directly so a verifier bug could not hide behind its own green light.
+
+### The failure, and why it is the good news
+
+The **first** hardware run failed. Two suites were run against the **same device concurrently**, and
+the E1 transfer contract uses **fixed paths** (`job.json`/`result.json`) — so they clobbered each
+other. The other suite's session-loss test left its own `result.json` on the device, and `run` found
+a **foreign** result, which `resultBelongsToJob` **correctly refused**.
+
+Re-run serially: 5/5 passed in 3.55 s, against 140 s of failure while overlapping.
+
+**The procedure was the defect; the ownership check caught it.** Recorded as an operational
+constraint: **device-gated suites must run serially — one device, fixed transfer paths.**
+
+### Regression
+
+Serial full suite **with the device attached**: **421 tests, 0 failures**. The count rose from 406
+to 421 because the 15 device-gated tests **actually ran** instead of skipping — including the E1
+harness's deliberate worker-kill, session-loss and `am force-stop` tests. No test weakened, skipped,
+or deleted.
+
+### Not performed
+
+The optional negative hardware test was not run: inducing a deterministic DTCA-1 refusal requires
+removing the worker or model, which is a device state change the brief forbids for this purpose.
+Refusal semantics are covered by the Step 4 scripted tests and by the foreign-result refusal
+observed here. `LOCAL-LLM-1` was not executed; no model was provisioned.
+
+### Lesson
+
+**A green suite run twice at once is not twice the evidence — it is one experiment destroying
+another.** The fixed-path transfer contract is deliberately narrow (ADR-010), which makes it
+unusually sensitive to concurrent use of the same device. The narrowness is right; running two
+suites at once was not. The refusal that resulted is the containment doing its job.
+
+**Artifacts:** `phases/phase-09-step-4-real-device-verification.md`,
+`Phase9HardwareVerificationTests.swift`.
