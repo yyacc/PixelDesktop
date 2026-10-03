@@ -155,6 +155,7 @@ enum CLIRunCommand {
             outcome: run.outcome,
             run: run,
             output: decoded.output,
+            inferenceOutput: decoded.inferenceOutput,
             workerRefusal: decoded.refusal
         )
 
@@ -166,8 +167,9 @@ enum CLIRunCommand {
     }
 
     /// What a decoded result payload yielded: a completed output, a refusal, or neither.
-    private struct DecodedResult {
+    struct DecodedResult {
         let output: DTCA1Result?
+        let inferenceOutput: InferenceResult?
         let refusal: PixelDesktopError?
     }
 
@@ -184,7 +186,7 @@ enum CLIRunCommand {
     ///
     /// - Parameter expectedSuccessToken: supplied by `run`, sourced from the workload's own
     ///   constant (`DTCA1Job.successResultToken`) rather than restated here.
-    private static func decodeResult(
+    static func decodeResult(
         from outcome: WorkerStreamOutcome,
         jobId: String,
         expectedSuccessToken: String
@@ -198,7 +200,7 @@ enum CLIRunCommand {
             // success, and the durability caveat travels in the error.
             json = payload
         default:
-            return DecodedResult(output: nil, refusal: nil)
+            return DecodedResult(output: nil, inferenceOutput: nil, refusal: nil)
         }
 
         guard WorkerStreamRunner.resultBelongsToJob(json, jobId: jobId) else {
@@ -218,6 +220,17 @@ enum CLIRunCommand {
                 reason: "Result is not a valid worker envelope: \(error.localizedDescription)")
         }
 
+        // Phase 9 Step 6: when the expected success token is LOCAL-LLM-1's ("OK"), attempt to
+        // decode as InferenceResult. This routes the LLM result shape through the CLI boundary
+        // without executing LOCAL-LLM-1. The WorkerResultEnvelope decode above succeeds because
+        // both shapes share the same wire keys for status and job_id; the InferenceResult decode
+        // is what distinguishes the LLM payload (text, token_ids, generated_tokens, etc.).
+        if expectedSuccessToken == InferenceResult.successResultToken,
+           let inferenceResult = try? JSONDecoder().decode(InferenceResult.self, from: data),
+           inferenceResult.status == .ok {
+            return DecodedResult(output: nil, inferenceOutput: inferenceResult, refusal: nil)
+        }
+
         // A FAILED envelope is a reported refusal carrying the worker's own structured category.
         // It is not a completed payload, and it is not a generic error: the category must survive
         // so a caller can tell MODEL_MISSING from INVALID_INPUT.
@@ -225,11 +238,12 @@ enum CLIRunCommand {
         // The success token is supplied by the caller from the workload's own constant
         // (Phase 7 Amendment 3) — this boundary compares, it does not decide.
         guard envelope.isCompleted(expectedSuccessToken: expectedSuccessToken) else {
-            return DecodedResult(output: nil, refusal: envelope.refusal)
+            return DecodedResult(output: nil, inferenceOutput: nil, refusal: envelope.refusal)
         }
 
         return DecodedResult(
             output: try envelope.asDTCA1Result(expectedSuccessToken: expectedSuccessToken),
+            inferenceOutput: nil,
             refusal: nil)
     }
 }

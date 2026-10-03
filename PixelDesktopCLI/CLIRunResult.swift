@@ -45,12 +45,20 @@ struct CLIRunResult: Encodable, Equatable {
     /// Stable token naming the `WorkerStreamOutcome` case that was observed.
     let outcome: String
 
-    /// The decoded result payload, present only when the worker reported this workload's own
-    /// success token (published as `Workload.successResultToken`).
+    /// The decoded DTCA-1 result payload, present only when the worker reported DTCA-1's own
+    /// success token (`"COMPLETED"`).
     ///
     /// Absent — not empty, not zeroed — when there is no result to report. A consumer must not
     /// read a missing payload as a result of any kind.
     let output: DTCA1Result?
+
+    /// The decoded LOCAL-LLM-1 inference result, present only when the worker reported
+    /// LOCAL-LLM-1's own success token (`"OK"`).
+    ///
+    /// This is the result-shape routing added in Phase 9 Step 6: the CLI boundary can decode
+    /// and publish the `InferenceResult` shape (including `text`, `token_ids`,
+    /// `generated_tokens`, and execution evidence) without executing LOCAL-LLM-1.
+    let inferenceOutput: InferenceResult?
 
     /// What the execution machinery observed while running the job.
     let evidence: CLIRunEvidence
@@ -61,6 +69,7 @@ struct CLIRunResult: Encodable, Equatable {
         outcome: WorkerStreamOutcome,
         run: WorkerStreamRunner.Run,
         output: DTCA1Result?,
+        inferenceOutput: InferenceResult? = nil,
         workerRefusal: PixelDesktopError? = nil
     ) {
         self.workload = workload
@@ -71,6 +80,7 @@ struct CLIRunResult: Encodable, Equatable {
         // outcome, and the stream-level detail stays in `evidence`.
         self.outcome = workerRefusal == nil ? CLIRunResult.token(for: outcome) : "failed"
         self.output = output
+        self.inferenceOutput = inferenceOutput
         self.evidence = CLIRunEvidence(run)
     }
 

@@ -95,6 +95,7 @@
 		F76C2625B9B1AA0520FADC18 /* InferenceEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */; };
 		FDAA05F49EF76C70E4EA5FBE /* Phase7Amendment2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F4DDF1638B3EED2B4092E7 /* Phase7Amendment2Tests.swift */; };
 		CAFEBABE0000000000000002 /* Phase7Amendment3PathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFEBABE0000000000000001 /* Phase7Amendment3PathTests.swift */; };
+		B0000000000000000000000000000002 /* Phase9Step6Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000000000001 /* Phase9Step6Tests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,6 +141,7 @@
 		8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledApp.swift; sourceTree = "<group>"; };
 		89F4DDF1638B3EED2B4092E7 /* Phase7Amendment2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7Amendment2Tests.swift; sourceTree = "<group>"; };
 		CAFEBABE0000000000000001 /* Phase7Amendment3PathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7Amendment3PathTests.swift; sourceTree = "<group>"; };
+		B0000000000000000000000000000001 /* Phase9Step6Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase9Step6Tests.swift; sourceTree = "<group>"; };
 		90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7EvidenceTests.swift; sourceTree = "<group>"; };
 		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F2AA1DB62A4E154B038DEB0 /* CLIDeviceSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIDeviceSelection.swift; sourceTree = "<group>"; };
@@ -347,6 +349,7 @@
 				4BB80C04344731006041936C /* Phase6InferenceTests.swift */,
 				89F4DDF1638B3EED2B4092E7 /* Phase7Amendment2Tests.swift */,
 				CAFEBABE0000000000000001 /* Phase7Amendment3PathTests.swift */,
+				B0000000000000000000000000000001 /* Phase9Step6Tests.swift */,
 				BDAA783B52EAF6DADE7A3ACC /* Phase7CapabilityContractTests.swift */,
 				DAC6788DDB017C6B88F28F6C /* Phase7DeviceEvidenceHarness.swift */,
 				90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */,
@@ -486,6 +489,7 @@
 				83BB4FAB62407EE3B74B8CB4 /* Phase6InferenceTests.swift in Sources */,
 				FDAA05F49EF76C70E4EA5FBE /* Phase7Amendment2Tests.swift in Sources */,
 				CAFEBABE0000000000000002 /* Phase7Amendment3PathTests.swift in Sources */,
+				B0000000000000000000000000000002 /* Phase9Step6Tests.swift in Sources */,
 				EE351D09DFE728DB6E40FBFC /* Phase7CapabilityContractTests.swift in Sources */,
 				733E8ACD972D747654978D05 /* Phase7DeviceEvidenceHarness.swift in Sources */,
 				0B94C65804A065FE4F58021B /* Phase7EvidenceTests.swift in Sources */,
