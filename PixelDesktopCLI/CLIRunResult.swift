@@ -45,7 +45,8 @@ struct CLIRunResult: Encodable, Equatable {
     /// Stable token naming the `WorkerStreamOutcome` case that was observed.
     let outcome: String
 
-    /// The decoded result payload, present only when the worker reported `COMPLETED`.
+    /// The decoded result payload, present only when the worker reported this workload's own
+    /// success token (published as `Workload.successResultToken`).
     ///
     /// Absent — not empty, not zeroed — when there is no result to report. A consumer must not
     /// read a missing payload as a result of any kind.

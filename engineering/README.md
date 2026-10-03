@@ -60,6 +60,7 @@ This directory contains all engineering documentation for the PixelDesktop proje
 - [Phase 7 Step 2 — Measured Evidence](phases/phase-07-step-2-evidence.md) — **implemented**: device state, execution evidence, freshness, snapshot-not-reservation
 - [Phase 7 Step 3 — The Refusal Path](phases/phase-07-step-3-refusal-path.md) — **implemented**: 8 tests; found 3 unreachable error cases + 1 erased structure; open decisions S3-1..S3-4 resolved
 - [Phase 9 Step 4 — Real-Device Verification](phases/phase-09-step-4-real-device-verification.md) — **PASS**: real `run` on the Pixel, independent Mac verification, 421/0 with the device attached
+- [Phase 9 Step 5 — Reconnaissance: the next capability](phases/phase-09-step-5-reconnaissance.md) — **recon complete**: LOCAL-LLM-1 blocked by 3 boundary defects; recommends closing them before adding a workload
 - [Phase 9 Step 4 — The DTCA-1 Execution Boundary](phases/phase-09-step-4-execution-boundary.md) — **implemented**: `run` command, E1 reused unchanged, 26 new tests
 - [Phase 9 Step 3A — Contract Fidelity + Phase 7 Amendment 2](phases/phase-09-step-3a-contract-fidelity.md) — **implemented**: per-workload input bounds, contractVersion 2
 - [Phase 9 Step 1 — The Read-Only Publication Interface](phases/phase-09-step-1-publication-interface.md) — **implemented**: `pixel-desktop` CLI, two commands, 23 tests, absent-never-zero presentation rule

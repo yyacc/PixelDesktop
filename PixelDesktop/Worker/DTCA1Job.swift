@@ -28,6 +28,15 @@ struct DTCA1Job: Codable, Equatable {
     /// than attempting it — an allowlist, not a dispatcher.
     static let workloadName = "DTCA-1"
 
+    /// The status token this workload's worker emits for a **successful** result.
+    ///
+    /// Owned here because it is a property of this workload's own worker (`Dtca1.java` writes
+    /// `status: "COMPLETED"`), not of the result boundary that decodes it. The capability contract
+    /// publishes it from this constant, so the published value and the worker's behaviour cannot
+    /// silently diverge. A different workload uses a different token — `LOCAL-LLM-1` emits `"OK"` —
+    /// which is why the generic boundary must never assume this one.
+    static let successResultToken = "COMPLETED"
+
     init(jobId: String, input: String) {
         self.jobId = jobId
         self.workload = Self.workloadName
@@ -65,7 +74,8 @@ struct WorkerResultEnvelope: Codable, Equatable {
     let errorType: String?
     let errorMessage: String?
 
-    // DTCA-1 payload — present only when status == "COMPLETED".
+    // DTCA-1 payload — present only on success, whose token is the workload's own
+    // (`Workload.successResultToken`); this type does not assume which token that is.
     let inputCharacters: Int?
     let totalWords: Int?
     let uniqueWords: Int?
@@ -90,14 +100,31 @@ struct WorkerResultEnvelope: Codable, Equatable {
         case executionDurationMs = "execution_duration_ms"
     }
 
-    var isCompleted: Bool { status == "COMPLETED" }
+    /// The status token `WorkerActivity` writes for a **failed** run, for every workload.
+    ///
+    /// Deliberately generic. Success is workload-owned (see `Workload.successResultToken`), but
+    /// failure is written once by the shared `WorkerActivity` — `{"status": "FAILED",
+    /// "error_type": ..., "error_message": ...}` — for DTCA-1 and LOCAL-LLM-1 alike. Modelling it
+    /// per workload would invent a distinction the worker does not make.
+    static let failureStatusToken = "FAILED"
+
+    /// Whether this envelope reports the success its caller's workload defines.
+    ///
+    /// - Parameter expectedSuccessToken: the token the requested workload's worker emits on
+    ///   success — supplied by the caller from the capability contract. There is deliberately no
+    ///   default and no stored token: this type must not know any workload, and a default would
+    ///   reintroduce exactly the coupling this replaced.
+    func isCompleted(expectedSuccessToken: String) -> Bool {
+        status == expectedSuccessToken
+    }
 
     /// Converts a completed envelope into the `DTCA1Result` the verifier consumes.
     ///
+    /// - Parameter expectedSuccessToken: as `isCompleted(expectedSuccessToken:)`.
     /// - Throws: `verificationFailed` when required fields are absent, rather than substituting
     ///   defaults — a result missing fields must not be silently coerced into a plausible one.
-    func asDTCA1Result() throws -> DTCA1Result {
-        guard isCompleted else {
+    func asDTCA1Result(expectedSuccessToken: String) throws -> DTCA1Result {
+        guard isCompleted(expectedSuccessToken: expectedSuccessToken) else {
             throw refusal
         }
         guard let inputCharacters,

@@ -170,14 +170,16 @@ struct WorkerComputeProof {
             throw ComputeProofError.staleResult(expected: jobId, actual: returnedJobId)
         }
 
-        let pixelResult = try envelope.asDTCA1Result()
+        let pixelResult = try envelope.asDTCA1Result(
+            expectedSuccessToken: DTCA1Job.successResultToken)
 
         // 10. Verify independently — re-run DTCA-1 locally (ADR-004). Never trust the worker.
         let localResult = try DTCA1Worker.execute(input)
         let verification = ResultVerifier.verify(
             pixelResult: pixelResult,
             localResult: localResult,
-            originalInput: input
+            originalInput: input,
+            expectedSuccessToken: DTCA1Job.successResultToken
         )
 
         return Evidence(

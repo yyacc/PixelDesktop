@@ -139,7 +139,7 @@ struct PixelCapabilityContract: Codable, Equatable, Sendable {
     ///   workload input bounds must check for version 2; under version 1 those bounds are not
     ///   published, and the contract-wide `limits.maximumPromptCharacters` is the LLM's limit
     ///   rather than a bound that applies to every workload.
-    static let currentVersion = 2
+    static let currentVersion = 3
 
     let contractVersion: Int
 
@@ -238,6 +238,25 @@ struct PixelCapabilityContract: Codable, Equatable, Sendable {
         /// genuinely accepts unbounded input would be a different and more serious statement than
         /// "the bound is not published", so the two are kept distinct.
         let maximumInputCharacters: CapabilityValue<Int>?
+
+        /// The status token this workload's worker writes for a **successful** result.
+        ///
+        /// ## Why the success token is per workload and the failure token is not
+        ///
+        /// Success is workload-owned: `DTCA-1`'s worker writes `"COMPLETED"` and `LOCAL-LLM-1`'s
+        /// writes `"OK"`. They are different components' vocabularies, and a boundary that assumed
+        /// either one would misread the other as a refusal. So each workload publishes its own.
+        ///
+        /// Failure is **not** workload-owned. Every workload's failure is written by the shared
+        /// `WorkerActivity`, which emits `"FAILED"` with `error_type` and `error_message` for all of
+        /// them. Modelling failure per workload would invent a distinction the worker does not make
+        /// and would fragment a genuinely shared vocabulary. The two are asymmetric on purpose, and
+        /// a consumer must not read this field as describing failure.
+        ///
+        /// Derived from the workload's own worker constant (`DTCA1Job.successResultToken`,
+        /// `InferenceResult.successResultToken`) rather than restated, so the published value and
+        /// the worker's behaviour cannot silently diverge.
+        let successResultToken: CapabilityValue<String>
     }
 
     let device: CapabilityValue<DeviceIdentity>
@@ -320,13 +339,26 @@ struct PixelCapabilityContract: Codable, Equatable, Sendable {
                             DTCA1Worker.maximumInputCharacters,
                             limitation: "Owned by the DTCA-1 validator that enforces it "
                                 + "(DTCA1Worker.validateInput), not restated here. DTCA-1 also "
-                                + "rejects null bytes, which this bound does not express.")),
+                                + "rejects null bytes, which this bound does not express."),
+                         successResultToken: .declared(
+                            DTCA1Job.successResultToken,
+                            limitation: "Success only. A failed DTCA-1 run is written by the shared "
+                                + "WorkerActivity as \"FAILED\" with error_type/error_message — the "
+                                + "failure token is worker-wide, not workload-owned, and is not "
+                                + "described by this field.")),
                 Workload(name: LlamaCppInferenceRuntime().workloadName, requiresModel: true,
                          requiresRuntime: true, exactlyVerifiable: false,
                          maximumInputCharacters: .declared(
                             InferenceRequest.maximumPromptCharacters,
                             limitation: "Owned by InferenceRequest.validate(), which also caps "
-                                + "generated tokens separately (see limits.maximumTokensCeiling).")),
+                                + "generated tokens separately (see limits.maximumTokensCeiling)."),
+                         successResultToken: .declared(
+                            InferenceResult.successResultToken,
+                            limitation: "Success only, and not an output-quality claim: ADR-012 §P7 "
+                                + "records that generative output is not verifiable by "
+                                + "re-computation, so this token says the runtime returned a result, "
+                                + "not that the result is correct. Failure is worker-wide, not "
+                                + "workload-owned.")),
             ]
         )
     }

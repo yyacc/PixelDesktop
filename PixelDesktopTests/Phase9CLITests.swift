@@ -355,12 +355,13 @@ final class Phase9CLIBinaryTests: XCTestCase {
                       "the published limitation must deny workload-wide scope")
     }
 
-    func testContractVersionIsTwoInPublishedJSON() throws {
+    func testContractVersionIsCurrentInPublishedJSON() throws {
         let result = try CLIRunner.run(["capability", "--json"])
         let json = try XCTUnwrap(result.json)
         let contract = try XCTUnwrap(json["contract"] as? [String: Any])
 
-        XCTAssertEqual(contract["contractVersion"] as? Int, 2)
+        XCTAssertEqual(contract["contractVersion"] as? Int,
+                       PixelCapabilityContract.currentVersion)
     }
 
     func testCapabilityPreservesProvenanceAndLimitations() throws {

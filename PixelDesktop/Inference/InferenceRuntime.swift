@@ -47,6 +47,23 @@ struct InferenceRequest: Equatable, Codable, Sendable {
     let temperature: Double
     let seed: Int
 
+    /// Explicit wire keys. **Not** decorative — the synthesized encoding would emit `jobId` and
+    /// `maxTokens`, and the Android worker reads `job_id` and `max_tokens`
+    /// (`LlmWorkload.execute`). A missing `max_tokens` is not an error on the device: the worker
+    /// falls back to its own default of 32 and reports no complaint, so the Mac would silently
+    /// receive a different request than the one it validated. Stating the keys here is what makes
+    /// the request self-describing rather than accidentally correct.
+    ///
+    /// The Swift property names are unchanged: this maps the wire spelling onto the semantic API,
+    /// not the other way round.
+    enum CodingKeys: String, CodingKey {
+        case jobId = "job_id"
+        case prompt
+        case maxTokens = "max_tokens"
+        case temperature
+        case seed
+    }
+
     static let maximumPromptCharacters = 4096
     static let maximumTokensCeiling = 256
 
@@ -136,6 +153,16 @@ struct InferenceResult: Equatable, Codable, Sendable {
     /// The model's own maximum trained context. A property of the model, not of our
     /// configuration — the two differ (2048 allocated vs 32768 trained) and both are useful.
     let trainedContextSizeTokens: Int?
+
+    /// The status token `LlmWorkload.java` writes for a **successful** inference (`"OK"`).
+    ///
+    /// Published by the capability contract for `LOCAL-LLM-1`, so the success token is owned by the
+    /// workload that produces it rather than assumed by the boundary that decodes it.
+    ///
+    /// Failure is deliberately **not** modelled this way: every workload's failure is written by
+    /// `WorkerActivity` as `"FAILED"` with `error_type` / `error_message`. The failure token is
+    /// genuinely worker-wide and stays generic.
+    static let successResultToken = "OK"
 
     enum Status: String, Codable, Sendable {
         case ok = "OK"

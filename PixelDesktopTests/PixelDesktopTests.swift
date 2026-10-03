@@ -146,7 +146,8 @@ final class PixelDesktopTests: XCTestCase {
         let verification = ResultVerifier.verify(
             pixelResult: pixelResult,
             localResult: localResult,
-            originalInput: input
+            originalInput: input,
+            expectedSuccessToken: DTCA1Job.successResultToken
         )
 
         XCTAssertTrue(verification.isVerified)
@@ -174,7 +175,8 @@ final class PixelDesktopTests: XCTestCase {
         let verification = ResultVerifier.verify(
             pixelResult: pixelResult,
             localResult: localResult,
-            originalInput: input
+            originalInput: input,
+            expectedSuccessToken: DTCA1Job.successResultToken
         )
 
         XCTAssertFalse(verification.isVerified)
@@ -201,7 +203,8 @@ final class PixelDesktopTests: XCTestCase {
         let verification = ResultVerifier.verify(
             pixelResult: pixelResult,
             localResult: localResult,
-            originalInput: input
+            originalInput: input,
+            expectedSuccessToken: DTCA1Job.successResultToken
         )
 
         XCTAssertFalse(verification.isVerified)
@@ -227,7 +230,8 @@ final class PixelDesktopTests: XCTestCase {
         let verification = ResultVerifier.verify(
             pixelResult: pixelResult,
             localResult: localResult,
-            originalInput: input
+            originalInput: input,
+            expectedSuccessToken: DTCA1Job.successResultToken
         )
 
         XCTAssertFalse(verification.isVerified)
@@ -2238,9 +2242,9 @@ final class WorkerComputeProofParsingTests: XCTestCase {
         let json = #"{"status":"COMPLETED","job_id":"j1","input_characters":5,"total_words":1,"unique_words":1,"top_words":[{"word":"hello","count":1}],"classification":"NATURAL_LANGUAGE","confidence":0.5,"execution_timestamp_ms":1,"execution_duration_ms":2}"#
         let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
 
-        XCTAssertTrue(envelope.isCompleted)
+        XCTAssertTrue(envelope.isCompleted(expectedSuccessToken: DTCA1Job.successResultToken))
         XCTAssertEqual(envelope.jobId, "j1")
-        let result = try envelope.asDTCA1Result()
+        let result = try envelope.asDTCA1Result(expectedSuccessToken: DTCA1Job.successResultToken)
         XCTAssertEqual(result.totalWords, 1)
         XCTAssertEqual(result.classification, "NATURAL_LANGUAGE")
     }
@@ -2252,8 +2256,8 @@ final class WorkerComputeProofParsingTests: XCTestCase {
         let json = #"{"status":"FAILED","job_id":"j1","error_type":"INVALID_INPUT","error_message":"unsupported workload"}"#
         let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
 
-        XCTAssertFalse(envelope.isCompleted)
-        XCTAssertThrowsError(try envelope.asDTCA1Result()) { error in
+        XCTAssertFalse(envelope.isCompleted(expectedSuccessToken: DTCA1Job.successResultToken))
+        XCTAssertThrowsError(try envelope.asDTCA1Result(expectedSuccessToken: DTCA1Job.successResultToken)) { error in
             guard case PixelDesktopError.workerRefused(let category, let message) = error else {
                 return XCTFail("got \(error)")
             }
@@ -2268,7 +2272,7 @@ final class WorkerComputeProofParsingTests: XCTestCase {
         let json = #"{"status":"FAILED","job_id":"j1","error_message":"malformed"}"#
         let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
 
-        XCTAssertThrowsError(try envelope.asDTCA1Result()) { error in
+        XCTAssertThrowsError(try envelope.asDTCA1Result(expectedSuccessToken: DTCA1Job.successResultToken)) { error in
             guard case PixelDesktopError.workerError(let message) = error else {
                 return XCTFail("got \(error)")
             }
@@ -2285,7 +2289,7 @@ final class WorkerComputeProofParsingTests: XCTestCase {
             let json = #"{"status":"FAILED","job_id":"j1","error_type":"\#(errorType)","error_message":"x"}"#
             let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
             do {
-                _ = try envelope.asDTCA1Result()
+                _ = try envelope.asDTCA1Result(expectedSuccessToken: DTCA1Job.successResultToken)
                 throw XCTSkip("expected a refusal")
             } catch let error as PixelDesktopError {
                 return error
@@ -2310,7 +2314,7 @@ final class WorkerComputeProofParsingTests: XCTestCase {
         let json = #"{"status":"COMPLETED","job_id":"j1","input_characters":5}"#
         let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
 
-        XCTAssertThrowsError(try envelope.asDTCA1Result()) { error in
+        XCTAssertThrowsError(try envelope.asDTCA1Result(expectedSuccessToken: DTCA1Job.successResultToken)) { error in
             guard case PixelDesktopError.verificationFailed = error else { return XCTFail("got \(error)") }
         }
     }

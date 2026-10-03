@@ -51,12 +51,17 @@ final class Phase7Amendment2Tests: XCTestCase {
 
     // MARK: - 1. Contract version
 
-    func testContractVersionIsTwoAfterTheAmendment() {
+    func testContractVersionIsAtLeastTwoAfterTheAmendment() {
         // The contract's own rule: bumped when a field is added. A consumer that reads
         // workload input bounds must be able to detect a version-1 contract, where those bounds
         // are absent and the only published limit belongs to the LLM.
-        XCTAssertEqual(PixelCapabilityContract.currentVersion, 2)
-        XCTAssertEqual(contract().contractVersion, 2)
+        //
+        // Amendment 2 introduced version 2; Amendment 3 added a further field and moved it to 3.
+        // The assertion is therefore "at least 2" — Amendment 2's guarantee — rather than a
+        // pinned literal, which would fail on every later amendment for no reason. Amendment 3
+        // pins the exact current version in its own suite.
+        XCTAssertGreaterThanOrEqual(PixelCapabilityContract.currentVersion, 2)
+        XCTAssertEqual(contract().contractVersion, PixelCapabilityContract.currentVersion)
     }
 
     // MARK: - 2. DTCA-1 publishes its own limit

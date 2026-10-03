@@ -225,8 +225,8 @@ final class WorkerStreamingTests: XCTestCase {
         // being fixed, and updating it is the deliberate act the pin was designed to force.
         let envelope = try JSONDecoder().decode(WorkerResultEnvelope.self, from: Data(json.utf8))
         XCTAssertEqual(envelope.errorType, errorType, file: file, line: line)
-        XCTAssertFalse(envelope.isCompleted, file: file, line: line)
-        XCTAssertThrowsError(try envelope.asDTCA1Result(), file: file, line: line) { error in
+        XCTAssertFalse(envelope.isCompleted(expectedSuccessToken: DTCA1Job.successResultToken), file: file, line: line)
+        XCTAssertThrowsError(try envelope.asDTCA1Result(expectedSuccessToken: DTCA1Job.successResultToken), file: file, line: line) { error in
             guard case PixelDesktopError.workerRefused(let category, let message) = error else {
                 return XCTFail("Expected workerRefused, got \(error)", file: file, line: line)
             }

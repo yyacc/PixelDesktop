@@ -104,7 +104,8 @@ final class Phase9HardwareVerificationTests: XCTestCase {
         let verification = ResultVerifier.verify(
             pixelResult: pixelResult,
             localResult: localResult,
-            originalInput: Self.verificationInput
+            originalInput: Self.verificationInput,
+            expectedSuccessToken: DTCA1Job.successResultToken
         )
 
         print("=== INDEPENDENT MAC VERIFICATION ===")

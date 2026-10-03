@@ -11,11 +11,24 @@ struct VerificationResult: Equatable {
 }
 
 enum ResultVerifier {
-    static func verify(pixelResult: DTCA1Result, localResult: DTCA1Result, originalInput: String) -> VerificationResult {
+    /// Compares the device's DTCA-1 result against a locally re-computed one.
+    ///
+    /// - Parameter expectedSuccessToken: the success token the requested workload's worker emits,
+    ///   supplied by the caller from the capability contract. This verifier deliberately holds **no
+    ///   workload knowledge** — it does not know which workload it is checking, and it must not
+    ///   start. The token is an input, not a constant, so the same verifier serves any workload
+    ///   whose result is exactly comparable.
+    static func verify(
+        pixelResult: DTCA1Result,
+        localResult: DTCA1Result,
+        originalInput: String,
+        expectedSuccessToken: String
+    ) -> VerificationResult {
         var mismatches: [String] = []
 
-        if pixelResult.status != "COMPLETED" {
-            mismatches.append("Status is not COMPLETED: \(pixelResult.status)")
+        if pixelResult.status != expectedSuccessToken {
+            mismatches.append(
+                "Status is not \(expectedSuccessToken): \(pixelResult.status)")
         }
 
         if pixelResult.inputCharacters != originalInput.count {

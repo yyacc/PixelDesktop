@@ -146,7 +146,8 @@ enum CLIRunCommand {
         // The durable result is authoritative. Decode it and confirm it belongs to this job
         // before reporting anything: a result file from a previous run is indistinguishable by
         // name alone, so the id echo is the ownership check (D9).
-        let decoded = try decodeResult(from: run.outcome, jobId: jobId)
+        let decoded = try decodeResult(from: run.outcome, jobId: jobId,
+                                      expectedSuccessToken: DTCA1Job.successResultToken)
 
         let result = CLIRunResult(
             workload: supportedWorkload,
@@ -174,7 +175,20 @@ enum CLIRunCommand {
     ///
     /// - Throws: `verificationFailed` when a payload exists but does not belong to this job, or
     ///   cannot be decoded. A payload that cannot be parsed is never trusted (ADR-004).
-    private static func decodeResult(from outcome: WorkerStreamOutcome, jobId: String) throws -> DecodedResult {
+    /// The published success token for the workload being run, read from the caller-supplied
+    /// token rather than looked up by name.
+    ///
+    /// The CLI resolves DTCA-1 only (the `run` command rejects any other workload up front), so the
+    /// token is the one DTCA-1 owns. The lookup is therefore passed through by the caller rather
+    /// than performed here: this keeps the *decode* boundary free of workload-name knowledge.
+    ///
+    /// - Parameter expectedSuccessToken: supplied by `run`, sourced from the workload's own
+    ///   constant (`DTCA1Job.successResultToken`) rather than restated here.
+    private static func decodeResult(
+        from outcome: WorkerStreamOutcome,
+        jobId: String,
+        expectedSuccessToken: String
+    ) throws -> DecodedResult {
         let json: String
         switch outcome {
         case .completed(let payload, _), .recoveredFromDevice(let payload, _):
@@ -207,10 +221,15 @@ enum CLIRunCommand {
         // A FAILED envelope is a reported refusal carrying the worker's own structured category.
         // It is not a completed payload, and it is not a generic error: the category must survive
         // so a caller can tell MODEL_MISSING from INVALID_INPUT.
-        guard envelope.isCompleted else {
+        //
+        // The success token is supplied by the caller from the workload's own constant
+        // (Phase 7 Amendment 3) — this boundary compares, it does not decide.
+        guard envelope.isCompleted(expectedSuccessToken: expectedSuccessToken) else {
             return DecodedResult(output: nil, refusal: envelope.refusal)
         }
 
-        return DecodedResult(output: try envelope.asDTCA1Result(), refusal: nil)
+        return DecodedResult(
+            output: try envelope.asDTCA1Result(expectedSuccessToken: expectedSuccessToken),
+            refusal: nil)
     }
 }
