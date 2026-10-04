@@ -1,5 +1,35 @@
 import Foundation
 
+/// A mutable payload shared between two pipe-drain threads and the awaiting task.
+///
+/// Each pipe is drained by its own thread, so the two writes never contend with each other — but
+/// the reader does read both after the drain group completes, which establishes the happens-before.
+/// The lock is therefore about the Swift memory model rather than about racing writers.
+///
+/// This type exists only because Swift has no `DispatchGroup`-combined tuple return: the drain
+/// results have to land somewhere the awaiting task can read them from.
+private final class PipePayloads: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _stdout = Data()
+    private var _stderr = Data()
+
+    func setStdout(_ data: Data) {
+        lock.lock(); _stdout = data; lock.unlock()
+    }
+
+    func setStderr(_ data: Data) {
+        lock.lock(); _stderr = data; lock.unlock()
+    }
+
+    var stdout: Data {
+        lock.lock(); defer { lock.unlock() }; return _stdout
+    }
+
+    var stderr: Data {
+        lock.lock(); defer { lock.unlock() }; return _stderr
+    }
+}
+
 actor ADBTransport: TransportProtocol {
     private let adbPath: String
     private let defaultTimeout: TimeInterval
@@ -57,13 +87,52 @@ actor ADBTransport: TransportProtocol {
                     )
                 }
 
+                // Drain BOTH pipes while the child is still running.
+                //
+                // Reading only after `waitUntilExit()` deadlocks. The child's `write` blocks once
+                // it has filled the pipe's buffer (65,536 bytes on macOS — measured, not assumed),
+                // so it never exits, so the wait never returns. The timeout task eventually kills
+                // it and the output is truncated to exactly one buffer.
+                //
+                // Reachability, stated precisely (corrected after an earlier draft of this comment
+                // overstated it): `execute()` is reached in production by `listDevices`,
+                // `getprop`, `push`, `pull`, `install`, `shell`, and `getSystemProperties`. Of
+                // those, the ones that can carry device-controlled volume are `shell` (whose
+                // callers include `PixelEvidence`'s combined reads and `WorkerStreamRunner`'s
+                // `cat result.json` during F7 recovery) and `getSystemProperties` (53,721 bytes
+                // measured — 82% of the buffer).
+                //
+                // `getSystemProperties` is currently reached only through
+                // `DeviceManager.enrichDevice`, which has no non-test caller yet, so that specific
+                // chain is latent rather than active. The defect is nonetheless real and one
+                // command away from firing: any read whose device-side output exceeds the buffer
+                // deadlocks and truncates. Fixing it here, at the single shared chokepoint, is what
+                // keeps that from being a per-caller concern.
+                let payloads = PipePayloads()
+                let drain = DispatchGroup()
+
+                drain.enter()
+                DispatchQueue.global(qos: .userInitiated).async {
+                    payloads.setStdout(stdoutPipe.fileHandleForReading.readDataToEndOfFile())
+                    drain.leave()
+                }
+                drain.enter()
+                DispatchQueue.global(qos: .userInitiated).async {
+                    payloads.setStderr(stderrPipe.fileHandleForReading.readDataToEndOfFile())
+                    drain.leave()
+                }
+
                 process.waitUntilExit()
 
-                let stdoutData = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
-                let stderrData = stderrPipe.fileHandleForReading.readDataToEndOfFile()
+                // The child has exited, so its write ends are closed and both drains observe EOF
+                // immediately. Bounded anyway: a grandchild that inherited a write end could hold
+                // the pipe open, and an unbounded wait here would reintroduce the very hang this
+                // removes. On that (unreachable in practice) timeout the stream is reported as far
+                // as it was drained rather than blocking the caller.
+                _ = drain.wait(timeout: .now() + 2.0)
 
-                let stdout = String(data: stdoutData, encoding: .utf8) ?? ""
-                let stderr = String(data: stderrData, encoding: .utf8) ?? ""
+                let stdout = String(data: payloads.stdout, encoding: .utf8) ?? ""
+                let stderr = String(data: payloads.stderr, encoding: .utf8) ?? ""
 
                 return TransportResult(
                     exitCode: process.terminationStatus,
