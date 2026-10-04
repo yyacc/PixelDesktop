@@ -16,6 +16,11 @@ import Foundation
 
 /// The identity of an inference runtime, recorded in evidence so a result can be attributed to
 /// a specific runtime rather than to "inference" in the abstract.
+///
+/// The Android worker (`LlamaBridge.nativeRuntimeInfo`) returns runtime identity as a single
+/// string: `"llama.cpp a868c3e backend=cpu"`. This type decodes both that legacy string form
+/// and the structured object form, so a result from either worker shape is accepted without
+/// requiring an Android-side change.
 struct InferenceRuntimeIdentity: Equatable, Codable, Sendable {
     /// Short stable name, e.g. `llama.cpp`.
     let name: String
@@ -24,11 +29,64 @@ struct InferenceRuntimeIdentity: Equatable, Codable, Sendable {
     /// The compute backend actually used. Phase 6 is CPU-only by decision (ADR-012 §11).
     let backend: String
 
+    /// Memberwise initializer. Required because the presence of a custom `init(from:)`
+    /// suppresses Swift's automatic memberwise initializer synthesis.
+    init(name: String, version: String, backend: String) {
+        self.name = name
+        self.version = version
+        self.backend = backend
+    }
+
     static let llamaCppCPU = InferenceRuntimeIdentity(
         name: "llama.cpp",
         version: LlamaCppRuntime.pinnedVersion,
         backend: "cpu"
     )
+
+    /// Decodes from either a legacy string (`"llama.cpp a868c3e backend=cpu"`) or a
+    /// structured object (`{"name":..., "version":..., "backend":...}`).
+    ///
+    /// The string form is the one the current worker emits; the object form is the one
+    /// this type's `Codable` synthesis would normally expect. Supporting both keeps the
+    /// decode boundary tolerant of worker versions without requiring the worker to change.
+    init(from decoder: Decoder) throws {
+        if let container = try? decoder.singleValueContainer(),
+           let stringValue = try? container.decode(String.self) {
+            // Legacy string form: "llama.cpp a868c3e backend=cpu"
+            // Split into [name, version, key=value]
+            let parts = stringValue.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
+            if parts.count == 3, String(parts[2]).starts(with: "backend=") {
+                self.name = String(parts[0])
+                self.version = String(parts[1])
+                self.backend = String(String(parts[2]).dropFirst("backend=".count))
+            } else {
+                // Fall back: everything is the name, version/backend unknown
+                self.name = stringValue
+                self.version = "unknown"
+                self.backend = "unknown"
+            }
+            return
+        }
+
+        // Structured object form
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.version = try container.decode(String.self, forKey: .version)
+        self.backend = try container.decode(String.self, forKey: .backend)
+    }
+
+    /// Encodes as a structured object. The worker only sends the string form, so this
+    /// direction is used only if the type is ever re-encoded on the Mac side (not currently).
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(version, forKey: .version)
+        try container.encode(backend, forKey: .backend)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case name, version, backend
+    }
 }
 
 /// A single bounded generation request.

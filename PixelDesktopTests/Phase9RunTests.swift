@@ -105,7 +105,7 @@ final class Phase9RunCommandTests: XCTestCase {
         let original = "  leading, trailing  \n\nand a newline\t\n"
         let path = try temporaryInput(original)
 
-        let loaded = try CLIRunCommand.loadInput(from: path)
+        let loaded = try CLIRunCommand.loadInput(from: path, workload: DTCA1Job.workloadName)
         XCTAssertEqual(loaded, original, "input must be read byte-for-byte, not normalised")
     }
 
@@ -122,14 +122,14 @@ final class Phase9RunCommandTests: XCTestCase {
             contract.workloads.first { $0.name == "DTCA-1" }?.maximumInputCharacters?.value)
 
         let path = try temporaryInput(String(repeating: "a", count: published))
-        XCTAssertNoThrow(try CLIRunCommand.loadInput(from: path),
+        XCTAssertNoThrow(try CLIRunCommand.loadInput(from: path, workload: DTCA1Job.workloadName),
                          "input exactly at the published bound must be accepted")
     }
 
     func testInputOneCharacterOverThePublishedBoundIsRejected() throws {
         let path = try temporaryInput(String(repeating: "a", count: DTCA1Worker.maximumInputCharacters + 1))
 
-        XCTAssertThrowsError(try CLIRunCommand.loadInput(from: path)) { error in
+        XCTAssertThrowsError(try CLIRunCommand.loadInput(from: path, workload: DTCA1Job.workloadName)) { error in
             guard case PixelDesktopError.invalidInput(let message) = error else {
                 return XCTFail("expected invalidInput, got \(error)")
             }
@@ -140,11 +140,11 @@ final class Phase9RunCommandTests: XCTestCase {
 
     func testNullByteInputIsRejected() throws {
         let path = try temporaryInput("has a \0 null byte")
-        XCTAssertThrowsError(try CLIRunCommand.loadInput(from: path))
+        XCTAssertThrowsError(try CLIRunCommand.loadInput(from: path, workload: DTCA1Job.workloadName))
     }
 
     func testMissingFileIsAStructuredInvalidInput() throws {
-        XCTAssertThrowsError(try CLIRunCommand.loadInput(from: "/nonexistent/\(UUID().uuidString)")) { error in
+        XCTAssertThrowsError(try CLIRunCommand.loadInput(from: "/nonexistent/\(UUID().uuidString)", workload: DTCA1Job.workloadName)) { error in
             guard case PixelDesktopError.invalidInput = error else {
                 return XCTFail("expected invalidInput, got \(error)")
             }
@@ -158,13 +158,13 @@ final class Phase9RunCommandTests: XCTestCase {
         let path = try temporaryInput("hello world")
 
         do {
-            _ = try await CLIRunCommand.run(workload: "LOCAL-LLM-1", inputPath: path, transport: transport)
+            _ = try await CLIRunCommand.run(workload: "UNSUPPORTED-WORKLOAD", inputPath: path, transport: transport)
             XCTFail("expected a refusal")
         } catch {
             guard case PixelDesktopError.invalidInput(let message) = error else {
                 return XCTFail("expected invalidInput, got \(error)")
             }
-            XCTAssertTrue(message.contains("LOCAL-LLM-1"))
+            XCTAssertTrue(message.contains("UNSUPPORTED-WORKLOAD"))
             XCTAssertTrue(message.contains("DTCA-1"), "the refusal must name what IS supported")
         }
 

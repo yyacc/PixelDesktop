@@ -27,15 +27,16 @@ enum CLICommand: String, CaseIterable {
       pixel-desktop capability --json
       pixel-desktop observe --json
       pixel-desktop run --workload DTCA-1 --input-file <path> --json
+      pixel-desktop run --workload LOCAL-LLM-1 --input-file <path> --json
 
     COMMANDS
       capability   Publish the static capability contract. No device required, no device I/O.
       observe      Publish a point-in-time observation of the connected device.
-      run          Execute one bounded workload on the connected device and report the result.
+      run          Execute one bounded workload on the connected device and report the result,
 
     OPTIONS
       --json                  Emit JSON on stdout. Required.
-      --workload <name>       (run) The workload to execute. Currently exactly one is supported.
+      --workload <name>       (run) The workload to execute. Supported: DTCA-1, LOCAL-LLM-1.
       --input-file <path>     (run) Path to the UTF-8 input file. Read verbatim, never modified.
 
     EXIT STATUS

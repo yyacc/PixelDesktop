@@ -36,13 +36,13 @@ import Foundation
 
 enum CLIRunCommand {
 
-    /// The one workload this step exposes.
+    /// The workloads this command exposes.
     ///
-    /// Deliberately a single named case rather than a registry. `LOCAL-LLM-1` is deferred: it
-    /// requires a provisioned model and is not exactly verifiable, so exposing it would drag
-    /// model provisioning and a different verification story into the first execution boundary.
-    /// A workload that is not this one is a usage error, not an unimplemented feature.
-    static let supportedWorkload = DTCA1Job.workloadName
+    /// Deliberately a fixed set rather than a registry. `LOCAL-LLM-1` requires a provisioned
+    /// model and is not exactly verifiable, so it is gated behind the same preflight checks
+    /// as DTCA-1. A workload that is not in this set is a usage error, not an unimplemented
+    /// feature.
+    static let supportedWorkloads: Set<String> = [DTCA1Job.workloadName, LlmJob.workloadName]
 
     // MARK: - Input
 
@@ -57,7 +57,7 @@ enum CLIRunCommand {
     /// the result unverifiable against what was actually submitted.
     ///
     /// - Throws: `invalidInput` when the file cannot be read or the workload rejects its contents.
-    static func loadInput(from path: String) throws -> String {
+    static func loadInput(from path: String, workload: String) throws -> String {
         let url = URL(fileURLWithPath: (path as NSString).expandingTildeInPath)
 
         let data: Data
@@ -74,7 +74,20 @@ enum CLIRunCommand {
         }
 
         // The workload owns its own limits. Nothing is duplicated here.
-        try DTCA1Worker.validateInput(text)
+        if workload == DTCA1Job.workloadName {
+            try DTCA1Worker.validateInput(text)
+        } else if workload == LlmJob.workloadName {
+            // LOCAL-LLM-1: the InferenceRequest owns its own validation. We validate the
+            // prompt here so that invalid input is rejected before any device I/O.
+            let request = InferenceRequest(
+                jobId: LlmJob.newJobId(),
+                prompt: text,
+                maxTokens: 32,
+                temperature: 0.0,
+                seed: 0
+            )
+            try request.validate()
+        }
         return text
     }
 
@@ -99,12 +112,12 @@ enum CLIRunCommand {
         transport: TransportProtocol
     ) async throws -> (result: CLIRunResult, error: PixelDesktopError?) {
 
-        guard workload == supportedWorkload else {
+        guard supportedWorkloads.contains(workload) else {
             throw PixelDesktopError.invalidInput(
-                "Unsupported workload '\(workload)'. This interface exposes exactly one: \(supportedWorkload).")
+                "Unsupported workload '\(workload)'. This interface exposes: \(supportedWorkloads.sorted().joined(separator: ", ")).")
         }
 
-        let input = try loadInput(from: inputPath)
+        let input = try loadInput(from: inputPath, workload: workload)
 
         // Device selection is PixelDesktop's, not the caller's. This reuses the same rule the
         // application applies (device → unauthorized → offline → not found).
@@ -135,9 +148,28 @@ enum CLIRunCommand {
         }
 
         // The existing job representation and the existing id rules. No second format.
-        let jobId = DTCA1Job.newJobId()
-        let job = DTCA1Job(jobId: jobId, input: input)
-        let payload = try job.encoded()
+        let jobId: String
+        let payload: String
+        let expectedSuccessToken: String
+
+        if workload == DTCA1Job.workloadName {
+            jobId = DTCA1Job.newJobId()
+            let job = DTCA1Job(jobId: jobId, input: input)
+            payload = try job.encoded()
+            expectedSuccessToken = DTCA1Job.successResultToken
+        } else {
+            jobId = LlmJob.newJobId()
+            let request = InferenceRequest(
+                jobId: jobId,
+                prompt: input,
+                maxTokens: 32,
+                temperature: 0.0,
+                seed: 0
+            )
+            let job = LlmJob(request: request)
+            payload = try job.encoded()
+            expectedSuccessToken = LlmJob.successResultToken
+        }
 
         // The proven E1 path, unchanged.
         let runner = WorkerStreamRunner(transport: transport)
@@ -147,10 +179,10 @@ enum CLIRunCommand {
         // before reporting anything: a result file from a previous run is indistinguishable by
         // name alone, so the id echo is the ownership check (D9).
         let decoded = try decodeResult(from: run.outcome, jobId: jobId,
-                                      expectedSuccessToken: DTCA1Job.successResultToken)
+                                      expectedSuccessToken: expectedSuccessToken)
 
         let result = CLIRunResult(
-            workload: supportedWorkload,
+            workload: workload,
             jobId: jobId,
             outcome: run.outcome,
             run: run,
