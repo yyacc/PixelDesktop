@@ -98,52 +98,79 @@ struct WorkerStreamRunner {
         let start = Date()
         let elapsed = { Date().timeIntervalSince(start) }
 
+        // Cancellation is owned by the execution boundary (WorkerStreamRunner). The transport
+        // receives a CancellationHandle and is responsible for cleaning up its own resources
+        // (process, pipes) when cancellation is requested. The Android worker is NOT cancelled.
+        let cancellation = CancellationHandle()
+
         let exitCode: Int32
         do {
-            exitCode = try await transport.shellStreaming(
-                deviceSerial: deviceSerial,
-                command: script,
-                stdin: payload,
-                onLine: { line in
-                    lock.lock()
-                    defer { lock.unlock() }
+            exitCode = try await withTaskCancellationHandler {
+                try await transport.shellStreaming(
+                    deviceSerial: deviceSerial,
+                    command: script,
+                    stdin: payload,
+                    onLine: { line in
+                        lock.lock()
+                        defer { lock.unlock() }
 
-                    guard let event = WorkerEventParser.parse(line) else {
-                        // Not a protocol line. While a result is being collected the payload is
-                        // opaque JSON and belongs to the result; otherwise this is stray output
-                        // and is recorded so a script/parser mismatch stays visible.
-                        if reducer.isCollectingResult {
-                            reducer.apply(.resultLine(line))
-                        } else {
-                            reducer.apply(.unrecognized(line))
+                        guard let event = WorkerEventParser.parse(line) else {
+                            // Not a protocol line. While a result is being collected the payload is
+                            // opaque JSON and belongs to the result; otherwise this is stray output
+                            // and is recorded so a script/parser mismatch stays visible.
+                            if reducer.isCollectingResult {
+                                reducer.apply(.resultLine(line))
+                            } else {
+                                reducer.apply(.unrecognized(line))
+                            }
+                            return
                         }
-                        return
-                    }
 
-                    if firstEventAt == nil { firstEventAt = elapsed() }
-                    if case .launched = event, launchAckAt == nil { launchAckAt = elapsed() }
-                    if case .heartbeat(_, let pid) = event {
-                        heartbeats += 1
-                        if let pid { pidObserved = pid }
-                    }
+                        if firstEventAt == nil { firstEventAt = elapsed() }
+                        if case .launched = event, launchAckAt == nil { launchAckAt = elapsed() }
+                        if case .heartbeat(_, let pid) = event {
+                            heartbeats += 1
+                            if let pid { pidObserved = pid }
+                        }
 
-                    reducer.apply(event)
-                    if reducer.finalOutcome != nil, outcomeAt == nil { outcomeAt = elapsed() }
-                    onEvent?(event)
-                },
-                onStderrLine: { line in
-                    lock.lock()
-                    defer { lock.unlock() }
-                    stderrLines.append(line)
-                }
-            )
+                        reducer.apply(event)
+                        if reducer.finalOutcome != nil, outcomeAt == nil { outcomeAt = elapsed() }
+                        onEvent?(event)
+                    },
+                    onStderrLine: { line in
+                        lock.lock()
+                        defer { lock.unlock() }
+                        stderrLines.append(line)
+                    },
+                    cancellation: cancellation
+                )
+            } onCancel: {
+                cancellation.cancel()
+            }
         } catch {
             // The session failed to start at all. Nothing was observed, so the worker state is
             // genuinely unknown rather than assumed dead.
             lock.lock()
             reducer.streamEnded(workerAlive: nil, workerPid: nil, reason: error.localizedDescription)
             lock.unlock()
+            // If the failure was due to explicit cancellation, report it as such.
+            // Task.isCancelled is the authoritative signal: it is set synchronously by the
+            // Swift runtime when withTaskCancellationHandler's onCancel fires, regardless of
+            // whether the onCancel closure has finished executing.
+            if cancellation.isCancelled || Task.isCancelled {
+                throw PixelDesktopError.cancelled
+            }
             throw error
+        }
+
+        // If cancellation occurred during the streaming session, report it immediately.
+        // F7 durable-result recovery is intentionally skipped for explicit cancellation:
+        // the caller abandoned the job, and the worker may still complete independently.
+        // Task.isCancelled is the authoritative signal: it is set synchronously by the
+        // Swift runtime when withTaskCancellationHandler's onCancel fires, regardless of
+        // whether the onCancel closure has finished executing.
+        if cancellation.isCancelled || Task.isCancelled {
+            throw PixelDesktopError.cancelled
         }
 
         // The session is over. What the stream produced is now frozen; the only remaining question

@@ -450,7 +450,8 @@ actor RunTransport: TransportProtocol {
         command: String,
         stdin: String?,
         onLine: @Sendable @escaping (String) -> Void,
-        onStderrLine: @Sendable @escaping (String) -> Void
+        onStderrLine: @Sendable @escaping (String) -> Void,
+        cancellation: CancellationHandle
     ) async throws -> Int32 {
         streamingSessionCount += 1
         if let stdin { streamingPayloads.append(stdin) }

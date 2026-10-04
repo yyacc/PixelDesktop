@@ -369,7 +369,8 @@ final class Phase7StreamingDeviceHarness: XCTestCase {
             command: "echo PDE1 TEST1; sleep 0.3; echo PDE1 TEST2; echo TO_STDERR >&2",
             stdin: nil,
             onLine: { line in lock.lock(); lines.append(line); lock.unlock() },
-            onStderrLine: { line in lock.lock(); errs.append(line); lock.unlock() }
+            onStderrLine: { line in lock.lock(); errs.append(line); lock.unlock() },
+            cancellation: CancellationHandle()
         )
         lock.lock()
         let captured = lines
@@ -392,7 +393,8 @@ final class Phase7StreamingDeviceHarness: XCTestCase {
             command: "cat > /data/local/tmp/pd-stdin-probe.txt; echo PDE1 WROTE=$(wc -c < /data/local/tmp/pd-stdin-probe.txt | tr -d ' ')",
             stdin: "{\"hello\":\"world\"}",
             onLine: { line in lock2.lock(); lines2.append(line); lock2.unlock() },
-            onStderrLine: { _ in }
+            onStderrLine: { _ in },
+            cancellation: CancellationHandle()
         )
         lock2.lock()
         let captured2 = lines2

@@ -55,7 +55,8 @@ protocol TransportProtocol: AnyObject, Sendable {
         command: String,
         stdin: String?,
         onLine: @Sendable @escaping (String) -> Void,
-        onStderrLine: @Sendable @escaping (String) -> Void
+        onStderrLine: @Sendable @escaping (String) -> Void,
+        cancellation: CancellationHandle
     ) async throws -> Int32
 
     /// Copies a local file to the device via `adb -s <serial> push`.
@@ -107,6 +108,52 @@ struct TransportResult: Equatable {
 
     var isSuccess: Bool {
         exitCode == 0
+    }
+}
+
+/// A thread-safe cancellation signal passed from the execution boundary into the transport.
+///
+/// The transport layer owns process/pipe cleanup. The execution boundary owns the decision of
+/// *when* to cancel. This type is the bridge: it carries the cancellation signal without
+/// exposing any transport primitives upward.
+///
+/// Exactly-once handler semantics:
+/// - `setCancellationHandler` stores the handler. If cancellation already occurred, the handler
+///   is invoked immediately (synchronously, before `setCancellationHandler` returns).
+/// - `cancel` sets the flag and invokes the handler if one is registered.
+/// - The handler is invoked at most once: `cancel` clears the handler reference before invoking,
+///   so a subsequent `setCancellationHandler` will not double-invoke.
+final class CancellationHandle: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _isCancelled = false
+    private var _handler: (@Sendable () -> Void)?
+
+    /// Whether cancellation has been requested.
+    var isCancelled: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return _isCancelled
+    }
+
+    /// Registers a cleanup handler. If cancellation already occurred, the handler is invoked
+    /// immediately. The handler is guaranteed to execute at most once across the lifetime
+    /// of this handle.
+    func setCancellationHandler(_ handler: @escaping @Sendable () -> Void) {
+        lock.lock()
+        let wasCancelled = _isCancelled
+        _handler = handler
+        lock.unlock()
+        if wasCancelled { handler() }
+    }
+
+    /// Requests cancellation. If a handler is registered, it is invoked exactly once.
+    func cancel() {
+        lock.lock()
+        _isCancelled = true
+        let handler = _handler
+        _handler = nil
+        lock.unlock()
+        handler?()
     }
 }
 

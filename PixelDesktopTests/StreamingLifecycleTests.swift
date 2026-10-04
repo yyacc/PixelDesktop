@@ -128,7 +128,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "true",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
             return Date().timeIntervalSince(start)
         }
@@ -148,7 +149,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "exit 0",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
             return Date().timeIntervalSince(start)
         }
@@ -169,7 +171,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "printf 'alpha\\nbeta\\ngamma\\n'",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -188,7 +191,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "printf 'no-newline-at-end'",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -209,7 +213,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "sleep 600",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
             return Date().timeIntervalSince(start)
         }
@@ -232,7 +237,8 @@ final class StreamingLifecycleTests: XCTestCase {
                     + "{\"status\":\"OK\"}\\nPDE1 RESULT_END bytes=15\\n'",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -258,7 +264,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "printf 'PDE1 START job_id=j\\n'; exit 3",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -279,7 +286,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "sleep 600",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -308,7 +316,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "sleep 300",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
             return Date().timeIntervalSince(start)
         }
@@ -333,7 +342,8 @@ final class StreamingLifecycleTests: XCTestCase {
                     command: "printf 'x\\n'",
                     stdin: nil,
                     onLine: { collector.addOut($0) },
-                    onStderrLine: { collector.addErr($0) }
+                    onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
                 )
                 return Date().timeIntervalSince(start)
             }
@@ -356,7 +366,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "printf 'first\\n'; sleep 300",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
             return Date().timeIntervalSince(start)
         }
@@ -379,7 +390,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 // A trailing newline, so `cat` terminates its echo with one and DONE is its own line.
                 stdin: "{\"payload\":true}\n",
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -406,7 +418,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "cat; printf 'DONE\\n'",
                 stdin: "{\"payload\":true}",
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -425,7 +438,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "printf 'to-stdout\\n'; printf 'to-stderr\\n' >&2",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -447,7 +461,8 @@ final class StreamingLifecycleTests: XCTestCase {
                     + "i=$((i+1)); done",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
             return Date().timeIntervalSince(start)
         }
@@ -469,7 +484,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "printf 'a\\n\\nb\\n'",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -488,7 +504,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "printf 'one\\r\\ntwo\\r\\n'",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 
@@ -520,7 +537,8 @@ final class StreamingLifecycleTests: XCTestCase {
                         command: command,
                         stdin: nil,
                         onLine: { collector.addOut($0) },
-                        onStderrLine: { collector.addErr($0) }
+                        onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
                     )
                     return Date().timeIntervalSince(start)
                 }
@@ -546,7 +564,8 @@ final class StreamingLifecycleTests: XCTestCase {
                 command: "sleep 300 # \(marker)",
                 stdin: nil,
                 onLine: { collector.addOut($0) },
-                onStderrLine: { collector.addErr($0) }
+                onStderrLine: { collector.addErr($0) },
+                cancellation: CancellationHandle()
             )
         }
 

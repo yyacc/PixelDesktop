@@ -2472,15 +2472,22 @@ actor MockTransport: TransportProtocol {
         command: String,
         stdin: String?,
         onLine: @Sendable @escaping (String) -> Void,
-        onStderrLine: @Sendable @escaping (String) -> Void
+        onStderrLine: @Sendable @escaping (String) -> Void,
+        cancellation: CancellationHandle
     ) async throws -> Int32 {
         streamingInvocations.append(command)
         lastStreamingStdin = stdin
 
         if let streamingError { throw streamingError }
 
-        for line in streamingLines { onLine(line) }
+        for line in streamingLines {
+            if cancellation.isCancelled || Task.isCancelled { break }
+            onLine(line)
+        }
         for line in streamingStderrLines { onStderrLine(line) }
+        if cancellation.isCancelled || Task.isCancelled {
+            throw PixelDesktopError.cancelled
+        }
         return streamingExitCode
     }
 

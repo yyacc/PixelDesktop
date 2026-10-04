@@ -255,8 +255,14 @@ actor ADBTransport: TransportProtocol {
         command: String,
         stdin: String?,
         onLine: @Sendable @escaping (String) -> Void,
-        onStderrLine: @Sendable @escaping (String) -> Void
+        onStderrLine: @Sendable @escaping (String) -> Void,
+        cancellation: CancellationHandle
     ) async throws -> Int32 {
+        // If cancellation already occurred before we started, do not launch a process.
+        if cancellation.isCancelled || Task.isCancelled {
+            throw PixelDesktopError.cancelled
+        }
+
         let process = Process()
         process.executableURL = URL(fileURLWithPath: adbPath)
         process.arguments = ["-s", deviceSerial, "shell", command]
@@ -337,12 +343,22 @@ actor ADBTransport: TransportProtocol {
             let state = StreamReadState()
             let queue = DispatchQueue(label: "pixeldesktop.adb.stdout")
 
+            // Register the cancellation handler. If cancellation already occurred before this
+            // registration, the handler is invoked immediately by setCancellationHandler.
+            // The handler closes the stdout handle to unblock a reader stuck in availableData,
+            // then resumes the continuation exactly once via StreamReadState.
+            cancellation.setCancellationHandler { [weak stdoutHandle] in
+                try? stdoutHandle?.close()
+                state.cancel()
+                state.finish(continuation)
+            }
+
             queue.async {
                 var buffer = Data()
                 while true {
                     let chunk = stdoutHandle.availableData
                     if chunk.isEmpty { break }
-                    if state.isCancelled { break }
+                    if state.isCancelled || cancellation.isCancelled { break }
                     buffer.append(chunk)
                     while let newline = buffer.firstIndex(of: 0x0A) {
                         let lineData = buffer[buffer.startIndex..<newline]
@@ -354,7 +370,7 @@ actor ADBTransport: TransportProtocol {
                         onLine(line)
                     }
                 }
-                if !state.isCancelled, !buffer.isEmpty {
+                if !state.isCancelled, !cancellation.isCancelled, !buffer.isEmpty {
                     var line = String(data: buffer, encoding: .utf8) ?? ""
                     if line.hasSuffix("\r") { line.removeLast() }
                     onLine(line)
