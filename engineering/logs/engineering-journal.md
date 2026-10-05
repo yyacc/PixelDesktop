@@ -2144,3 +2144,68 @@ suites at once was not. The refusal that resulted is the containment doing its j
 
 **Artifacts:** `phases/phase-09-step-4-real-device-verification.md`,
 `Phase9HardwareVerificationTests.swift`.
+...
+
+---
+
+## 2026-10-04 — Phase 8: PixelDesktop UX (COMPLETE)
+
+**Phase:** 8
+**Task:** Build the user-facing macOS application UI that reaches existing backend capabilities.
+**Baseline:** 421 tests (device verified) to 506 tests, 0 failures, 22 skipped.
+
+### The two defects this phase fixed
+
+Phase 8 wired the UI to capabilities that were already built and tested but unreachable from the
+app front door. The wiring code exposed two latent defects:
+
+1. **enrichDevice was never called from the Refresh path.** refreshDevices() discovered devices
+   but enrichment ran in a detached Task that nothing awaited, and self.devices was set from
+   deviceManager.devices while enrichment ran separately, so enriched values never reached
+   AppState.devices.
+
+2. **AppOperationsProtocol had no UI caller.** The operations layer existed and was tested in
+   Phase 4, but ContentView never called it.
+
+### The three bugs fixed in the implementation
+
+  Bug A: refreshDevices() used fireAndForget + Combine dispatch with no testable completion.
+    Fix: rewrote as async with direct assignment.
+  Bug B: enrichConnectedDevice ran before self.devices was populated, so selectedSerial was nil
+    and enrichment was skipped entirely.
+    Fix: set self.devices before enrichment, re-read after.
+  Bug C: enriched values never reached self.devices because DeviceManager.enrichDevice mutates
+    deviceManager.devices in place; self.devices is a separate copy.
+    Fix: two-read pattern — copy before enrichment (precondition) + copy after (result).
+
+### Test approach
+
+11 tests in Phase8UIWiringTests.swift covering: device selection, enrichment (success, failure,
+unauthorized), observation, app list (success, failure, guard), app launch (success, failure).
+
+Tests use await state.refreshDevices() then read state.devices directly — no XCTWaiter, no
+runloop pumps, no Combine expectations. Each test runs in 0.001-0.003 s.
+
+A new MockAppOperations double was added (the project had none because nothing outside Phase 4
+tests called AppOperationsProtocol).
+
+### Verification
+
+  Phase 8 tests: 11/11 pass in 0.020 s.
+  Full suite: 506 tests, 0 failures, 22 skipped (device-gated Phase 5/6/7 live tests).
+  No existing test was modified, skipped, or weakened.
+
+### Real-device verification: NOT RUN
+
+No device attached at write time. Enrichment is covered by 2 tests using captured real getprop
+output; observation and app-operation paths use mock transports. Live verification of enrichment
+against the Pixel 7a was completed in Phase 2/3 and is not re-done here.
+
+### Decision
+
+Phase 8 COMPLETE. The UI reaches every Phase 2-5 capability through AppState.
+
+### Artifacts
+
+phases/phase-08-ui-wiring.md, decisions/ADR-015-appstate-ui-bridge.md,
+Phase8UIWiringTests.swift, AppState.swift (refreshDevices enrichment wiring).

@@ -971,6 +971,33 @@
       "task_id": "phase-09-step-5-recon",
       "purpose": "Phase 9 Step 5 reconnaissance: next capability analysis",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-08-ui-wiring.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-04T00:00:00Z",
+      "phase": 8,
+      "task_id": "phase-08",
+      "purpose": "Phase 8 engineering log: UI wiring and AppState bridge",
+      "status": "complete"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-015-appstate-ui-bridge.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-04T00:00:00Z",
+      "phase": 8,
+      "task_id": "phase-08",
+      "purpose": "ADR-015: AppState as the UI-to-backend bridge with deterministic refresh postcondition",
+      "status": "accepted"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase8UIWiringTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-04T00:00:00Z",
+      "phase": 8,
+      "task_id": "phase-08",
+      "purpose": "Phase 8 UI wiring tests: selection, enrichment, observation, app operations",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [
