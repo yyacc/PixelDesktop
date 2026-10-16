@@ -27,6 +27,7 @@
 		31F8DF7D7DF82AC901DEF04E /* InferenceRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */; };
 		336E7BB5E988EE0A004A6E45 /* AndroidDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */; };
 		36F111FA96428A8E74355EF1 /* ExecutePipeDrainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3239BB5CC229AF3F421DAFDF /* ExecutePipeDrainTests.swift */; };
+		3A13977BBA18C467B8B4F6CA /* Phase8UIWiringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA0117ADBEC0C626A25A77E /* Phase8UIWiringTests.swift */; };
 		45D925383CFE970F56CB7F4C /* WorkerInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1E177AF6227A5996CA07B3 /* WorkerInstaller.swift */; };
 		46B691568BB1C10FE80DC973 /* AndroidDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */; };
 		49D97522C3361B3591FA899B /* Phase7StreamingDeviceHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A8789F3D4A63B4F363B829 /* Phase7StreamingDeviceHarness.swift */; };
@@ -158,6 +159,7 @@
 		B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
 		BB7B180883979E61C38D7ADD /* CLIRunResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIRunResult.swift; sourceTree = "<group>"; };
 		BBE3B397855A7BE312776A8E /* WorkerStreamProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamProtocol.swift; sourceTree = "<group>"; };
+		BDA0117ADBEC0C626A25A77E /* Phase8UIWiringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase8UIWiringTests.swift; sourceTree = "<group>"; };
 		BDAA783B52EAF6DADE7A3ACC /* Phase7CapabilityContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7CapabilityContractTests.swift; sourceTree = "<group>"; };
 		BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerOperationsProtocol.swift; sourceTree = "<group>"; };
 		C234D386B8952BA7EE0FF257 /* WorkerLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerLifecycle.swift; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 				DAC6788DDB017C6B88F28F6C /* Phase7DeviceEvidenceHarness.swift */,
 				90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */,
 				50A8789F3D4A63B4F363B829 /* Phase7StreamingDeviceHarness.swift */,
+				BDA0117ADBEC0C626A25A77E /* Phase8UIWiringTests.swift */,
 				EE19C379BC33CE1517BD0EAD /* Phase9CLITests.swift */,
 				3859822D7DBF379B94726ACB /* Phase9HardwareVerificationTests.swift */,
 				7C52620230E71F0F0AA482E2 /* Phase9RunTests.swift */,
@@ -508,6 +511,7 @@
 				733E8ACD972D747654978D05 /* Phase7DeviceEvidenceHarness.swift in Sources */,
 				0B94C65804A065FE4F58021B /* Phase7EvidenceTests.swift in Sources */,
 				49D97522C3361B3591FA899B /* Phase7StreamingDeviceHarness.swift in Sources */,
+				3A13977BBA18C467B8B4F6CA /* Phase8UIWiringTests.swift in Sources */,
 				4BF7F5B3E1FC9B1CF6E49A95 /* Phase9CLITests.swift in Sources */,
 				CE41F6DD526BFDD0841672A9 /* Phase9HardwareVerificationTests.swift in Sources */,
 				D1ABEE184209ACAF5263EFA6 /* Phase9RunTests.swift in Sources */,
