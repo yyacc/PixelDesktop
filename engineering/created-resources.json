@@ -998,6 +998,351 @@
       "task_id": "phase-08",
       "purpose": "Phase 8 UI wiring tests: selection, enrichment, observation, app operations",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/Ciel/design/reasoning-state/CR-4-reasoning-model.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-05T00:00:00Z",
+      "phase": "CR-4",
+      "task_id": "CR-4",
+      "purpose": "Ciel 4-layer reasoning architecture + working-state schema. MOVED out of PixelDesktop/engineering/phases/ to remove the phase-namespace collision.",
+      "status": "active",
+      "note": "Ciel reasoning-architecture project. NOT a PixelDesktop phase."
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/Ciel/design/reasoning-state/CR-7-mechanism-design-superseded.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-05T02:30:00Z",
+      "phase": "CR-7",
+      "task_id": "CR-7",
+      "purpose": "Mechanism design revision 1 (superseded by CR-7-mechanism-design.md rev 2 after design review). Retained as engineering history.",
+      "status": "superseded",
+      "note": "Ciel reasoning-architecture project. NOT a PixelDesktop phase."
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/Ciel/design/reasoning-state/CR-7-mechanism-design.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-05T03:10:00Z",
+      "phase": "CR-9",
+      "task_id": "CR-9",
+      "purpose": "Mechanism design revision 2: fixes G1 bootstrap/discovery, G2 integrity canonicalization, G3 numeric staleness, G4 compaction, G5 concurrency, G6 stall detection, C1 phase numbering, C2 namespace. Design only; no implementation.",
+      "status": "active",
+      "note": "Ciel reasoning-architecture project. NOT a PixelDesktop phase."
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityConfig.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Configurable service addresses; no hardcoded ports in views.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityError.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Typed observability errors; credential-free by construction.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ServiceStatus.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Per-service status: connected / authenticationRequired / unavailable / unknown.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/OpenCodeModels.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Session, message, agent, config and model decode types.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/SSEParser.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Byte-level Server-Sent Events parser (CRLF-correct).",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityHTTP.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Transport seam protocol + URLSession implementation.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/CredentialProvider.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Reads ~/.config/opencode/service.json on demand; never caches or logs.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/OpenCodeClient.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Read-only OpenCode client (GET only).",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ModelServerClient.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Read-only model-server client.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoObservabilityStore.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Observable state for the observability dashboard.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoDashboardView.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Dashboard shell and per-source status cards.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSessionViews.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Session list, detail and message views.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSourcePanelsView.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Models, agents, configuration and live-event panels.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ObservabilityFormat.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Absence-renders-as-absence presentation rules.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/RootView.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Workspace switcher; ContentView left untouched.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ObservabilityTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "45 offline tests: decoding, error classification, credential containment, SSE, config.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoObservabilityStoreTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "19 offline store tests: state transitions and source isolation.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ObservabilityLiveTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "4 opt-in live integration tests against the running services.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/design/zeno-observability-architecture.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Architecture and data-flow documentation for the observability MVP.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-016-zeno-observability-dashboard.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "ADR: read-only observability dashboard, source labelling, credential boundary.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-11-observability-mvp.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Phase 11 engineering log.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/PixelDesktopApp.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-09T00:00:00Z",
+      "phase": 11,
+      "task_id": "phase-11-observability",
+      "purpose": "Modified: injects ZenoObservabilityStore and presents RootView instead of ContentView.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoSQLiteModels.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 12,
+      "task_id": "phase-12-mvp12",
+      "purpose": "ZenoSession and ZenoSessionTodo models decoded from Zeno's SQLite store.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/SQLiteDatabaseReader.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 12,
+      "task_id": "phase-12-mvp12",
+      "purpose": "Read-only SQLite3 C API wrapper. Opens databases with SQLITE_OPEN_READONLY; no write path.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoSessionStoreAdapter.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 12,
+      "task_id": "phase-12-mvp12",
+      "purpose": "Maps Zeno SQLite rows to ZenoSession/ZenoSessionTodo. Reads only from Zeno's data directory.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSQLiteSessionViews.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 12,
+      "task_id": "phase-12-mvp12",
+      "purpose": "Zeno OpenCode session list and detail views, labelled Zeno OpenCode throughout.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoSQLiteAdapterTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 12,
+      "task_id": "phase-12-mvp12",
+      "purpose": "11 adapter tests using real SQLite databases. No mocks \u2014 exercises full C interop and mapping.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-12-zeno-activity-reconnaissance.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 12,
+      "task_id": "phase-12-mvp12",
+      "purpose": "Phase 12 reconnaissance + MVP-12 implementation record.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoEventModels.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 13,
+      "task_id": "phase-13",
+      "purpose": "ZenoEvent, ZenoEventType, ZenoEventInfo, ZenoEventPart \u2014 typed models for the event table",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoEventStoreAdapter.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 13,
+      "task_id": "phase-13",
+      "purpose": "Read-only event adapter with incremental polling (WHERE seq > cursor)",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoEventTimelineView.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 13,
+      "task_id": "phase-13",
+      "purpose": "ZenoEventTimelinePanel and ZenoEventRow \u2014 SwiftUI timeline view",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoEventStoreAdapterTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 13,
+      "task_id": "phase-13",
+      "purpose": "22 tests for ZenoEventStoreAdapter covering all event types, polling, limits, ordering, malformed data, read-only behavior",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-13-zeno-event-timeline.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 13,
+      "task_id": "phase-13",
+      "purpose": "Phase 13 engineering log \u2014 Zeno Event Timeline implementation",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-13-independent-audit.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 13,
+      "task_id": "phase-13-audit",
+      "purpose": "Independent post-implementation audit of Phase 13; found and fixed 4 defects (seq-cursor skip, swallowed step errors, permanent open-error cache, oldest-first cold start)",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoEventStoreIntegrationTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-10T00:00:00Z",
+      "phase": 13,
+      "task_id": "phase-13-store-integration",
+      "purpose": "Store-level integration test: drives ZenoObservabilityStore.refresh() against a real temp opencode.db fixture (cold start newest-200, incremental poll, new-session pickup with overlapping per-session seq, no duplicates, bounded memory, DB-unavailable recovery, malformed-row cursor advance)",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [
@@ -1020,6 +1365,26 @@
       "task_id": "RNZM-20",
       "purpose": "CLI harness compiling production sources for real-device verification",
       "status": "preserved"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/.hermes/plugins/ciel-working-state/",
+      "created_by": "Hermes",
+      "created_at": "2026-10-05T03:30:00Z",
+      "phase": "CR-10",
+      "task_id": "CR-10",
+      "purpose": "Ciel reasoning-state mechanism runtime plugin (CR-10). Implements approved design CR-7 rev 2 via first-class Hermes plugin hooks; no core runtime modification.",
+      "status": "active",
+      "note": "Ciel reasoning-architecture project. User plugin, enabled in ~/.hermes/config.yaml. Delete to roll back."
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/.hermes/working_state/",
+      "created_by": "Hermes",
+      "created_at": "2026-10-05T03:32:00Z",
+      "phase": "CR-10",
+      "task_id": "CR-10",
+      "purpose": "Per-session reasoning-state storage root (CR-10). Holds only integrity-sealed working-state checkpoints; never chain-of-thought.",
+      "status": "active",
+      "note": "Ciel reasoning-architecture project. Self-owned; safe to delete for rollback. Not part of any manifest-protected set."
     }
   ],
   "removed_resources": [

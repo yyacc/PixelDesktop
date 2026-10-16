@@ -30,7 +30,7 @@ private final class PipePayloads: @unchecked Sendable {
     }
 }
 
-actor ADBTransport: TransportProtocol {
+actor ADBTransport: TransportProtocol, ConnectionTransporting {
     private let adbPath: String
     private let defaultTimeout: TimeInterval
 
@@ -170,6 +170,65 @@ actor ADBTransport: TransportProtocol {
             }
 
             return transportResult
+        }
+    }
+
+    // MARK: - Wireless connect
+
+    /// Establishes a wireless ADB connection via `adb connect <host>:<port>`.
+    ///
+    /// This is the re-dial primitive `ConnectionManager` uses when the remembered
+    /// Wireless Debugging endpoint is offline (app restart, network change, device
+    /// reconnect). It performs no pairing — pairing is a one-time, user-performed
+    /// step on the device (`adb pair`), recorded when the paired device is first
+    /// observed; connect only re-establishes a channel to a paired endpoint.
+    ///
+    /// Note the discipline of the shell-command prototype: it is a transport
+    /// primitive reached only from `ConnectionManager`, never from the operations
+    /// layer, and takes structured host/port arguments — never a caller-supplied
+    /// command string.
+    func connect(host: String, port: Int) async throws {
+        let endpoint = "\(host):\(port)"
+        let result = try await execute(
+            command: "connect",
+            arguments: [endpoint],
+            timeout: 10
+        )
+
+        try Self.validateConnectResult(result, endpoint: endpoint)
+    }
+
+    /// Interprets `adb connect` output as success or failure.
+    ///
+    /// `adb connect` is a **liar about exit codes**: reaching an unreachable
+    /// endpoint exits 0 and prints `cannot connect to ...` on stdout. Success is
+    /// therefore judged on the output text (`connected to` with none of the
+    /// documented failure phrasings), never on the exit status alone.
+    nonisolated static func validateConnectResult(_ result: TransportResult, endpoint: String) throws {
+        guard result.isSuccess else {
+            throw PixelDesktopError.adbCommandFailed(
+                command: "connect \(endpoint)",
+                exitCode: Int(result.exitCode),
+                stderr: result.stderr
+            )
+        }
+
+        let output = "\(result.stdout) \(result.stderr)".lowercased()
+
+        if output.contains("cannot connect")
+            || output.contains("could not connect")
+            || output.contains("unable to connect")
+            || output.contains("failed")
+            || output.contains("refused") {
+            throw PixelDesktopError.adbTransportError(
+                "adb could not connect to \(endpoint): \(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines))"
+            )
+        }
+
+        guard output.contains("connected") else {
+            throw PixelDesktopError.adbTransportError(
+                "Unexpected adb connect response for \(endpoint): \(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines))"
+            )
         }
     }
 

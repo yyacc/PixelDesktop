@@ -1,0 +1,910 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00F2466B35CAAE7213959122 /* CLIDeviceSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2AA1DB62A4E154B038DEB0 /* CLIDeviceSelection.swift */; };
+		0170E0D49030CE783F54F4A2 /* DTCA1Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CCD306C655C2A44C786B42 /* DTCA1Job.swift */; };
+		0897057655C94588DF8424B7 /* CLIInvocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556F07519B9F11B81110152 /* CLIInvocation.swift */; };
+		0B94C65804A065FE4F58021B /* Phase7EvidenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */; };
+		0D6528A10CC1B3DEEA39B455 /* CLIEnvelopeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614448AB0FEE281926589F46 /* CLIEnvelopeRenderer.swift */; };
+		0D83A285CF0B13ED01626991 /* InferenceRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */; };
+		0ED167DF68BEA9DBA5598406 /* InstalledApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */; };
+		133A98DDE6C19E0D33F4E728 /* CLICommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 283D1E489376FE4A0574CA0A /* CLICommands.swift */; };
+		14AA9AD6480C917C03B9B4E3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C2D83AFA87754C63612A30 /* ContentView.swift */; };
+		16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045B4B73580F62547149ED08 /* PixelDesktopError.swift */; };
+		1A64D1FCCC6D3BF2030BB0C9 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3477EF8564205AB3ACA49E55 /* main.swift */; };
+		1B38F5862DED7D80E048E372 /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1C96AAA82CA14C8156167C /* DeviceManager.swift */; };
+		252C15545E1D6B0BF3C23022 /* Phase9Step6Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275B8575021C609915EDC7B8 /* Phase9Step6Tests.swift */; };
+		2558B7BB50243D179940E328 /* WorkerStreamProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE3B397855A7BE312776A8E /* WorkerStreamProtocol.swift */; };
+		28887A1BE5535D84E915A999 /* WorkerStreamRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6547148E3D29CCC7C15A62D3 /* WorkerStreamRunner.swift */; };
+		29FAB8602ECBCFF901C8CBD6 /* AppOperationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F9BDD850C20BCFC6BCA598 /* AppOperationsProtocol.swift */; };
+		2A9E2F81E5F218C44A0156A5 /* WorkerStreamingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9EC3724152E592875EE900 /* WorkerStreamingTests.swift */; };
+		31F8DF7D7DF82AC901DEF04E /* InferenceRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */; };
+		336E7BB5E988EE0A004A6E45 /* AndroidDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */; };
+		36F111FA96428A8E74355EF1 /* ExecutePipeDrainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3239BB5CC229AF3F421DAFDF /* ExecutePipeDrainTests.swift */; };
+		3A13977BBA18C467B8B4F6CA /* Phase8UIWiringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA0117ADBEC0C626A25A77E /* Phase8UIWiringTests.swift */; };
+		45D925383CFE970F56CB7F4C /* WorkerInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1E177AF6227A5996CA07B3 /* WorkerInstaller.swift */; };
+		46B691568BB1C10FE80DC973 /* AndroidDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */; };
+		49D97522C3361B3591FA899B /* Phase7StreamingDeviceHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A8789F3D4A63B4F363B829 /* Phase7StreamingDeviceHarness.swift */; };
+		4A2D6C9F00B4C607CBF79A5F /* LlmJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4B8B5F2820A1729CFAC5A6 /* LlmJob.swift */; };
+		4BCCA9F56402D3C38512118E /* AppOperationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F9BDD850C20BCFC6BCA598 /* AppOperationsProtocol.swift */; };
+		4BF7F5B3E1FC9B1CF6E49A95 /* Phase9CLITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE19C379BC33CE1517BD0EAD /* Phase9CLITests.swift */; };
+		4FBA1B7AA08349620ACF5EB5 /* ADBTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */; };
+		52E852A379937A56C4A67D0B /* InstalledApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */; };
+		54023E6F6CB9EACD306ADE9F /* PixelCapabilityContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D253305E24FEB2C98A6F9B0 /* PixelCapabilityContract.swift */; };
+		5539B7300558664EF91454DD /* CLIRunCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05323F79C16955B82D257199 /* CLIRunCommand.swift */; };
+		5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D453AF971B8227981443968 /* DTCA1Worker.swift */; };
+		57477E916E0FBCF59E5528BE /* Phase10Step1CancellationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A813830024DD7AFB1C5F977 /* Phase10Step1CancellationTests.swift */; };
+		60FC83041EDCC8E48900194C /* PixelCapabilityContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D253305E24FEB2C98A6F9B0 /* PixelCapabilityContract.swift */; };
+		619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560A663C5EAF42792941431A /* PixelDesktopTests.swift */; };
+		63513752CAEF4DE76113A7BE /* WorkerTransferContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */; };
+		6588C60ED7417106754355CB /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832112C57257637193F8B80A /* Transport.swift */; };
+		68277647178FC865B7CB4043 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59495D8B39B4270FE682515C /* AppLogger.swift */; };
+		6A479CB8CD73851D18911D11 /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */; };
+		6DADA4DD5928AE317F7C0ABD /* WorkerStreamScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEEF214A8E61537E5FAD184 /* WorkerStreamScript.swift */; };
+		70635EF1BAFDE1C6600A49A6 /* WorkerInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1E177AF6227A5996CA07B3 /* WorkerInstaller.swift */; };
+		733E8ACD972D747654978D05 /* Phase7DeviceEvidenceHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC6788DDB017C6B88F28F6C /* Phase7DeviceEvidenceHarness.swift */; };
+		77961F1E0A4A86888D0E7163 /* WorkerStreamRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6547148E3D29CCC7C15A62D3 /* WorkerStreamRunner.swift */; };
+		809AB5880C38024AC93D96AC /* ADBAppOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */; };
+		83BB4FAB62407EE3B74B8CB4 /* Phase6InferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB80C04344731006041936C /* Phase6InferenceTests.swift */; };
+		83F0BD2A99208139ABB6CE8A /* DTCA1Job.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CCD306C655C2A44C786B42 /* DTCA1Job.swift */; };
+		84278C2FD9B8F73A5BFC1B3C /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1C96AAA82CA14C8156167C /* DeviceManager.swift */; };
+		88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */; };
+		8955A287EEA4FF086B4E514C /* CLIRunCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05323F79C16955B82D257199 /* CLIRunCommand.swift */; };
+		91AE4ACF395191517B183109 /* PixelDesktopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045B4B73580F62547149ED08 /* PixelDesktopError.swift */; };
+		91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */; };
+		97DEBA3C248948A4ACB3F664 /* WorkerStreamProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE3B397855A7BE312776A8E /* WorkerStreamProtocol.swift */; };
+		983F312E3A54A22BE6A71245 /* ResultVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */; };
+		9C69F49F7B8245FDF805E30C /* ADBAppOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */; };
+		9E0652E777A5E8BE5946EF59 /* WorkerLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C234D386B8952BA7EE0FF257 /* WorkerLifecycle.swift */; };
+		9EFBC0E7990967B866CAFC41 /* ModelProvisioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56771EB671377140963F0BF /* ModelProvisioning.swift */; };
+		A0611BD58F83B1A4B64FE1F3 /* WorkerComputeProof.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE82D7431F3D03AEDA966728 /* WorkerComputeProof.swift */; };
+		A59BDCB1934E60E6DD2525C4 /* CLIDeviceSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F2AA1DB62A4E154B038DEB0 /* CLIDeviceSelection.swift */; };
+		A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */; };
+		A7E4480DB01E8EA8D5CF8287 /* StreamingLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A31BE1DB79DBD27E87A8617 /* StreamingLifecycleTests.swift */; };
+		A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */; };
+		AE10307DD81AA7B4719646A0 /* CLIEnvelope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F824BD49A498A5F263EE64 /* CLIEnvelope.swift */; };
+		AEA9E2DA2321898DA047CEA9 /* DeviceEnricher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */; };
+		AEC868F0EE718B50F70EF114 /* WorkerStreamReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FC3384A43066404AFD9DE6 /* WorkerStreamReducer.swift */; };
+		AF494ED8D3334CD7562A4E54 /* Phase9Step7Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD90367A1519A1938DA3F78C /* Phase9Step7Tests.swift */; };
+		B00693F03ADEF73B54EB40A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C52DFC447810455E987F16D /* Assets.xcassets */; };
+		B144599095899C261AD57BAF /* CLIInvocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556F07519B9F11B81110152 /* CLIInvocation.swift */; };
+		B48412CCAAE4AAC96AC60862 /* DTCA1Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D453AF971B8227981443968 /* DTCA1Worker.swift */; };
+		B705233D20BE74FEA864EA94 /* CLIJSONPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855D12EC9D14FB70CF71FE1 /* CLIJSONPresentation.swift */; };
+		B90D692030FE5D28D7C755E6 /* PixelEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52734F2217E7411A6F134440 /* PixelEvidence.swift */; };
+		B93B9E106ED44DFED5F02C8F /* WorkerStreamReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FC3384A43066404AFD9DE6 /* WorkerStreamReducer.swift */; };
+		B9762C3C96E7112BCD2B9363 /* ModelProvisioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = A56771EB671377140963F0BF /* ModelProvisioning.swift */; };
+		C509AA489ECE6BD065F831B5 /* Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832112C57257637193F8B80A /* Transport.swift */; };
+		C617767BFC1AA1384ED02012 /* LlmJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4B8B5F2820A1729CFAC5A6 /* LlmJob.swift */; };
+		C998025A044192904CC5E11D /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59495D8B39B4270FE682515C /* AppLogger.swift */; };
+		CB60999E16721A76472F458F /* WorkerLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C234D386B8952BA7EE0FF257 /* WorkerLifecycle.swift */; };
+		CC4AA3155664133001031B68 /* CLIEnvelope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F824BD49A498A5F263EE64 /* CLIEnvelope.swift */; };
+		CE41F6DD526BFDD0841672A9 /* Phase9HardwareVerificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3859822D7DBF379B94726ACB /* Phase9HardwareVerificationTests.swift */; };
+		D12ECAAAC500FC8F164A615A /* WorkerOperationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */; };
+		D1ABEE184209ACAF5263EFA6 /* Phase9RunTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C52620230E71F0F0AA482E2 /* Phase9RunTests.swift */; };
+		D267172DC0BC5B85133C1479 /* CLIJSONPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855D12EC9D14FB70CF71FE1 /* CLIJSONPresentation.swift */; };
+		D3D2F34C19BE2B6DE3B51EE0 /* CLIRunResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B180883979E61C38D7ADD /* CLIRunResult.swift */; };
+		D41EA86DD463F57F5BDB82CE /* CLIRunResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7B180883979E61C38D7ADD /* CLIRunResult.swift */; };
+		DA76BA01D1346D9FEB2F03D6 /* WorkerStreamScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEEF214A8E61537E5FAD184 /* WorkerStreamScript.swift */; };
+		DF4A926E2DC22B26ACE3ADBA /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EEE5EA3E8F6933113FA516 /* AppState.swift */; };
+		E0FE0762ED7A9DAA7B7BCB07 /* InferenceEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */; };
+		E6786DF01143F52422BF11BC /* PixelEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52734F2217E7411A6F134440 /* PixelEvidence.swift */; };
+		E72D168C6E8BEE4FCD149163 /* ADBTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */; };
+		ECA8FE38ADF8E7F5FCC57FE6 /* WorkerOperationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */; };
+		ED3DD04D3891F20B4CB1B14B /* WorkerTransferContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */; };
+		EE351D09DFE728DB6E40FBFC /* Phase7CapabilityContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDAA783B52EAF6DADE7A3ACC /* Phase7CapabilityContractTests.swift */; };
+		EFB4F801B6B07AFAC5090BFE /* WorkerComputeProof.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE82D7431F3D03AEDA966728 /* WorkerComputeProof.swift */; };
+		F676D2A6FC5B357C003205DE /* Phase7Amendment3PathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7239B55108175EF8E05F1637 /* Phase7Amendment3PathTests.swift */; };
+		F76C2625B9B1AA0520FADC18 /* InferenceEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */; };
+		FDAA05F49EF76C70E4EA5FBE /* Phase7Amendment2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F4DDF1638B3EED2B4092E7 /* Phase7Amendment2Tests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E18D0989DFB3C9D5A4B6F1C0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 53D24CE556C5EB25233927CF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8594CA8BA3CDF11BA225E84F;
+			remoteInfo = PixelDesktop;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		045B4B73580F62547149ED08 /* PixelDesktopError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopError.swift; sourceTree = "<group>"; };
+		05323F79C16955B82D257199 /* CLIRunCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIRunCommand.swift; sourceTree = "<group>"; };
+		09F9BDD850C20BCFC6BCA598 /* AppOperationsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOperationsProtocol.swift; sourceTree = "<group>"; };
+		1D253305E24FEB2C98A6F9B0 /* PixelCapabilityContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelCapabilityContract.swift; sourceTree = "<group>"; };
+		275B8575021C609915EDC7B8 /* Phase9Step6Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase9Step6Tests.swift; sourceTree = "<group>"; };
+		283D1E489376FE4A0574CA0A /* CLICommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLICommands.swift; sourceTree = "<group>"; };
+		29EEE5EA3E8F6933113FA516 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		2A31BE1DB79DBD27E87A8617 /* StreamingLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingLifecycleTests.swift; sourceTree = "<group>"; };
+		31CCD306C655C2A44C786B42 /* DTCA1Job.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTCA1Job.swift; sourceTree = "<group>"; };
+		3239BB5CC229AF3F421DAFDF /* ExecutePipeDrainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutePipeDrainTests.swift; sourceTree = "<group>"; };
+		3477EF8564205AB3ACA49E55 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		3859822D7DBF379B94726ACB /* Phase9HardwareVerificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase9HardwareVerificationTests.swift; sourceTree = "<group>"; };
+		39F824BD49A498A5F263EE64 /* CLIEnvelope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIEnvelope.swift; sourceTree = "<group>"; };
+		41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultVerifier.swift; sourceTree = "<group>"; };
+		4855D12EC9D14FB70CF71FE1 /* CLIJSONPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIJSONPresentation.swift; sourceTree = "<group>"; };
+		4BB80C04344731006041936C /* Phase6InferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase6InferenceTests.swift; sourceTree = "<group>"; };
+		50A8789F3D4A63B4F363B829 /* Phase7StreamingDeviceHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7StreamingDeviceHarness.swift; sourceTree = "<group>"; };
+		52734F2217E7411A6F134440 /* PixelEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelEvidence.swift; sourceTree = "<group>"; };
+		560A663C5EAF42792941431A /* PixelDesktopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopTests.swift; sourceTree = "<group>"; };
+		59495D8B39B4270FE682515C /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		5C52DFC447810455E987F16D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		614448AB0FEE281926589F46 /* CLIEnvelopeRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIEnvelopeRenderer.swift; sourceTree = "<group>"; };
+		6547148E3D29CCC7C15A62D3 /* WorkerStreamRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamRunner.swift; sourceTree = "<group>"; };
+		6D4B8B5F2820A1729CFAC5A6 /* LlmJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LlmJob.swift; sourceTree = "<group>"; };
+		7239B55108175EF8E05F1637 /* Phase7Amendment3PathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7Amendment3PathTests.swift; sourceTree = "<group>"; };
+		7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AndroidDevice.swift; sourceTree = "<group>"; };
+		7556F07519B9F11B81110152 /* CLIInvocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIInvocation.swift; sourceTree = "<group>"; };
+		7A1E177AF6227A5996CA07B3 /* WorkerInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerInstaller.swift; sourceTree = "<group>"; };
+		7C52620230E71F0F0AA482E2 /* Phase9RunTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase9RunTests.swift; sourceTree = "<group>"; };
+		7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBTransport.swift; sourceTree = "<group>"; };
+		7CBCAA7C2B6E79FE69212702 /* PixelDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PixelDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D453AF971B8227981443968 /* DTCA1Worker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DTCA1Worker.swift; sourceTree = "<group>"; };
+		832112C57257637193F8B80A /* Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transport.swift; sourceTree = "<group>"; };
+		8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledApp.swift; sourceTree = "<group>"; };
+		89F4DDF1638B3EED2B4092E7 /* Phase7Amendment2Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7Amendment2Tests.swift; sourceTree = "<group>"; };
+		8A813830024DD7AFB1C5F977 /* Phase10Step1CancellationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase10Step1CancellationTests.swift; sourceTree = "<group>"; };
+		90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7EvidenceTests.swift; sourceTree = "<group>"; };
+		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F2AA1DB62A4E154B038DEB0 /* CLIDeviceSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIDeviceSelection.swift; sourceTree = "<group>"; };
+		A56771EB671377140963F0BF /* ModelProvisioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelProvisioning.swift; sourceTree = "<group>"; };
+		B0688291D09BAB5DAADB4681 /* pixel-desktop */ = {isa = PBXFileReference; includeInIndex = 0; path = "pixel-desktop"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
+		BB7B180883979E61C38D7ADD /* CLIRunResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIRunResult.swift; sourceTree = "<group>"; };
+		BBE3B397855A7BE312776A8E /* WorkerStreamProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamProtocol.swift; sourceTree = "<group>"; };
+		BDA0117ADBEC0C626A25A77E /* Phase8UIWiringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase8UIWiringTests.swift; sourceTree = "<group>"; };
+		BDAA783B52EAF6DADE7A3ACC /* Phase7CapabilityContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7CapabilityContractTests.swift; sourceTree = "<group>"; };
+		BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerOperationsProtocol.swift; sourceTree = "<group>"; };
+		C234D386B8952BA7EE0FF257 /* WorkerLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerLifecycle.swift; sourceTree = "<group>"; };
+		C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBAppOperations.swift; sourceTree = "<group>"; };
+		CA9EC3724152E592875EE900 /* WorkerStreamingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamingTests.swift; sourceTree = "<group>"; };
+		CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InferenceRuntime.swift; sourceTree = "<group>"; };
+		D4FC3384A43066404AFD9DE6 /* WorkerStreamReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamReducer.swift; sourceTree = "<group>"; };
+		D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDesktopApp.swift; sourceTree = "<group>"; };
+		DAC6788DDB017C6B88F28F6C /* Phase7DeviceEvidenceHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7DeviceEvidenceHarness.swift; sourceTree = "<group>"; };
+		DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceEnricher.swift; sourceTree = "<group>"; };
+		DEECEB33C31DAB1BF023236B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E7C2D83AFA87754C63612A30 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InferenceEvidence.swift; sourceTree = "<group>"; };
+		EE19C379BC33CE1517BD0EAD /* Phase9CLITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase9CLITests.swift; sourceTree = "<group>"; };
+		EE1C96AAA82CA14C8156167C /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
+		EE82D7431F3D03AEDA966728 /* WorkerComputeProof.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerComputeProof.swift; sourceTree = "<group>"; };
+		EEEEF214A8E61537E5FAD184 /* WorkerStreamScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamScript.swift; sourceTree = "<group>"; };
+		FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerTransferContract.swift; sourceTree = "<group>"; };
+		FD90367A1519A1938DA3F78C /* Phase9Step7Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase9Step7Tests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		00EDFDA5D942AAF5041D4B41 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				59495D8B39B4270FE682515C /* AppLogger.swift */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
+		09877C10C67BC1CB066C4E91 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */,
+				8900DB7BE68E1C4C5E4C83C3 /* InstalledApp.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1442FAAC6AD67B874A89538F /* PixelDesktop */ = {
+			isa = PBXGroup;
+			children = (
+				5C52DFC447810455E987F16D /* Assets.xcassets */,
+				DEECEB33C31DAB1BF023236B /* Info.plist */,
+				8BD41B949A36854C01BCF408 /* App */,
+				464295B08B2849859094B2BE /* Compute */,
+				7A34BB91CBC8A89E485F96B7 /* Core */,
+				B9D2EC1D7C2A00ED2D2BBABD /* Device */,
+				80CED929C0F4541EFB8D81A3 /* Inference */,
+				EC5B83872D0FD302834606B2 /* Operations */,
+				D052E11B69A45A0FE1265DF4 /* Transport */,
+				297CB6D35AA23D96C557A278 /* Verification */,
+				C2749E920DE022F549DCCED6 /* Worker */,
+			);
+			path = PixelDesktop;
+			sourceTree = "<group>";
+		};
+		205D5C559DD6FB7D72B84C5F = {
+			isa = PBXGroup;
+			children = (
+				1442FAAC6AD67B874A89538F /* PixelDesktop */,
+				688138440303FC2E97EDFB10 /* PixelDesktopCLI */,
+				FC2E3DC2516F7D52AF7895C8 /* PixelDesktopTests */,
+				362AA2AE9FC87DA0852C759A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		297CB6D35AA23D96C557A278 /* Verification */ = {
+			isa = PBXGroup;
+			children = (
+				41AACCD1A7DE9487E3E83171 /* ResultVerifier.swift */,
+			);
+			path = Verification;
+			sourceTree = "<group>";
+		};
+		362AA2AE9FC87DA0852C759A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B0688291D09BAB5DAADB4681 /* pixel-desktop */,
+				7CBCAA7C2B6E79FE69212702 /* PixelDesktop.app */,
+				96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		464295B08B2849859094B2BE /* Compute */ = {
+			isa = PBXGroup;
+			children = (
+				7D453AF971B8227981443968 /* DTCA1Worker.swift */,
+			);
+			path = Compute;
+			sourceTree = "<group>";
+		};
+		688138440303FC2E97EDFB10 /* PixelDesktopCLI */ = {
+			isa = PBXGroup;
+			children = (
+				283D1E489376FE4A0574CA0A /* CLICommands.swift */,
+				9F2AA1DB62A4E154B038DEB0 /* CLIDeviceSelection.swift */,
+				39F824BD49A498A5F263EE64 /* CLIEnvelope.swift */,
+				614448AB0FEE281926589F46 /* CLIEnvelopeRenderer.swift */,
+				7556F07519B9F11B81110152 /* CLIInvocation.swift */,
+				4855D12EC9D14FB70CF71FE1 /* CLIJSONPresentation.swift */,
+				05323F79C16955B82D257199 /* CLIRunCommand.swift */,
+				BB7B180883979E61C38D7ADD /* CLIRunResult.swift */,
+				3477EF8564205AB3ACA49E55 /* main.swift */,
+			);
+			path = PixelDesktopCLI;
+			sourceTree = "<group>";
+		};
+		7A34BB91CBC8A89E485F96B7 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				921026CFEA5EDE3F6AE3A626 /* Errors */,
+				00EDFDA5D942AAF5041D4B41 /* Logging */,
+				09877C10C67BC1CB066C4E91 /* Models */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		80CED929C0F4541EFB8D81A3 /* Inference */ = {
+			isa = PBXGroup;
+			children = (
+				E9FCB5D5BCC4F98A6E740BB7 /* InferenceEvidence.swift */,
+				CEB1CA1C8028E805E6AFC45E /* InferenceRuntime.swift */,
+				A56771EB671377140963F0BF /* ModelProvisioning.swift */,
+				1D253305E24FEB2C98A6F9B0 /* PixelCapabilityContract.swift */,
+				52734F2217E7411A6F134440 /* PixelEvidence.swift */,
+			);
+			path = Inference;
+			sourceTree = "<group>";
+		};
+		8BD41B949A36854C01BCF408 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				29EEE5EA3E8F6933113FA516 /* AppState.swift */,
+				E7C2D83AFA87754C63612A30 /* ContentView.swift */,
+				D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		921026CFEA5EDE3F6AE3A626 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				045B4B73580F62547149ED08 /* PixelDesktopError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		B9D2EC1D7C2A00ED2D2BBABD /* Device */ = {
+			isa = PBXGroup;
+			children = (
+				B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */,
+				DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */,
+				EE1C96AAA82CA14C8156167C /* DeviceManager.swift */,
+			);
+			path = Device;
+			sourceTree = "<group>";
+		};
+		C2749E920DE022F549DCCED6 /* Worker */ = {
+			isa = PBXGroup;
+			children = (
+				31CCD306C655C2A44C786B42 /* DTCA1Job.swift */,
+				6D4B8B5F2820A1729CFAC5A6 /* LlmJob.swift */,
+				EE82D7431F3D03AEDA966728 /* WorkerComputeProof.swift */,
+				7A1E177AF6227A5996CA07B3 /* WorkerInstaller.swift */,
+				C234D386B8952BA7EE0FF257 /* WorkerLifecycle.swift */,
+				BE6AF2ABE8C4E0E1E22E27ED /* WorkerOperationsProtocol.swift */,
+				BBE3B397855A7BE312776A8E /* WorkerStreamProtocol.swift */,
+				D4FC3384A43066404AFD9DE6 /* WorkerStreamReducer.swift */,
+				6547148E3D29CCC7C15A62D3 /* WorkerStreamRunner.swift */,
+				EEEEF214A8E61537E5FAD184 /* WorkerStreamScript.swift */,
+				FB1E98AB03661E074172AFDC /* WorkerTransferContract.swift */,
+			);
+			path = Worker;
+			sourceTree = "<group>";
+		};
+		D052E11B69A45A0FE1265DF4 /* Transport */ = {
+			isa = PBXGroup;
+			children = (
+				7C6F6F6542B0A631B5CF475D /* ADBTransport.swift */,
+				832112C57257637193F8B80A /* Transport.swift */,
+			);
+			path = Transport;
+			sourceTree = "<group>";
+		};
+		EC5B83872D0FD302834606B2 /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				C5ADD28922F9EE586336C531 /* ADBAppOperations.swift */,
+				09F9BDD850C20BCFC6BCA598 /* AppOperationsProtocol.swift */,
+			);
+			path = Operations;
+			sourceTree = "<group>";
+		};
+		FC2E3DC2516F7D52AF7895C8 /* PixelDesktopTests */ = {
+			isa = PBXGroup;
+			children = (
+				3239BB5CC229AF3F421DAFDF /* ExecutePipeDrainTests.swift */,
+				4BB80C04344731006041936C /* Phase6InferenceTests.swift */,
+				89F4DDF1638B3EED2B4092E7 /* Phase7Amendment2Tests.swift */,
+				7239B55108175EF8E05F1637 /* Phase7Amendment3PathTests.swift */,
+				BDAA783B52EAF6DADE7A3ACC /* Phase7CapabilityContractTests.swift */,
+				DAC6788DDB017C6B88F28F6C /* Phase7DeviceEvidenceHarness.swift */,
+				90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */,
+				50A8789F3D4A63B4F363B829 /* Phase7StreamingDeviceHarness.swift */,
+				BDA0117ADBEC0C626A25A77E /* Phase8UIWiringTests.swift */,
+				EE19C379BC33CE1517BD0EAD /* Phase9CLITests.swift */,
+				3859822D7DBF379B94726ACB /* Phase9HardwareVerificationTests.swift */,
+				7C52620230E71F0F0AA482E2 /* Phase9RunTests.swift */,
+				275B8575021C609915EDC7B8 /* Phase9Step6Tests.swift */,
+				FD90367A1519A1938DA3F78C /* Phase9Step7Tests.swift */,
+				8A813830024DD7AFB1C5F977 /* Phase10Step1CancellationTests.swift */,
+				560A663C5EAF42792941431A /* PixelDesktopTests.swift */,
+				2A31BE1DB79DBD27E87A8617 /* StreamingLifecycleTests.swift */,
+				CA9EC3724152E592875EE900 /* WorkerStreamingTests.swift */,
+			);
+			path = PixelDesktopTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3D25A11B07E7C5CF753CF190 /* pixel-desktop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BDD454E9F33E4974CA1BE70E /* Build configuration list for PBXNativeTarget "pixel-desktop" */;
+			buildPhases = (
+				AC4AEFBE96B45D531B1F526A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "pixel-desktop";
+			packageProductDependencies = (
+			);
+			productName = "pixel-desktop";
+			productReference = B0688291D09BAB5DAADB4681 /* pixel-desktop */;
+			productType = "com.apple.product-type.tool";
+		};
+		8594CA8BA3CDF11BA225E84F /* PixelDesktop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 750D92081F412F7B50766D23 /* Build configuration list for PBXNativeTarget "PixelDesktop" */;
+			buildPhases = (
+				C17092F403EAB1A58DA36A37 /* Sources */,
+				A32946FEB0E22B24BFAA6C40 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PixelDesktop;
+			packageProductDependencies = (
+			);
+			productName = PixelDesktop;
+			productReference = 7CBCAA7C2B6E79FE69212702 /* PixelDesktop.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CDC84E382246B0EF8859AD44 /* PixelDesktopTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A0CD9F307ED97B34198B359 /* Build configuration list for PBXNativeTarget "PixelDesktopTests" */;
+			buildPhases = (
+				2E42DC92AB2BFE168EAD7D5E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CE3B9D5971B2571155121D8E /* PBXTargetDependency */,
+			);
+			name = PixelDesktopTests;
+			packageProductDependencies = (
+			);
+			productName = PixelDesktopTests;
+			productReference = 96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		53D24CE556C5EB25233927CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					3D25A11B07E7C5CF753CF190 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					8594CA8BA3CDF11BA225E84F = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					CDC84E382246B0EF8859AD44 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9701FBFE84F6E2A5DF2624B8 /* Build configuration list for PBXProject "PixelDesktop" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 205D5C559DD6FB7D72B84C5F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 362AA2AE9FC87DA0852C759A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8594CA8BA3CDF11BA225E84F /* PixelDesktop */,
+				3D25A11B07E7C5CF753CF190 /* pixel-desktop */,
+				CDC84E382246B0EF8859AD44 /* PixelDesktopTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A32946FEB0E22B24BFAA6C40 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00693F03ADEF73B54EB40A7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2E42DC92AB2BFE168EAD7D5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A59BDCB1934E60E6DD2525C4 /* CLIDeviceSelection.swift in Sources */,
+				AE10307DD81AA7B4719646A0 /* CLIEnvelope.swift in Sources */,
+				0897057655C94588DF8424B7 /* CLIInvocation.swift in Sources */,
+				B705233D20BE74FEA864EA94 /* CLIJSONPresentation.swift in Sources */,
+				8955A287EEA4FF086B4E514C /* CLIRunCommand.swift in Sources */,
+				D3D2F34C19BE2B6DE3B51EE0 /* CLIRunResult.swift in Sources */,
+				36F111FA96428A8E74355EF1 /* ExecutePipeDrainTests.swift in Sources */,
+				57477E916E0FBCF59E5528BE /* Phase10Step1CancellationTests.swift in Sources */,
+				83BB4FAB62407EE3B74B8CB4 /* Phase6InferenceTests.swift in Sources */,
+				FDAA05F49EF76C70E4EA5FBE /* Phase7Amendment2Tests.swift in Sources */,
+				F676D2A6FC5B357C003205DE /* Phase7Amendment3PathTests.swift in Sources */,
+				EE351D09DFE728DB6E40FBFC /* Phase7CapabilityContractTests.swift in Sources */,
+				733E8ACD972D747654978D05 /* Phase7DeviceEvidenceHarness.swift in Sources */,
+				0B94C65804A065FE4F58021B /* Phase7EvidenceTests.swift in Sources */,
+				49D97522C3361B3591FA899B /* Phase7StreamingDeviceHarness.swift in Sources */,
+				3A13977BBA18C467B8B4F6CA /* Phase8UIWiringTests.swift in Sources */,
+				4BF7F5B3E1FC9B1CF6E49A95 /* Phase9CLITests.swift in Sources */,
+				CE41F6DD526BFDD0841672A9 /* Phase9HardwareVerificationTests.swift in Sources */,
+				D1ABEE184209ACAF5263EFA6 /* Phase9RunTests.swift in Sources */,
+				252C15545E1D6B0BF3C23022 /* Phase9Step6Tests.swift in Sources */,
+				AF494ED8D3334CD7562A4E54 /* Phase9Step7Tests.swift in Sources */,
+				619E441B2434F0CB8ADBB20F /* PixelDesktopTests.swift in Sources */,
+				A7E4480DB01E8EA8D5CF8287 /* StreamingLifecycleTests.swift in Sources */,
+				2A9E2F81E5F218C44A0156A5 /* WorkerStreamingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC4AEFBE96B45D531B1F526A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C69F49F7B8245FDF805E30C /* ADBAppOperations.swift in Sources */,
+				4FBA1B7AA08349620ACF5EB5 /* ADBTransport.swift in Sources */,
+				46B691568BB1C10FE80DC973 /* AndroidDevice.swift in Sources */,
+				68277647178FC865B7CB4043 /* AppLogger.swift in Sources */,
+				4BCCA9F56402D3C38512118E /* AppOperationsProtocol.swift in Sources */,
+				133A98DDE6C19E0D33F4E728 /* CLICommands.swift in Sources */,
+				00F2466B35CAAE7213959122 /* CLIDeviceSelection.swift in Sources */,
+				CC4AA3155664133001031B68 /* CLIEnvelope.swift in Sources */,
+				0D6528A10CC1B3DEEA39B455 /* CLIEnvelopeRenderer.swift in Sources */,
+				B144599095899C261AD57BAF /* CLIInvocation.swift in Sources */,
+				D267172DC0BC5B85133C1479 /* CLIJSONPresentation.swift in Sources */,
+				5539B7300558664EF91454DD /* CLIRunCommand.swift in Sources */,
+				D41EA86DD463F57F5BDB82CE /* CLIRunResult.swift in Sources */,
+				0170E0D49030CE783F54F4A2 /* DTCA1Job.swift in Sources */,
+				B48412CCAAE4AAC96AC60862 /* DTCA1Worker.swift in Sources */,
+				6A479CB8CD73851D18911D11 /* DeviceDiscovery.swift in Sources */,
+				AEA9E2DA2321898DA047CEA9 /* DeviceEnricher.swift in Sources */,
+				84278C2FD9B8F73A5BFC1B3C /* DeviceManager.swift in Sources */,
+				E0FE0762ED7A9DAA7B7BCB07 /* InferenceEvidence.swift in Sources */,
+				0D83A285CF0B13ED01626991 /* InferenceRuntime.swift in Sources */,
+				52E852A379937A56C4A67D0B /* InstalledApp.swift in Sources */,
+				4A2D6C9F00B4C607CBF79A5F /* LlmJob.swift in Sources */,
+				B9762C3C96E7112BCD2B9363 /* ModelProvisioning.swift in Sources */,
+				60FC83041EDCC8E48900194C /* PixelCapabilityContract.swift in Sources */,
+				91AE4ACF395191517B183109 /* PixelDesktopError.swift in Sources */,
+				B90D692030FE5D28D7C755E6 /* PixelEvidence.swift in Sources */,
+				983F312E3A54A22BE6A71245 /* ResultVerifier.swift in Sources */,
+				C509AA489ECE6BD065F831B5 /* Transport.swift in Sources */,
+				A0611BD58F83B1A4B64FE1F3 /* WorkerComputeProof.swift in Sources */,
+				45D925383CFE970F56CB7F4C /* WorkerInstaller.swift in Sources */,
+				CB60999E16721A76472F458F /* WorkerLifecycle.swift in Sources */,
+				D12ECAAAC500FC8F164A615A /* WorkerOperationsProtocol.swift in Sources */,
+				2558B7BB50243D179940E328 /* WorkerStreamProtocol.swift in Sources */,
+				B93B9E106ED44DFED5F02C8F /* WorkerStreamReducer.swift in Sources */,
+				77961F1E0A4A86888D0E7163 /* WorkerStreamRunner.swift in Sources */,
+				6DADA4DD5928AE317F7C0ABD /* WorkerStreamScript.swift in Sources */,
+				ED3DD04D3891F20B4CB1B14B /* WorkerTransferContract.swift in Sources */,
+				1A64D1FCCC6D3BF2030BB0C9 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C17092F403EAB1A58DA36A37 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				809AB5880C38024AC93D96AC /* ADBAppOperations.swift in Sources */,
+				E72D168C6E8BEE4FCD149163 /* ADBTransport.swift in Sources */,
+				336E7BB5E988EE0A004A6E45 /* AndroidDevice.swift in Sources */,
+				C998025A044192904CC5E11D /* AppLogger.swift in Sources */,
+				29FAB8602ECBCFF901C8CBD6 /* AppOperationsProtocol.swift in Sources */,
+				DF4A926E2DC22B26ACE3ADBA /* AppState.swift in Sources */,
+				14AA9AD6480C917C03B9B4E3 /* ContentView.swift in Sources */,
+				83F0BD2A99208139ABB6CE8A /* DTCA1Job.swift in Sources */,
+				5621E4F03EF6A2E9F56D329E /* DTCA1Worker.swift in Sources */,
+				A95703A8CA71A3A343F8B406 /* DeviceDiscovery.swift in Sources */,
+				88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */,
+				1B38F5862DED7D80E048E372 /* DeviceManager.swift in Sources */,
+				F76C2625B9B1AA0520FADC18 /* InferenceEvidence.swift in Sources */,
+				31F8DF7D7DF82AC901DEF04E /* InferenceRuntime.swift in Sources */,
+				0ED167DF68BEA9DBA5598406 /* InstalledApp.swift in Sources */,
+				C617767BFC1AA1384ED02012 /* LlmJob.swift in Sources */,
+				9EFBC0E7990967B866CAFC41 /* ModelProvisioning.swift in Sources */,
+				54023E6F6CB9EACD306ADE9F /* PixelCapabilityContract.swift in Sources */,
+				91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */,
+				16508FA3C203095833DCF204 /* PixelDesktopError.swift in Sources */,
+				E6786DF01143F52422BF11BC /* PixelEvidence.swift in Sources */,
+				A75FCC00A82BFDC6163715D4 /* ResultVerifier.swift in Sources */,
+				6588C60ED7417106754355CB /* Transport.swift in Sources */,
+				EFB4F801B6B07AFAC5090BFE /* WorkerComputeProof.swift in Sources */,
+				70635EF1BAFDE1C6600A49A6 /* WorkerInstaller.swift in Sources */,
+				9E0652E777A5E8BE5946EF59 /* WorkerLifecycle.swift in Sources */,
+				ECA8FE38ADF8E7F5FCC57FE6 /* WorkerOperationsProtocol.swift in Sources */,
+				97DEBA3C248948A4ACB3F664 /* WorkerStreamProtocol.swift in Sources */,
+				AEC868F0EE718B50F70EF114 /* WorkerStreamReducer.swift in Sources */,
+				28887A1BE5535D84E915A999 /* WorkerStreamRunner.swift in Sources */,
+				DA76BA01D1346D9FEB2F03D6 /* WorkerStreamScript.swift in Sources */,
+				63513752CAEF4DE76113A7BE /* WorkerTransferContract.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CE3B9D5971B2571155121D8E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8594CA8BA3CDF11BA225E84F /* PixelDesktop */;
+			targetProxy = E18D0989DFB3C9D5A4B6F1C0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0D1E503AD06C27E1584FA9F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app.tests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PixelDesktop.app/Contents/MacOS/PixelDesktop";
+			};
+			name = Release;
+		};
+		29CD06CA9E21641924E4A898 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PixelDesktop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.cli;
+				PRODUCT_NAME = "pixel-desktop";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		4356EC386625BEF190A6263A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PixelDesktop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app;
+				PRODUCT_NAME = PixelDesktop;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		453DDA12F554047F4B866AF0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		4DB40685BD2B7EE08B9E78D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app.tests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PixelDesktop.app/Contents/MacOS/PixelDesktop";
+			};
+			name = Debug;
+		};
+		9F279D80CC31366558E46FB1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PixelDesktop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.cli;
+				PRODUCT_NAME = "pixel-desktop";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		BC309789F4C2474A329328F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PixelDesktop/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pixeldesktop.app;
+				PRODUCT_NAME = PixelDesktop;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E78C4D597266F5ACEC4A7E3B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5A0CD9F307ED97B34198B359 /* Build configuration list for PBXNativeTarget "PixelDesktopTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4DB40685BD2B7EE08B9E78D2 /* Debug */,
+				0D1E503AD06C27E1584FA9F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		750D92081F412F7B50766D23 /* Build configuration list for PBXNativeTarget "PixelDesktop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4356EC386625BEF190A6263A /* Debug */,
+				BC309789F4C2474A329328F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9701FBFE84F6E2A5DF2624B8 /* Build configuration list for PBXProject "PixelDesktop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				453DDA12F554047F4B866AF0 /* Debug */,
+				E78C4D597266F5ACEC4A7E3B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BDD454E9F33E4974CA1BE70E /* Build configuration list for PBXNativeTarget "pixel-desktop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F279D80CC31366558E46FB1 /* Debug */,
+				29CD06CA9E21641924E4A898 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 53D24CE556C5EB25233927CF /* Project object */;
+}

@@ -13,9 +13,61 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
     private var discoveryTask: Task<Void, Never>?
     private var discoveryInterval: TimeInterval = 5.0
 
-    init(transport: TransportProtocol? = nil, logger: AppLogger? = nil) {
+    // MARK: - Phase 1 (Connection Foundation) additions
+    //
+    // Dual-transport handling: selection (USB > WiFi), wireless-endpoint persistence,
+    // and auto-reconnect all live in `ConnectionManager`; the manager is the single
+    // driver that feeds it observations and re-lists devices on its request.
+
+    /// The connection coordinator. Always present; reconnect capability depends on
+    /// whether the active transport can actually `connect` (see `NullConnectionTransport`).
+    let connectionManager: ConnectionManager
+
+    /// Live network-availability monitoring, kept alive for as long as the manager is.
+    private let pathMonitor: NetworkPathMonitoring?
+
+    /// The transport the connection layer currently targets, mirroring
+    /// `connectionManager.transportState` for the UI layer to observe directly.
+    @Published private(set) var transportState: TransportState?
+
+    init(
+        transport: TransportProtocol? = nil,
+        logger: AppLogger? = nil,
+        connectionTransport: ConnectionTransporting? = nil,
+        pathMonitor: NetworkPathMonitoring? = nil,
+        defaults: UserDefaults? = nil,
+        reconnectScheduler: ReconnectScheduler = .standard
+    ) {
         self.transport = transport ?? ADBTransport()
         self.logger = logger ?? AppLogger()
+
+        // Reconnect reaches the *same* transport the manager polls when that
+        // transport IS ADB; a transport without connect capability (a mock double)
+        // gets the null object, so auto-reconnect is visibly inert rather than
+        // firing at a real `adb` from inside a test run.
+        let resolvedConnectionTransport: ConnectionTransporting
+        if let connectionTransport {
+            resolvedConnectionTransport = connectionTransport
+        } else if let adb = self.transport as? ConnectionTransporting {
+            resolvedConnectionTransport = adb
+        } else {
+            resolvedConnectionTransport = NullConnectionTransport()
+        }
+
+        let resolvedPathMonitor = pathMonitor ?? NetworkPathMonitor()
+        self.pathMonitor = resolvedPathMonitor
+
+        let manager = ConnectionManager(
+            transport: resolvedConnectionTransport,
+            logger: self.logger,
+            defaults: defaults ?? .standard,
+            scheduler: reconnectScheduler,
+            pathMonitor: resolvedPathMonitor
+        )
+        self.connectionManager = manager
+        manager.refreshHook = { [weak self] in
+            await self?.refreshDevices()
+        }
     }
 
     func startDiscovery() async {
@@ -39,6 +91,9 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
         discoveryTask?.cancel()
         discoveryTask = nil
         isDiscovering = false
+        // Teardown only: remembered endpoints survive; a stopped manager must not
+        // keep reconnecting in the background.
+        connectionManager.stop()
         logger.info("Stopped device discovery", source: "DeviceManager.stopDiscovery")
     }
 
@@ -50,11 +105,18 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
     /// never cached across a disconnect or reconnect, which is the decision recorded in
     /// ADR-009. The properties are constant for a boot session but can change across a
     /// reboot or OS update, and a reconnect is exactly when that becomes possible.
+    ///
+    /// **Transport selection (Phase 1):** only a *successful* listing is fed to
+    /// `ConnectionManager.observe`. A failed listing (`adb` itself broken) is not
+    /// evidence that a connected device disappeared, so it neither tears down the
+    /// current selection nor triggers reconnect; the next successful poll decides.
     func refreshDevices() async {
         do {
             let deviceList = try await transport.listDevices()
             devices = deviceList
             lastError = nil
+            connectionManager.observe(devices: deviceList)
+            transportState = connectionManager.transportState
             logger.info("Found \(deviceList.count) device(s)", source: "DeviceManager.refreshDevices")
         } catch let error as PixelDesktopError {
             lastError = error

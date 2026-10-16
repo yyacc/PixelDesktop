@@ -8,6 +8,43 @@ final class AppState: ObservableObject {
     @Published var lastError: PixelDesktopError?
     @Published var logMessages: [LogEntry] = []
 
+    /// Phase 1 (Connection Foundation) — the transport currently in use, wired or
+    /// wireless, or `nil` when offline. Pure passthrough of what
+    /// `DeviceManager.refreshDevices` selected; Phase 3 renders it in status UI.
+    @Published var transportState: TransportState?
+
+    // MARK: - Storage state (Phase 3)
+    //
+    // These expose the StorageService to the UI. The service is created on-demand
+    // when a device is connected; all operations go through it so the UI never
+    // touches ADB directly.
+
+    /// The items in the currently-displayed storage directory.
+    @Published var storageItems: [StorageItem] = []
+
+    /// The path of the directory whose contents are currently displayed.
+    /// Updated on every successful `loadStorageItems` so post-mutation reloads
+    /// target the same directory the user is viewing.
+    @Published var storageCurrentPath: String = StorageService.storageRoot
+
+    /// Whether a storage operation is in flight.
+    @Published var storageIsLoading: Bool = false
+
+    /// The last storage error, or `nil` when the last operation succeeded.
+    @Published var storageError: StorageError?
+
+    /// The most recent transfer progress sample, or `nil` when no transfer is active.
+    @Published var storageTransferProgress: StorageTransferProgress?
+
+    /// Disk space on the device filesystem, or `nil` when unknown.
+    @Published var storageDiskSpace: (used: UInt64, total: UInt64)?
+
+    /// The storage service for the connected device, or `nil` when offline.
+    var storageService: StorageService? {
+        guard let serial = selectedSerial else { return nil }
+        return StorageService(deviceSerial: serial, transport: transport)
+    }
+
     // MARK: - Phase 8 (UI) additions
     //
     // These expose backend capability that already existed and was already verified on real
@@ -67,6 +104,10 @@ final class AppState: ObservableObject {
         deviceManager.$logMessages
             .receive(on: DispatchQueue.main)
             .assign(to: &$logMessages)
+
+        deviceManager.$transportState
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$transportState)
     }
 
     /// Starts discovery and returns once it has begun.
@@ -263,4 +304,138 @@ final class AppState: ObservableObject {
             timeout: 30
         )
     }
+
+    // MARK: - Storage operations (Phase 3)
+    //
+    // Each wrapper is guard-first: it refuses to act when no device is connected,
+    // before any command is issued. Failures are recorded in `storageError` rather
+    // than thrown, so the view never has to manage its own do/catch.
+
+    /// Creates the storage root if it does not exist. Idempotent.
+    func ensureStorageRoot() async {
+        guard let service = storageService else { return }
+        _ = try? await service.mkdir(path: StorageService.storageRoot)
+    }
+
+    /// Lists the contents of a storage directory.
+    func loadStorageItems(path: String) async {
+        guard let service = storageService else {
+            storageItems = []
+            storageError = nil
+            return
+        }
+        storageIsLoading = true
+        storageError = nil
+        defer { storageIsLoading = false }
+        do {
+            storageItems = try await service.list(path: path)
+            storageCurrentPath = path
+        } catch let error as StorageError {
+            storageError = error
+        } catch {
+            storageError = .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Uploads a local file to the device.
+    func uploadFile(localPath: String, remotePath: String) async {
+        guard let service = storageService else {
+            storageError = .deviceOffline
+            return
+        }
+        storageError = nil
+        do {
+            try await service.upload(localPath: localPath, remotePath: remotePath) { progress in
+                Task { @MainActor in
+                    self.storageTransferProgress = progress
+                }
+            }
+            await loadStorageItems(path: storageCurrentPath)
+        } catch let error as StorageError {
+            storageError = error
+        } catch {
+            storageError = .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Downloads a device file to a local path.
+    func downloadFile(remotePath: String, localPath: String) async {
+        guard let service = storageService else {
+            storageError = .deviceOffline
+            return
+        }
+        storageError = nil
+        do {
+            try await service.download(remotePath: remotePath, localPath: localPath) { progress in
+                Task { @MainActor in
+                    self.storageTransferProgress = progress
+                }
+            }
+        } catch let error as StorageError {
+            storageError = error
+        } catch {
+            storageError = .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Deletes a file or folder on the device.
+    func deleteStorageItem(path: String) async {
+        guard let service = storageService else {
+            storageError = .deviceOffline
+            return
+        }
+        storageError = nil
+        do {
+            try await service.delete(path: path)
+            await loadStorageItems(path: storageCurrentPath)
+        } catch let error as StorageError {
+            storageError = error
+        } catch {
+            storageError = .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Creates a directory on the device.
+    func createStorageFolder(path: String) async {
+        guard let service = storageService else {
+            storageError = .deviceOffline
+            return
+        }
+        storageError = nil
+        do {
+            try await service.mkdir(path: path)
+            await loadStorageItems(path: storageCurrentPath)
+        } catch let error as StorageError {
+            storageError = error
+        } catch {
+            storageError = .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Renames or moves an item on the device.
+    func renameStorageItem(from: String, to: String) async {
+        guard let service = storageService else {
+            storageError = .deviceOffline
+            return
+        }
+        storageError = nil
+        do {
+            try await service.rename(from: from, to: to)
+            await loadStorageItems(path: storageCurrentPath)
+        } catch let error as StorageError {
+            storageError = error
+        } catch {
+            storageError = .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Refreshes the disk space display.
+    func refreshStorageDiskSpace() async {
+        guard let service = storageService else {
+            storageDiskSpace = nil
+            return
+        }
+        storageDiskSpace = await service.diskSpace()
+    }
+
 }

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slime Mission Control — Zeno Edition v1</title>
+<style>
+  :root {
+    --bg-deep: #080c18;
+    --bg-surface: #0e1428;
+    --bg-panel: #121a33;
+    --bg-card: #182244;
+    --bg-card-hover: #1d2a52;
+    --border: #253358;
+    --border-bright: #354a7a;
+    --cyan: #22d3ee;
+    --cyan-dim: rgba(34,211,238,0.15);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.12);
+    --purple: #a78bfa;
+    --gold: #fbbf24;
+    --gold-dim: rgba(251,191,36,0.12);
+    --green: #4ade80;
+    --orange: #fb923c;
+    --red: #f87171;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --font-main: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    --font-mono: 'SF Mono', 'Cascadia Mono', 'Consolas', monospace;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    font-family: var(--font-main);
+    background: var(--bg-deep);
+    color: var(--text);
+    width: 1440px;
+    height: 900px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* === BACKGROUND === */
+  .bg-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .bg-gradient {
+    background:
+      radial-gradient(ellipse 50% 35% at 35% 25%, rgba(34,211,238,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 75% 50%, rgba(96,165,250,0.02) 0%, transparent 50%),
+      linear-gradient(175deg, var(--bg-deep) 0%, var(--bg-surface) 100%);
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(34,211,238,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34,211,238,0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Subtle scanline effect for game UI feel */
+  .bg-scanline {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+  }
+
+  /* === APP LAYOUT === */
+  .app {
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; z-index: 10;
+  }
+
+  /* === TOP BAR === */
+  .topbar {
+    height: 40px; flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(14,20,40,0.98) 0%, rgba(8,12,24,0.96) 100%);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-logo {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #fff; font-weight: 800;
+  }
+  .topbar-title { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: var(--text2); text-transform: uppercase; }
+  .topbar-badge {
+    font-size: 8px; font-weight: 700; letter-spacing: 1px;
+    color: var(--cyan);
+    padding: 2px 8px;
+    background: var(--cyan-dim);
+    border: 1px solid rgba(34,211,238,0.2);
+    border-radius: 10px;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-time {
+    font-family: var(--font-mono);
+    font-size: 10px; color: var(--text3);
+  }
+
+  /* === MAIN AREA === */
+  .main {
+    display: flex; flex: 1; min-height: 0;
+  }
+
+  /* === LEFT NAV — Compact Game Menu === */
+  .nav {
+    width: 152px; flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(14,20,40,0.5) 0%, rgba(8,12,24,0.3) 100%);
+    border-right: 1px solid var(--border);
+    padding: 10px 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .nav-section {
+    padding: 8px 14px 3px;
+    font-size: 8px; font-weight: 700; letter-spacing: 2px;
+    color: var(--text3); text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 14px;
+    font-size: 10px; font-weight: 600;
+    color: var(--text2);
+    border-left: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .nav-item:hover {
+    color: var(--text);
+    background: rgba(34,211,238,0.03);
+  }
+  .nav-item.active {
+    color: var(--cyan);
+    background: linear-gradient(90deg, rgba(34,211,238,0.06) 0%, transparent 100%);
+    border-left-color: var(--cyan);
+  }
+  .nav-icon { width: 14px; text-align: center; font-size: 10px; opacity: 0.8; }
+  .nav-badge {
+    margin-left: auto;
+    font-size: 7px; font-weight: 700;
+    color: var(--cyan);
+    background: var(--cyan-dim);
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+
+  /* === CENTER: RIMURU FEATURED — Game Home Screen Style === */
+  .center {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    padding: 12px 20px;
+  }
+  .rimuru-stage {
+    position: relative;
+    display: flex; align-items: flex-end; gap: 20px;
+    max-height: 100%;
+  }
+  .rimuru-portrait-wrap {
+    position: relative;
+    width: 260px; height: 320px;
+    flex-shrink: 0;
+  }
+  /* Subtle character backdrop — game UI aesthetic */
+  .rimuru-backdrop {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 200px; height: 280px;
+    background: radial-gradient(ellipse 60% 50% at 50% 80%, rgba(34,211,238,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .rimuru-portrait {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 10%;
+    border-radius: 10px;
+    border: 1.5px solid rgba(96,165,250,0.3);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    position: relative; z-index: 2;
+  }
+  /* Featured badge — compact game UI style */
+  .rimuru-badge {
+    position: absolute; top: 6px; left: 6px;
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    color: #000;
+    font-size: 8px; font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 1.5px;
+    z-index: 3;
+  }
+  /* Rarity stars below portrait */
+  .rimuru-stars {
+    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; color: var(--gold);
+    white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    z-index: 3;
+  }
+  /* Rimuru info panel — compact game UI */
+  .rimuru-info {
+    display: flex; flex-direction: column; gap: 6px;
+    max-width: 250px;
+    padding-bottom: 4px;
+  }
+  .rimuru-name {
+    font-size: 22px; font-weight: 800; letter-spacing: 1.5px;
+    color: var(--text);
+    line-height: 1.05;
+  }
+  .rimuru-title {
+    font-size: 10px; color: var(--cyan); font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .rimuru-divider {
+    width: 32px; height: 1.5px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+  }
+  .rimuru-stats {
+    display: flex; flex-wrap: wrap; gap: 4px 12px;
+  }
+  .rs-item {
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .rs-label { font-size: 8px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .rs-value { font-size: 11px; font-weight: 700; color: var(--text); }
+  .rs-value.online { color: var(--green); }
+
+  /* === RIGHT: CIEL INTELLIGENCE CORE — Compact Panel === */
+  .ciel-panel {
+    width: 200px; flex-shrink: 0;
+    background: linear-gradient(180deg, rgba(14,20,40,0.5) 0%, rgba(8,12,24,0.3) 100%);
+    border-left: 1px solid var(--border);
+    padding: 12px 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .ciel-header { text-align: center; width: 100%; }
+  .ciel-header h2 {
+    font-size: 13px; font-weight: 800; letter-spacing: 2px;
+    color: var(--cyan);
+  }
+  .ciel-subtitle {
+    font-size: 7px; font-weight: 700; letter-spacing: 2px; color: var(--text3); text-transform: uppercase;
+  }
+  /* Ciel portrait — compact circular with cyan accent ring */
+  .ciel-portrait-wrap {
+    position: relative;
+    width: 72px; height: 72px;
+  }
+  .ciel-ring {
+    position: absolute; inset: -3px;
+    border-radius: 50%;
+    border: 1px solid rgba(34,211,238,0.15);
+  }
+  .ciel-ring-inner {
+    position: absolute; inset: 3px;
+    border-radius: 50%;
+    border: 1px solid rgba(34,211,238,0.08);
+  }
+  .ciel-portrait {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 15%;
+    border: 1.5px solid rgba(34,211,238,0.3);
+    position: relative; z-index: 2;
+  }
+  /* Status indicator dot */
+  .ciel-dot {
+    position: absolute; bottom: 2px; right: 2px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green);
+    border: 2px solid var(--bg-surface);
+    z-index: 3;
+  }
+  /* Ciel diagnostic — compact list */
+  .ciel-diagnostics {
+    width: 100%;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .diag-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 8px;
+    background: rgba(24,34,68,0.3);
+    border: 1px solid rgba(37,51,88,0.3);
+    border-radius: 5px;
+  }
+  .diag-label { font-size: 7px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .diag-value { font-size: 9px; font-weight: 600; color: var(--text); }
+  .diag-value.online { color: var(--green); }
+
+  /* Zeno mini-status below Ciel */
+  .zeno-status {
+    width: 100%;
+    padding: 6px 8px;
+    background: rgba(24,34,68,0.2);
+    border: 1px solid rgba(37,51,88,0.3);
+    border-radius: 5px;
+  }
+  .zeno-label { font-size: 7px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .zeno-value { font-size: 9px; font-weight: 600; color: var(--blue); }
+
+  /* === BOTTOM SECTION === */
+  .bottom {
+    flex-shrink: 0;
+    border-top: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(8,12,24,0.6) 0%, rgba(8,12,24,0.8) 100%);
+    padding: 8px 16px 10px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  /* === ROSTER — Compact Game Collection === */
+  .roster-section { }
+  .section-label {
+    font-size: 7px; font-weight: 700; letter-spacing: 2px;
+    color: var(--text3); text-transform: uppercase;
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .section-label::before { content: '◆'; font-size: 6px; color: var(--cyan); opacity: 0.7; }
+  .roster {
+    display: flex; gap: 5px;
+  }
+  .char-card {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 3px 5px;
+    background: rgba(24,34,68,0.2);
+    border: 1px solid rgba(37,51,88,0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+  .char-card:hover {
+    border-color: var(--border-bright);
+    background: rgba(24,34,68,0.4);
+  }
+  .char-card.selected {
+    border-color: var(--cyan);
+    background: rgba(34,211,238,0.04);
+  }
+  /* Rarity frames — compact game UI style */
+  .char-card.rarity-ssr {
+    border: 1.5px solid rgba(251,191,36,0.4) !important;
+  }
+  .char-card.rarity-sr {
+    border: 1.5px solid rgba(167,139,250,0.35) !important;
+  }
+  .char-card.rarity-r {
+    border: 1.5px solid rgba(96,165,250,0.25) !important;
+  }
+  /* Subtle hover glow by rarity */
+  .char-card.rarity-ssr:hover { box-shadow: 0 0 12px rgba(251,191,36,0.1); }
+  .char-card.rarity-sr:hover { box-shadow: 0 0 10px rgba(167,139,250,0.08); }
+  .char-card.rarity-r:hover { box-shadow: 0 0 8px rgba(96,165,250,0.06); }
+
+  .char-frame {
+    position: relative;
+    width: 48px; height: 48px;
+  }
+  .char-portrait {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 15%;
+    border: 1.5px solid var(--ac);
+  }
+  /* Rarity badge — compact */
+  .char-rarity-badge {
+    position: absolute; top: -3px; right: -3px;
+    font-size: 6px; font-weight: 800;
+    padding: 0 3px;
+    border-radius: 2px;
+    background: var(--rarity-color);
+    color: #000;
+  }
+  /* Stars — compact */
+  .char-stars {
+    font-size: 5px; color: var(--gold);
+    white-space: nowrap;
+  }
+  .char-info {
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    text-align: center;
+  }
+  .char-name { font-size: 8px; font-weight: 700; color: var(--text); line-height: 1.1; }
+  .char-role { font-size: 6px; color: var(--ac); font-weight: 500; }
+  .char-meta {
+    display: flex; gap: 3px; align-items: center;
+  }
+  .char-power { font-size: 6px; color: var(--text3); font-weight: 600; }
+  .char-status {
+    font-size: 5px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 0 3px; border-radius: 5px;
+  }
+  .char-status.online { color: var(--green); background: rgba(74,222,128,0.08); }
+  .char-status.busy { color: var(--orange); background: rgba(251,146,60,0.08); }
+  .char-status.idle { color: var(--text3); background: rgba(100,116,139,0.08); }
+
+  /* === SYSTEM PANELS — Compact === */
+  .panels {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  }
+  .panel {
+    background: rgba(18,26,51,0.3);
+    border: 1px solid rgba(37,51,88,0.3);
+    border-radius: 6px;
+    padding: 7px 10px;
+  }
+  .panel-title {
+    font-size: 7px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--cyan); text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .panel-content { display: flex; flex-direction: column; gap: 3px; }
+  .panel-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 8px;
+  }
+  .pr-label { color: var(--text3); font-weight: 500; }
+  .pr-value { color: var(--text); font-weight: 600; }
+  .pr-value.online { color: var(--green); }
+
+  /* === EVENT CHRONICLE — Compact === */
+  .chronicle {
+    background: rgba(18,26,51,0.2);
+    border: 1px solid rgba(37,51,88,0.3);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .chronicle-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 10px;
+    border-bottom: 1px solid rgba(37,51,88,0.2);
+    background: rgba(0,0,0,0.08);
+  }
+  .chronicle-header h3 {
+    font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--text2); text-transform: uppercase;
+  }
+  .chronicle-filters { display: flex; gap: 2px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 1px 6px;
+    font-size: 7px; font-weight: 600;
+    background: rgba(24,34,68,0.3);
+    color: var(--text3);
+    border: 1px solid rgba(37,51,88,0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .filter-btn:hover { color: var(--text); border-color: var(--border-bright); }
+  .filter-btn.active {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    background: var(--cyan-dim);
+  }
+  .chronicle-events {
+    max-height: 80px;
+    overflow-y: auto;
+    padding: 1px 0;
+  }
+  .chronicle-events::-webkit-scrollbar { width: 3px; }
+  .chronicle-events::-webkit-scrollbar-track { background: transparent; }
+  .chronicle-events::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .event {
+    display: flex; align-items: center; gap: 6px;
+    padding: 3px 10px;
+    font-size: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.008);
+  }
+  .event:hover { background: rgba(34,211,238,0.015); }
+  .event.hidden { display: none; }
+  .event-time { font-family: var(--font-mono); font-size: 7px; color: var(--text3); width: 42px; flex-shrink: 0; }
+  .event-char { font-weight: 700; width: 52px; flex-shrink: 0; font-size: 8px; }
+  .event-msg { color: var(--text2); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .event-sev { font-size: 6px; font-weight: 700; letter-spacing: 0.5px; padding: 0 3px; border-radius: 4px; flex-shrink: 0; }
+  .event-sev.info { color: var(--text3); background: rgba(100,116,139,0.08); }
+  .event-sev.success { color: var(--green); background: rgba(74,222,128,0.08); }
+  .event-sev.warn { color: var(--orange); background: rgba(251,146,60,0.08); }
+  .event-sev.error { color: var(--red); background: rgba(248,113,113,0.08); }
+
+  /* === SAMPLE BADGE === */
+  .sample-badge {
+    position: fixed; bottom: 4px; right: 8px;
+    font-size: 7px; font-weight: 600; letter-spacing: 0.5px;
+    color: var(--text3);
+    padding: 1px 6px;
+    background: rgba(14,20,40,0.7);
+    border: 1px solid rgba(37,51,88,0.2);
+    border-radius: 6px;
+    z-index: 100;
+  }
+
+  /* === REDUCED MOTION === */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* === RESPONSIVE BREAKPOINTS === */
+  @media (max-width: 1280px) {
+    body { width: 1280px; }
+    .rimuru-portrait-wrap { width: 220px; height: 270px; }
+    .rimuru-name { font-size: 18px; }
+    .nav { width: 132px; }
+    .ciel-panel { width: 180px; }
+    .char-frame { width: 42px; height: 42px; }
+    .char-name { font-size: 7px; }
+  }
+  @media (max-width: 1024px) {
+    body { width: 1024px; }
+    .rimuru-portrait-wrap { width: 180px; height: 220px; }
+    .rimuru-info { max-width: 180px; }
+    .rimuru-name { font-size: 15px; }
+    .nav { width: 112px; }
+    .ciel-panel { width: 160px; padding: 8px 8px; }
+    .ciel-portrait-wrap { width: 56px; height: 56px; }
+    .ciel-portrait { width: 56px; height: 56px; }
+    .char-frame { width: 36px; height: 36px; }
+    .char-name { font-size: 6px; }
+    .char-stars { font-size: 4px; }
+    .panels { grid-template-columns: 1fr; }
+    .chronicle-filters { gap: 1px; }
+    .filter-btn { font-size: 6px; padding: 1px 4px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div class="bg-layer bg-gradient"></div>
+<div class="bg-layer bg-grid"></div>
+<div class="bg-layer bg-scanline"></div>
+
+<div class="app">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">PM</div>
+      <span class="topbar-title">PixelDesktop</span>
+      <span class="topbar-badge">ZENEO v1</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-time" id="clock"></span>
+    </div>
+  </div>
+
+  <!-- Main Area -->
+  <div class="main">
+
+    <!-- Left Navigation -->
+    <nav class="nav">
+      <div class="nav-section">SYSTEM</div>
+      <div class="nav-item active" data-nav="command">
+        <span class="nav-icon">◆</span> Command
+      </div>
+      <div class="nav-item" data-nav="intelligence">
+        <span class="nav-icon">◈</span> Intelligence
+      </div>
+      <div class="nav-section">UNITS</div>
+      <div class="nav-item" data-nav="units">
+        <span class="nav-icon">▣</span> Units
+        <span class="nav-badge">8</span>
+      </div>
+      <div class="nav-item" data-nav="inference">
+        <span class="nav-icon">⚙</span> Inference
+      </div>
+      <div class="nav-section">DEVICE</div>
+      <div class="nav-item" data-nav="device">
+        <span class="nav-icon">◉</span> Device
+      </div>
+      <div class="nav-section">LOG</div>
+      <div class="nav-item" data-nav="log">
+        <span class="nav-icon">▤</span> Log
+        <span class="nav-badge">12</span>
+      </div>
+    </nav>
+
+    <!-- Center: Rimuru Featured -->
+    <div class="center">
+      <div class="rimuru-stage">
+        <div class="rimuru-portrait-wrap">
+          <div class="rimuru-backdrop"></div>
+          <img class="rimuru-portrait" src="data:image/jpeg;base64,/INSERT_RIMURU_BASE64_HERE" alt="Rimuru — Featured Unit">
+          <div class="rimuru-badge">FEATURED</div>
+          <div class="rimuru-stars">★★★★★</div>
+        </div>
+        <div class="rimuru-info">
+          <div class="rimuru-name">RIMURU</div>
+          <div class="rimuru-title">Orchestrator · SSR</div>
+          <div class="rimuru-divider"></div>
+          <div class="rimuru-stats">
+            <div class="rs-item">
+              <span class="rs-label">Level</span>
+              <span class="rs-value">99</span>
+            </div>
+            <div class="rs-item">
+              <span class="rs-label">Status</span>
+              <span class="rs-value online">ONLINE</span>
+            </div>
+            <div class="rs-item">
+              <span class="rs-label">Tasks</span>
+              <span class="rs-value">3 Active</span>
+            </div>
+            <div class="rs-item">
+              <span class="rs-label">Uptime</span>
+              <span class="rs-value">14d 7h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Ciel Intelligence Core -->
+    <div class="ciel-panel">
+      <div class="ciel-header">
+        <h2>CIEL</h2>
+        <div class="ciel-subtitle">Intelligence Core</div>
+      </div>
+      <div class="ciel-portrait-wrap">
+        <div class="ciel-ring"></div>
+        <div class="ciel-ring-inner"></div>
+        <img class="ciel-portrait" src="data:image/jpeg;base64,/INSERT_CIEL_BASE64_HERE" alt="Ciel — Intelligence Core">
+        <div class="ciel-dot"></div>
+      </div>
+      <div class="ciel-diagnostics">
+        <div class="diag-row">
+          <span class="diag-label">Status</span>
+          <span class="diag-value online">Active</span>
+        </div>
+        <div class="diag-row">
+          <span class="diag-label">Tasks</span>
+          <span class="diag-value">2 Running</span>
+        </div>
+        <div class="diag-row">
+          <span class="diag-label">Model</span>
+          <span class="diag-value">Qwen3.6</span>
+        </div>
+        <div class="diag-row">
+          <span class="diag-label">Memory</span>
+          <span class="diag-value">3.6k / 4.4k</span>
+        </div>
+        <div class="diag-row">
+          <span class="diag-label">Sessions</span>
+          <span class="diag-value">20 Indexed</span>
+        </div>
+      </div>
+      <!-- Zeno mini-status -->
+      <div class="zeno-status">
+        <div class="zeno-label">Zeno · Memory</div>
+        <div class="zeno-value">● Operational</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="bottom">
+
+    <!-- Roster -->
+    <div class="roster-section">
+      <div class="section-label">Unit Roster</div>
+      <div class="roster">
+        <div class="char-card rarity-ssr" data-char="rimuru" style="--ac: rgba(251,191,36,0.5); --rarity-color: var(--gold); --rarity-glow: rgba(251,191,36,0.08); --ac-glow: rgba(251,191,36,0.15);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_RIMURU_BASE64_HERE" alt="Rimuru">
+            <span class="char-rarity-badge">SSR</span>
+          </div>
+          <div class="char-stars">★★★★★</div>
+          <div class="char-info">
+            <span class="char-name">Rimuru</span>
+            <span class="char-role">Orchestrator</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 98</span>
+              <span class="char-status online">ON</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="char-card rarity-ssr" data-char="ciel" style="--ac: rgba(34,211,238,0.5); --rarity-color: var(--cyan); --rarity-glow: rgba(34,211,238,0.08); --ac-glow: rgba(34,211,238,0.15);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_CIEL_BASE64_HERE" alt="Ciel">
+            <span class="char-rarity-badge">SSR</span>
+          </div>
+          <div class="char-stars">★★★★★</div>
+          <div class="char-info">
+            <span class="char-name">Ciel</span>
+            <span class="char-role">Intelligence</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 95</span>
+              <span class="char-status online">ON</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="char-card rarity-ssr" data-char="diablo" style="--ac: rgba(139,92,246,0.5); --rarity-color: var(--purple); --rarity-glow: rgba(139,92,246,0.08); --ac-glow: rgba(139,92,246,0.15);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_DIABLO_BASE64_HERE" alt="Diablo">
+            <span class="char-rarity-badge">SSR</span>
+          </div>
+          <div class="char-stars">★★★★★</div>
+          <div class="char-info">
+            <span class="char-name">Diablo</span>
+            <span class="char-role">Inference</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 92</span>
+              <span class="char-status online">ON</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="char-card rarity-sr" data-char="shion" style="--ac: rgba(249,115,22,0.5); --rarity-color: var(--purple); --rarity-glow: rgba(167,139,250,0.06); --ac-glow: rgba(249,115,22,0.12);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_SHION_BASE64_HERE" alt="Shion">
+            <span class="char-rarity-badge">SR</span>
+          </div>
+          <div class="char-stars">★★★★☆</div>
+          <div class="char-info">
+            <span class="char-name">Shion</span>
+            <span class="char-role">Worker</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 85</span>
+              <span class="char-status busy">BUSY</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="char-card rarity-sr" data-char="souei" style="--ac: rgba(34,211,128,0.5); --rarity-color: var(--blue); --rarity-glow: rgba(96,165,250,0.05); --ac-glow: rgba(34,211,128,0.12);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_SOUEI_BASE64_HERE" alt="Souei">
+            <span class="char-rarity-badge">SR</span>
+          </div>
+          <div class="char-stars">★★★★☆</div>
+          <div class="char-info">
+            <span class="char-name">Souei</span>
+            <span class="char-role">Device</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 78</span>
+              <span class="char-status online">ON</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="char-card rarity-sr" data-char="benimaru" style="--ac: rgba(239,68,68,0.5); --rarity-color: var(--purple); --rarity-glow: rgba(167,139,250,0.06); --ac-glow: rgba(239,68,68,0.12);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_BENIMARU_BASE64_HERE" alt="Benimaru">
+            <span class="char-rarity-badge">SR</span>
+          </div>
+          <div class="char-stars">★★★★☆</div>
+          <div class="char-info">
+            <span class="char-name">Benimaru</span>
+            <span class="char-role">Verification</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 82</span>
+              <span class="char-status online">ON</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="char-card rarity-sr" data-char="ranga" style="--ac: rgba(236,72,153,0.5); --rarity-color: var(--purple); --rarity-glow: rgba(167,139,250,0.06); --ac-glow: rgba(236,72,153,0.12);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_RANGA_BASE64_HERE" alt="Ranga">
+            <span class="char-rarity-badge">SR</span>
+          </div>
+          <div class="char-stars">★★★★☆</div>
+          <div class="char-info">
+            <span class="char-name">Ranga</span>
+            <span class="char-role">Background</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 79</span>
+              <span class="char-status idle">IDLE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="char-card rarity-r" data-char="gobta" style="--ac: rgba(234,179,8,0.5); --rarity-color: var(--blue); --rarity-glow: rgba(96,165,250,0.04); --ac-glow: rgba(234,179,8,0.1);">
+          <div class="char-frame">
+            <img class="char-portrait" src="data:image/png;base64,/INSERT_ROSTER_GOBTA_BASE64_HERE" alt="Gobta">
+            <span class="char-rarity-badge">R</span>
+          </div>
+          <div class="char-stars">★★★☆☆</div>
+          <div class="char-info">
+            <span class="char-name">Gobta</span>
+            <span class="char-role">Transfer</span>
+            <div class="char-meta">
+              <span class="char-power">PWR 65</span>
+              <span class="char-status online">ON</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Panels -->
+    <div class="panels">
+      <div class="panel">
+        <div class="panel-title">Inference</div>
+        <div class="panel-content">
+          <div class="panel-row"><span class="pr-label">Model</span><span class="pr-value">Qwen3.6-35B</span></div>
+          <div class="panel-row"><span class="pr-label">Provider</span><span class="pr-value">Ollama</span></div>
+          <div class="panel-row"><span class="pr-label">Status</span><span class="pr-value online">Ready</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Memory</div>
+        <div class="panel-content">
+          <div class="panel-row"><span class="pr-label">Sessions</span><span class="pr-value">20 indexed</span></div>
+          <div class="panel-row"><span class="pr-label">Memory</span><span class="pr-value">3.6k / 4.4k</span></div>
+          <div class="panel-row"><span class="pr-label">Events</span><span class="pr-value">128 total</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Device Link</div>
+        <div class="panel-content">
+          <div class="panel-row"><span class="pr-label">Device</span><span class="pr-value">Pixel 7a</span></div>
+          <div class="panel-row"><span class="pr-label">ADB</span><span class="pr-value online">Connected</span></div>
+          <div class="panel-row"><span class="pr-label">Storage</span><span class="pr-value">64 GB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chronicle -->
+    <div class="chronicle">
+      <div class="chronicle-header">
+        <h3>Mission Log</h3>
+        <div class="chronicle-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="rimuru">Rimuru</button>
+          <button class="filter-btn" data-filter="ciel">Ciel</button>
+          <button class="filter-btn" data-filter="shion">Shion</button>
+          <button class="filter-btn" data-filter="souei">Souei</button>
+          <button class="filter-btn" data-filter="diablo">Diablo</button>
+          <button class="filter-btn" data-filter="gobta">Gobta</button>
+          <button class="filter-btn" data-filter="benimaru">Benimaru</button>
+          <button class="filter-btn" data-filter="ranga">Ranga</button>
+        </div>
+      </div>
+      <div class="chronicle-events">
+        <div class="event" data-char="rimuru" data-sev="info">
+          <span class="event-time">11:23:01</span>
+          <span class="event-char" style="color:#3b82f6">Rimuru</span>
+          <span class="event-msg">Worker Shion started LLM job #42</span>
+          <span class="event-sev info">INFO</span>
+        </div>
+        <div class="event" data-char="ciel" data-sev="info">
+          <span class="event-time">11:22:45</span>
+          <span class="event-char" style="color:#22d3ee">Ciel</span>
+          <span class="event-msg">Memory updated: 3 new sessions indexed</span>
+          <span class="event-sev info">INFO</span>
+        </div>
+        <div class="event" data-char="shion" data-sev="success">
+          <span class="event-time">11:22:30</span>
+          <span class="event-char" style="color:#fb923c">Shion</span>
+          <span class="event-msg">Inference completed: 1,247 tokens generated</span>
+          <span class="event-sev success">SUCCESS</span>
+        </div>
+        <div class="event" data-char="souei" data-sev="success">
+          <span class="event-time">11:22:15</span>
+          <span class="event-char" style="color:#4ade80">Souei</span>
+          <span class="event-msg">Device Pixel 7a connected via ADB</span>
+          <span class="event-sev success">SUCCESS</span>
+        </div>
+        <div class="event" data-char="diablo" data-sev="info">
+          <span class="event-time">11:21:58</span>
+          <span class="event-char" style="color:#a78bfa">Diablo</span>
+          <span class="event-msg">Model Qwen3.6-35B loaded via Ollama</span>
+          <span class="event-sev info">INFO</span>
+        </div>
+        <div class="event" data-char="gobta" data-sev="info">
+          <span class="event-time">11:21:30</span>
+          <span class="event-char" style="color:#eab308">Gobta</span>
+          <span class="event-msg">File transfer: 2.3 MB → device storage</span>
+          <span class="event-sev info">INFO</span>
+        </div>
+        <div class="event" data-char="benimaru" data-sev="success">
+          <span class="event-time">11:20:45</span>
+          <span class="event-char" style="color:#ef4444">Benimaru</span>
+          <span class="event-msg">Verification passed: run #38 confirmed</span>
+          <span class="event-sev success">SUCCESS</span>
+        </div>
+        <div class="event" data-char="ranga" data-sev="info">
+          <span class="event-time">11:20:00</span>
+          <span class="event-char" style="color:#ec4899">Ranga</span>
+          <span class="event-msg">Cron: daily snapshot backed up</span>
+          <span class="event-sev info">INFO</span>
+        </div>
+        <div class="event" data-char="rimuru" data-sev="info">
+          <span class="event-time">11:19:30</span>
+          <span class="event-char" style="color:#3b82f6">Rimuru</span>
+          <span class="event-msg">Orchestrator heartbeat: all systems nominal</span>
+          <span class="event-sev info">INFO</span>
+        </div>
+        <div class="event" data-char="ciel" data-sev="info">
+          <span class="event-time">11:19:00</span>
+          <span class="event-char" style="color:#22d3ee">Ciel</span>
+          <span class="event-msg">Knowledge graph updated: 12 entities linked</span>
+          <span class="event-sev info">INFO</span>
+        </div>
+        <div class="event" data-char="shion" data-sev="success">
+          <span class="event-time">11:18:45</span>
+          <span class="event-char" style="color:#fb923c">Shion</span>
+          <span class="event-msg">DTCA1 job #41 completed: 847 tokens, 3.2s</span>
+          <span class="event-sev success">SUCCESS</span>
+        </div>
+        <div class="event" data-char="souei" data-sev="warn">
+          <span class="event-time">11:18:00</span>
+          <span class="event-char" style="color:#4ade80">Souei</span>
+          <span class="event-msg">Scanning for new devices on network...</span>
+          <span class="event-sev warn">WARN</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="sample-badge">SAMPLE DATA · ZENEO v1</div>
+
+<script>
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = h+':'+m+':'+s;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Character selection
+  const charCards = document.querySelectorAll('.char-card');
+  const events = document.querySelectorAll('.event');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  let selectedChar = null;
+
+  charCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const char = card.dataset.char;
+      if (selectedChar === char) {
+        selectedChar = null;
+        charCards.forEach(c => c.classList.remove('selected'));
+        events.forEach(e => e.classList.remove('hidden'));
+        filterBtns.forEach(b => b.classList.remove('active'));
+        filterBtns[0].classList.add('active');
+      } else {
+        selectedChar = char;
+        charCards.forEach(c => c.classList.toggle('selected', c.dataset.char === char));
+        events.forEach(e => {
+          e.classList.toggle('hidden', e.dataset.char !== char);
+        });
+        filterBtns.forEach(b => b.classList.remove('active'));
+        const matchBtn = document.querySelector('.filter-btn[data-filter="'+char+'"]');
+        if (matchBtn) matchBtn.classList.add('active');
+      }
+    });
+  });
+
+  // Filter buttons
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (selectedChar) {
+        events.forEach(e => {
+          const matchChar = e.dataset.char === selectedChar;
+          const matchFilter = filter === 'all' || e.dataset.char === filter;
+          e.classList.toggle('hidden', !(matchChar && matchFilter));
+        });
+      } else {
+        events.forEach(e => {
+          e.classList.toggle('hidden', filter !== 'all' && e.dataset.char !== filter);
+        });
+      }
+    });
+  });
+
+  // Navigation
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      navItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // Escape key — reset all
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      selectedChar = null;
+      charCards.forEach(c => c.classList.remove('selected'));
+      events.forEach(e => e.classList.remove('hidden'));
+      filterBtns.forEach(b => b.classList.remove('active'));
+      filterBtns[0].classList.add('active');
+    }
+  });
+</script>
+
+</body>
+</html>

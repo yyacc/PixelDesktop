@@ -47,6 +47,7 @@ targets:
       - path: PixelDesktop
         excludes:
           - "App/**"
+          - "StorageUI/**"
           - "Info.plist"
           - "Assets.xcassets/**"
       - path: PixelDesktopCLI
