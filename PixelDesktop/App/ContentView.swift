@@ -120,6 +120,10 @@ struct ContentView: View {
                     PerceptionView()
                 case .inference:
                     InferenceView()
+                case .telemetry:
+                    TelemetryView()
+                case .input:
+                    InputView()
                 }
             }
         } else if appState.devices.isEmpty {
@@ -142,7 +146,7 @@ struct ContentView: View {
 }
 
 enum DeviceTab: String, CaseIterable, Identifiable {
-    case device, state, applications, log, storage, perception, inference
+    case device, state, applications, log, storage, perception, inference, telemetry, input
 
     var id: String { rawValue }
 
@@ -155,6 +159,8 @@ enum DeviceTab: String, CaseIterable, Identifiable {
         case .storage: return "Storage"
         case .perception: return "Perception"
         case .inference: return "Inference"
+        case .telemetry: return "Telemetry"
+        case .input: return "Input"
         }
     }
 }

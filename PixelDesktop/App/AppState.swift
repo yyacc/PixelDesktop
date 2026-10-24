@@ -263,13 +263,19 @@ final class AppState: ObservableObject {
         deviceManager: DeviceManager? = nil,
         transport: TransportProtocol? = nil,
         appOperations: AppOperationsProtocol? = nil,
-        inferenceRunner: OnDeviceInferenceJobRunnerProtocol? = nil
+        inferenceRunner: OnDeviceInferenceJobRunnerProtocol? = nil,
+        inputAuditLog: InputAuditLog? = nil
     ) {
         let resolvedTransport = transport ?? ADBTransport()
         self.transport = resolvedTransport
         self.appOperations = appOperations ?? ADBAppOperations(transport: resolvedTransport)
         self.deviceManager = deviceManager ?? DeviceManager()
         self.inferenceRunner = inferenceRunner ?? URLSessionOnDeviceInferenceJobRunner()
+        // Phase 2 (B1): the audit trail persists by default, so a tap on a dead-screen phone
+        // is reviewable after the fact. A test injects its own log (or an in-memory one) and
+        // the suite never writes into Application Support.
+        self.inputAuditLog = inputAuditLog
+            ?? InputAuditLog(fileURL: try? InputAuditLog.applicationDefaultURL())
         setupBindings()
     }
 
@@ -637,4 +643,233 @@ final class AppState: ObservableObject {
         storageDiskSpace = await service.diskSpace()
     }
 
+    // MARK: - Phase 2 (A7) — telemetry and thermal history
+    //
+    // Read-only, and deliberately so: ADR-018 decided the phone throttles and rnz accepts it,
+    // so this layer observes and alerts rather than intervening. Nothing here sets a thermal
+    // policy, a CPU governor, or a battery-saver state.
+
+    /// The most recent telemetry read, or `nil` before the first one.
+    ///
+    /// `nil` means "not read yet", which the view renders differently from a read whose
+    /// sub-sources were all absent.
+    @Published var telemetry: DeviceTelemetry?
+
+    /// The retained time series. Bounded — see `TelemetryHistory.defaultCapacity`.
+    @Published var telemetryHistory = TelemetryHistory()
+
+    @Published var isReadingTelemetry: Bool = false
+    @Published var telemetryError: PixelDesktopError?
+
+    /// Whether the poll loop is running.
+    @Published var telemetryPolling: Bool = false
+
+    private var telemetryPollTask: Task<Void, Never>?
+
+    /// The telemetry reader. Same transport, same pattern as `perception`.
+    var telemetryReader: DeviceTelemetryProtocol {
+        ADBDeviceTelemetry(transport: transport)
+    }
+
+    /// The most recent ADR-018 alert in the retained window, or `nil`.
+    ///
+    /// Read by `TelemetryView` to render the alert banner, which is what makes
+    /// `ThermalStatus.isAlert` an enforced contract rather than a declaration.
+    var thermalAlert: TelemetrySample? { telemetryHistory.latestAlert }
+
+    /// Reads one sample and appends it to the history.
+    ///
+    /// A failed read keeps the previous sample rather than clearing it: a failed read is not
+    /// evidence that the device cooled down.
+    func readTelemetry() async {
+        guard let serial = selectedSerial else {
+            telemetryError = .deviceNotFound
+            return
+        }
+        isReadingTelemetry = true
+        defer { isReadingTelemetry = false }
+        do {
+            let sample = try await telemetryReader.read(deviceSerial: serial, timeout: 20)
+            telemetry = sample
+            telemetryHistory.append(sample)
+            telemetryError = nil
+        } catch {
+            telemetryError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Starts the poll loop. Idempotent — a second call while running does nothing, so a view
+    /// that appears twice does not double the cadence.
+    func startTelemetryPolling(interval: TimeInterval = 10) {
+        guard telemetryPollTask == nil else { return }
+        telemetryPolling = true
+        telemetryPollTask = Task { [weak self] in
+            guard let self else { return }
+            while !Task.isCancelled {
+                await self.readTelemetry()
+                try? await Task.sleep(nanoseconds: UInt64(max(1, interval) * 1_000_000_000))
+            }
+            self.telemetryPolling = false
+        }
+    }
+
+    func stopTelemetryPolling() {
+        telemetryPollTask?.cancel()
+        telemetryPollTask = nil
+        telemetryPolling = false
+    }
+
+    // MARK: - Phase 2 (B1) — input injection
+    //
+    // The dry-run gate lives in the type system (`InputActionPlan.confirmed`), and these
+    // wrappers are what the UI drives: propose → render the preview → confirm → execute.
+    // There is no path here that executes without a proposal the user saw.
+
+    /// The persistent audit trail (proposal D2).
+    let inputAuditLog: InputAuditLog
+
+    /// The plan awaiting confirmation, or `nil` when nothing is proposed.
+    @Published var pendingInputPlan: InputActionPlan?
+
+    /// Why the last proposal was refused, or `nil`.
+    @Published var inputRefusal: InputRefusal?
+
+    /// Candidates listed when a query matched more than one element.
+    @Published var inputCandidates: [String] = []
+
+    /// The last executed action, or `nil`.
+    @Published var lastInputResult: InputActionResult?
+
+    @Published var inputIsBusy: Bool = false
+
+    /// A snapshot of the audit trail, for rendering.
+    ///
+    /// `InputAuditLog` is a reference type whose mutations SwiftUI cannot observe, so the view
+    /// reads this published copy instead of reaching into the log. Refreshed after every
+    /// execution.
+    @Published var inputAuditRecords: [InputAuditRecord] = []
+
+    var deviceInput: DeviceInputProtocol {
+        ADBDeviceInput(transport: transport, auditLog: inputAuditLog)
+    }
+
+    /// Proposes a tap on the single element matching `query`, against a fresh dump.
+    ///
+    /// The dump is read here rather than accepted from the caller because a plan resolved
+    /// against a stale hierarchy taps where the element *was*, which on a live phone is a
+    /// different screen.
+    func proposeTap(query: String) async {
+        guard let serial = selectedSerial else {
+            pendingInputPlan = nil
+            lastError = PixelDesktopError.deviceNotFound
+            return
+        }
+        inputIsBusy = true
+        defer { inputIsBusy = false }
+        do {
+            let hierarchy = try await perception.uiHierarchy(deviceSerial: serial, timeout: 20)
+            pendingInputPlan = try deviceInput.planTap(hierarchy: hierarchy, matching: query)
+            inputRefusal = nil
+            inputCandidates = []
+        } catch let refusal as InputRefusal {
+            pendingInputPlan = nil
+            inputRefusal = refusal
+            if case .targetAmbiguous(let candidates) = refusal {
+                inputCandidates = candidates
+            }
+        } catch {
+            pendingInputPlan = nil
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Proposes a tap on one exact element index, the disambiguation path.
+    func proposeTap(elementIndex: Int) async {
+        guard let serial = selectedSerial else {
+            lastError = PixelDesktopError.deviceNotFound
+            return
+        }
+        inputIsBusy = true
+        defer { inputIsBusy = false }
+        do {
+            let hierarchy = try await perception.uiHierarchy(deviceSerial: serial, timeout: 20)
+            pendingInputPlan = try deviceInput.planTap(hierarchy: hierarchy, elementIndex: elementIndex)
+            inputRefusal = nil
+            inputCandidates = []
+        } catch let refusal as InputRefusal {
+            pendingInputPlan = nil
+            inputRefusal = refusal
+        } catch {
+            pendingInputPlan = nil
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Proposes a key event. No dump needed — a key goes to whatever has focus.
+    func proposeKey(_ key: String) {
+        do {
+            pendingInputPlan = try deviceInput.planKeyEvent(key)
+            inputRefusal = nil
+            inputCandidates = []
+        } catch let refusal as InputRefusal {
+            pendingInputPlan = nil
+            inputRefusal = refusal
+        } catch {
+            pendingInputPlan = nil
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Proposes typing text into the focused field.
+    func proposeText(_ text: String) {
+        do {
+            pendingInputPlan = try deviceInput.planText(text)
+            inputRefusal = nil
+            inputCandidates = []
+        } catch let refusal as InputRefusal {
+            pendingInputPlan = nil
+            inputRefusal = refusal
+        } catch {
+            pendingInputPlan = nil
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Confirms the pending plan and runs it.
+    ///
+    /// This is the only place a plan is promoted to `confirmed`, and it is called from the
+    /// user's approval of the preview — not automatically after planning.
+    func confirmAndExecuteInput() async {
+        guard let plan = pendingInputPlan else { return }
+        guard let serial = selectedSerial else {
+            lastError = PixelDesktopError.deviceNotFound
+            return
+        }
+        inputIsBusy = true
+        defer {
+            inputIsBusy = false
+            inputAuditRecords = inputAuditLog.records
+        }
+        do {
+            lastInputResult = try await deviceInput.execute(
+                plan.confirming(),
+                deviceSerial: serial,
+                timeout: 20
+            )
+            pendingInputPlan = nil
+            inputRefusal = nil
+            inputCandidates = []
+        } catch let refusal as InputRefusal {
+            inputRefusal = refusal
+        } catch {
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+        }
+    }
+
+    /// Discards the pending plan without executing it.
+    func cancelInputPlan() {
+        pendingInputPlan = nil
+        inputRefusal = nil
+        inputCandidates = []
+    }
 }

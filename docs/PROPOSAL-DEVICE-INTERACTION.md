@@ -356,7 +356,7 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 |---|---|---|---|
 | 0 | **Control plane** | A4 UI dump wired in · A6 logcat · B3 port forwarding · A2 screenshot-as-evidence · delete dead `Video/` scaffold · document scrcpy invocation (no subsystem) | ✅ **done 2026-10-24** — `engineering/phases/phase-00-control-plane.md` |
 | 1 | **The node** | C1 Termux + llama-server · B2 host service management · C2 inference jobs | rnz approval |
-| 2 | **Hands** | B1 input injection (dry-run gated) · A7 telemetry + thermal history | rnz approval + ADR |
+| 2 | **Hands** | B1 input injection (dry-run gated) · A7 telemetry + thermal history | ✅ **done 2026-10-25** — `engineering/phases/phase-02-hands.md`, ADR-019 |
 | 3 | **Durability** | A5 notifications · C4 scheduled tasks · C3 remote shell · B4/B5 · D1–D4 | rnz approval |
 
 ---
