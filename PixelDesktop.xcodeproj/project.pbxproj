@@ -13,6 +13,7 @@
 		0645C14B1394CA5C37C7A97B /* StorageItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A113F8B753E0200FF49C0F6D /* StorageItem.swift */; };
 		06505B76195DBF4743A3AB89 /* StorageToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914F215CAEA3BDA13A57593B /* StorageToolbarView.swift */; };
 		0897057655C94588DF8424B7 /* CLIInvocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7556F07519B9F11B81110152 /* CLIInvocation.swift */; };
+		0A7CF23D4933CB94292E09C7 /* Phase5IntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB9C9411F3A4AC96266DDD4 /* Phase5IntegrationTests.swift */; };
 		0B94C65804A065FE4F58021B /* Phase7EvidenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90F0DA3E1911EE1455AA9B7C /* Phase7EvidenceTests.swift */; };
 		0C83A8899628F4FC490EA058 /* NetworkPathMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19B800C932C91292D362E9C4 /* NetworkPathMonitor.swift */; };
 		0D6528A10CC1B3DEEA39B455 /* CLIEnvelopeRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614448AB0FEE281926589F46 /* CLIEnvelopeRenderer.swift */; };
@@ -185,6 +186,7 @@
 		914F215CAEA3BDA13A57593B /* StorageToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageToolbarView.swift; sourceTree = "<group>"; };
 		96BA9C0B15D4E6B1F3A20335 /* PixelDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PixelDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F2AA1DB62A4E154B038DEB0 /* CLIDeviceSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIDeviceSelection.swift; sourceTree = "<group>"; };
+		9FB9C9411F3A4AC96266DDD4 /* Phase5IntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase5IntegrationTests.swift; sourceTree = "<group>"; };
 		A113F8B753E0200FF49C0F6D /* StorageItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageItem.swift; sourceTree = "<group>"; };
 		A56771EB671377140963F0BF /* ModelProvisioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelProvisioning.swift; sourceTree = "<group>"; };
 		B0688291D09BAB5DAADB4681 /* pixel-desktop */ = {isa = PBXFileReference; includeInIndex = 0; path = "pixel-desktop"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -421,6 +423,7 @@
 			children = (
 				4DE502E2871C61F3AFF7DD25 /* ConnectionFoundationTests.swift */,
 				3239BB5CC229AF3F421DAFDF /* ExecutePipeDrainTests.swift */,
+				9FB9C9411F3A4AC96266DDD4 /* Phase5IntegrationTests.swift */,
 				4BB80C04344731006041936C /* Phase6InferenceTests.swift */,
 				89F4DDF1638B3EED2B4092E7 /* Phase7Amendment2Tests.swift */,
 				7239B55108175EF8E05F1637 /* Phase7Amendment3PathTests.swift */,
@@ -568,6 +571,7 @@
 				93B505C15A54ADCAD95A91E7 /* ConnectionFoundationTests.swift in Sources */,
 				36F111FA96428A8E74355EF1 /* ExecutePipeDrainTests.swift in Sources */,
 				57477E916E0FBCF59E5528BE /* Phase10Step1CancellationTests.swift in Sources */,
+				0A7CF23D4933CB94292E09C7 /* Phase5IntegrationTests.swift in Sources */,
 				83BB4FAB62407EE3B74B8CB4 /* Phase6InferenceTests.swift in Sources */,
 				FDAA05F49EF76C70E4EA5FBE /* Phase7Amendment2Tests.swift in Sources */,
 				F676D2A6FC5B357C003205DE /* Phase7Amendment3PathTests.swift in Sources */,
