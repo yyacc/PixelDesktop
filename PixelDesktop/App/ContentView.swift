@@ -38,8 +38,17 @@ struct ContentView: View {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
                 .disabled(appState.isDiscovering)
+                .keyboardShortcut("r", modifiers: .command)
             }
         }
+        .background(
+            ForEach(DeviceTab.allCases.indices, id: \.self) { index in
+                Button("") { selection = DeviceTab.allCases[index] }
+                    .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: .command)
+                    .opacity(0)
+                    .allowsHitTesting(false)
+            }
+        )
     }
 
     // MARK: - Sidebar
@@ -364,6 +373,19 @@ struct ObservationRow<Value: Codable & Equatable & Sendable>: View {
 struct ApplicationsView: View {
     @EnvironmentObject var appState: AppState
     @State private var includeSystem = false
+    @State private var searchText = ""
+    @State private var autoRefresh = false
+    @State private var refreshTimer: Timer?
+
+    var filteredApplications: [InstalledApp] {
+        if searchText.isEmpty {
+            return appState.installedApplications
+        }
+        return appState.installedApplications.filter {
+            $0.displayLabel.localizedCaseInsensitiveContains(searchText) ||
+            $0.packageName.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -374,6 +396,7 @@ struct ApplicationsView: View {
                     Label("List Applications", systemImage: "square.grid.2x2")
                 }
                 .disabled(appState.isListingApplications || appState.selectedSerial == nil)
+                .keyboardShortcut("l", modifiers: .command)
 
                 Toggle("Include system apps", isOn: $includeSystem)
                     .toggleStyle(.checkbox)
@@ -381,9 +404,25 @@ struct ApplicationsView: View {
                 if appState.isListingApplications {
                     ProgressView().controlSize(.small)
                 }
+
+                TextField("Search", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 200)
+                    .help("Filter by app name or package")
+
+                Toggle("Auto-refresh", isOn: Binding(
+                    get: { autoRefresh },
+                    set: { newValue in
+                        autoRefresh = newValue
+                        if newValue { startAutoRefresh() } else { stopAutoRefresh() }
+                    }
+                ))
+                .toggleStyle(.checkbox)
+                .help("Reload applications every 30 seconds")
+
                 Spacer()
                 if !appState.installedApplications.isEmpty {
-                    Text("\(appState.installedApplications.count) packages")
+                    Text("\(filteredApplications.count) of \(appState.installedApplications.count) packages")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -397,13 +436,15 @@ struct ApplicationsView: View {
                     .foregroundStyle(.secondary)
                     .padding()
                 Spacer()
+            } else if filteredApplications.isEmpty {
+                Text("No applications match '\(searchText)'.")
+                    .foregroundStyle(.secondary)
+                    .padding()
+                Spacer()
             } else {
-                List(appState.installedApplications) { app in
+                List(filteredApplications) { app in
                     HStack {
                         VStack(alignment: .leading) {
-                            // `displayLabel` is the last package-name segment, not the real app
-                            // label — reading the real label needs `dumpsys package` (49 KB per
-                            // app) and is deliberately not done.
                             Text(app.displayLabel)
                                 .font(.body)
                             Text(app.packageName)
@@ -428,6 +469,20 @@ struct ApplicationsView: View {
                 }
             }
         }
+        .onDisappear {
+            stopAutoRefresh()
+        }
+    }
+
+    private func startAutoRefresh() {
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+            Task { await appState.loadInstalledApplications(includeSystem: includeSystem) }
+        }
+    }
+
+    private func stopAutoRefresh() {
+        refreshTimer?.invalidate()
+        refreshTimer = nil
     }
 }
 
@@ -435,33 +490,65 @@ struct ApplicationsView: View {
 
 struct LogView: View {
     @EnvironmentObject var appState: AppState
+    @State private var levelFilter: LogLevel?
+
+    var filteredLogs: [LogEntry] {
+        if let level = levelFilter {
+            return appState.logMessages.filter { $0.level == level }
+        }
+        return appState.logMessages
+    }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 2) {
-                if appState.logMessages.isEmpty {
-                    Text("No log entries.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(appState.logMessages) { entry in
-                        HStack(alignment: .top, spacing: 8) {
-                            Text(entry.formattedTimestamp)
-                                .font(.system(.caption, design: .monospaced))
-                                .foregroundStyle(.secondary)
-                            Text(entry.level.rawValue)
-                                .font(.system(.caption2, design: .monospaced))
-                                .foregroundStyle(color(for: entry.level))
-                                .frame(width: 60, alignment: .leading)
-                            Text(entry.message)
-                                .font(.system(.caption, design: .monospaced))
-                                .textSelection(.enabled)
-                            Spacer()
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Picker("Level", selection: $levelFilter) {
+                    Text("All").tag(LogLevel?.none)
+                    ForEach(LogLevel.allCases, id: \.self) { level in
+                        Text(level.rawValue).tag(LogLevel?.some(level))
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 350)
+
+                Spacer()
+
+                Button("Clear") {
+                    appState.logMessages.removeAll()
+                }
+                .disabled(appState.logMessages.isEmpty)
+                .help("Clear all log entries")
+            }
+            .padding()
+
+            Divider()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 2) {
+                    if filteredLogs.isEmpty {
+                        Text(appState.logMessages.isEmpty ? "No log entries." : "No entries match the selected filter.")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(filteredLogs) { entry in
+                            HStack(alignment: .top, spacing: 8) {
+                                Text(entry.formattedTimestamp)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                Text(entry.level.rawValue)
+                                    .font(.system(.caption2, design: .monospaced))
+                                    .foregroundStyle(color(for: entry.level))
+                                    .frame(width: 60, alignment: .leading)
+                                Text(entry.message)
+                                    .font(.system(.caption, design: .monospaced))
+                                    .textSelection(.enabled)
+                                Spacer()
+                            }
                         }
                     }
                 }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 

@@ -30,6 +30,14 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
     /// `connectionManager.transportState` for the UI layer to observe directly.
     @Published private(set) var transportState: TransportState?
 
+    /// A user-actionable reading of *why* the system is not connected (ADR-017, Option C).
+    ///
+    /// `nil` means nothing has been read yet — the same "absence is meaningful" discipline
+    /// `transportState` uses, so a first paint can never be mistaken for a diagnosed failure.
+    /// When non-nil and not connected, `cause` distinguishes "cable unplugged" from
+    /// "wireless debugging silently disabled", which the UI previously collapsed into "Offline".
+    @Published private(set) var diagnosis: TransportDiagnosis?
+
     init(
         transport: TransportProtocol? = nil,
         logger: AppLogger? = nil,
@@ -117,14 +125,34 @@ final class DeviceManager: ObservableObject, DeviceDiscoveryProtocol {
             lastError = nil
             connectionManager.observe(devices: deviceList)
             transportState = connectionManager.transportState
+            updateDiagnosis(listingError: nil)
             logger.info("Found \(deviceList.count) device(s)", source: "DeviceManager.refreshDevices")
         } catch let error as PixelDesktopError {
             lastError = error
+            updateDiagnosis(listingError: error)
             logger.error(error.description, source: "DeviceManager.refreshDevices")
         } catch {
             lastError = .unknown(error.localizedDescription)
+            updateDiagnosis(listingError: lastError)
             logger.error("Unexpected error: \(error.localizedDescription)", source: "DeviceManager.refreshDevices")
         }
+    }
+
+    /// Recomputes the user-facing connection diagnosis from the facts currently held.
+    ///
+    /// Called after every listing attempt, successful or not, because the *failure* of a listing
+    /// is itself a diagnosable cause (`adbUnavailable`) and must not be reported as "no device
+    /// detected" — a distinction that sends the user to the phone when the fault is on the Mac.
+    private func updateDiagnosis(listingError: PixelDesktopError?) {
+        let context = TransportDiagnosisContext(
+            transportState: connectionManager.transportState,
+            devices: devices,
+            listingError: listingError,
+            rememberedEndpoint: connectionManager.rememberedWirelessEndpoint,
+            isReconnecting: connectionManager.isReconnecting,
+            reconnectAttempt: connectionManager.reconnectAttempt
+        )
+        diagnosis = TransportDiagnoser.classify(context)
     }
 
     func getDevice(bySerialNumber serial: String) -> AndroidDevice? {

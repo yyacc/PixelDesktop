@@ -69,7 +69,7 @@ private actor MockConnectionTransport: ConnectionTransporting {
     }
 }
 
-private final class MockNetworkPathMonitor: NetworkPathMonitoring {
+final class MockNetworkPathMonitor: NetworkPathMonitoring {
     var onUpdate: (@Sendable (NetworkPathStatus) -> Void)?
     private(set) var started = false
     private(set) var cancelled = false
@@ -619,5 +619,301 @@ final class ADBConnectValidationTests: XCTestCase {
         let result = TransportResult(exitCode: 0, stdout: "definitely not a connect reply", stderr: "")
 
         XCTAssertThrowsError(try ADBTransport.validateConnectResult(result, endpoint: "192.168.1.4:37351"))
+    }
+}
+
+// MARK: - 8. Connection diagnosis (ADR-017, Option C)
+//
+// The defect this closes: `transportState == nil` rendered as the single word "Offline" collapses
+// four situations with four different remedies into one undifferentiated state. The order of the
+// checks below is the decision, not an implementation detail — a failed listing is not evidence
+// about the device, and an unauthorised device is strictly more information than an endpoint that
+// is not answering.
+
+/// A transport whose listing always fails, modelling an `adb` that does not answer.
+///
+/// `MockTransport` cannot express this — its `listDevices` returns the canned array and never
+/// throws — and a failed listing is a genuinely different cause from an empty one, so the
+/// distinction is worth a dedicated double rather than a flag on the shared mock.
+private actor ListingFailureTransport: TransportProtocol {
+    func listDevices() async throws -> [AndroidDevice] {
+        throw PixelDesktopError.adbTransportError("adb server not responding")
+    }
+
+    func execute(command: String, arguments: [String], timeout: TimeInterval) async throws -> TransportResult {
+        TransportResult(exitCode: 1, stdout: "", stderr: "adb: command not found")
+    }
+
+    func getprop(deviceSerial: String, key: String, timeout: TimeInterval) async throws -> String {
+        throw PixelDesktopError.adbCommandFailed(command: "getprop", exitCode: 1, stderr: "unavailable")
+    }
+
+    func shell(deviceSerial: String, command: String, timeout: TimeInterval) async throws -> TransportResult {
+        TransportResult(exitCode: 1, stdout: "", stderr: "unavailable")
+    }
+
+    func shellStreaming(
+        deviceSerial: String,
+        command: String,
+        stdin: String?,
+        onLine: @Sendable @escaping (String) -> Void,
+        onStderrLine: @Sendable @escaping (String) -> Void,
+        cancellation: CancellationHandle
+    ) async throws -> Int32 {
+        1
+    }
+
+    func push(deviceSerial: String, localPath: String, remotePath: String, timeout: TimeInterval) async throws -> TransportResult {
+        TransportResult(exitCode: 1, stdout: "", stderr: "unavailable")
+    }
+
+    func pull(deviceSerial: String, remotePath: String, localPath: String, timeout: TimeInterval) async throws -> TransportResult {
+        TransportResult(exitCode: 1, stdout: "", stderr: "unavailable")
+    }
+
+    func install(deviceSerial: String, apkPath: String, replace: Bool, timeout: TimeInterval) async throws -> TransportResult {
+        TransportResult(exitCode: 1, stdout: "", stderr: "unavailable")
+    }
+
+    func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {
+        [:]
+    }
+}
+
+final class TransportDiagnosisTests: XCTestCase {
+
+    private func context(
+        transportState: TransportState? = nil,
+        devices: [AndroidDevice] = [],
+        listingError: PixelDesktopError? = nil,
+        rememberedEndpoint: WirelessEndpoint? = nil,
+        isReconnecting: Bool = false,
+        reconnectAttempt: Int = 0
+    ) -> TransportDiagnosisContext {
+        TransportDiagnosisContext(
+            transportState: transportState,
+            devices: devices,
+            listingError: listingError,
+            rememberedEndpoint: rememberedEndpoint,
+            isReconnecting: isReconnecting,
+            reconnectAttempt: reconnectAttempt
+        )
+    }
+
+    // MARK: Classification
+
+    /// A selected transport is a fact, reported as such — never diagnosed as a failure.
+    func testConnectedTransportHasNoCause() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(
+                transportState: TransportState(mode: .wired, deviceSerial: wiredSerial),
+                devices: [makeDevice(serial: wiredSerial)]
+            )
+        )
+
+        XCTAssertTrue(diagnosis.isConnected)
+        XCTAssertNil(diagnosis.cause)
+        XCTAssertNil(diagnosis.action)
+        XCTAssertEqual(diagnosis.summary, "Connected")
+    }
+
+    /// Nothing attached and no remembered endpoint: the "cable unplugged" case.
+    func testNoDeviceAndNoEndpointIsNoDeviceDetected() {
+        let diagnosis = TransportDiagnoser.classify(context())
+
+        XCTAssertFalse(diagnosis.isConnected)
+        XCTAssertEqual(diagnosis.cause, .noDeviceDetected)
+    }
+
+    /// An endpoint is remembered but not answering — the "wireless debugging silently disabled"
+    /// case, and the one the user cannot fix from the Mac.
+    func testRememberedEndpointWithoutDeviceIsWirelessUnreachable() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(rememberedEndpoint: wirelessEndpoint)
+        )
+
+        XCTAssertEqual(diagnosis.cause, .wirelessUnreachable)
+        XCTAssertEqual(diagnosis.rememberedEndpoint, wirelessEndpoint)
+    }
+
+    /// A device is attached but unauthorised: the phone is present, the user must tap Allow.
+    func testUnauthorizedDeviceIsPairingRequired() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(devices: [makeDevice(serial: wiredSerial, state: .unauthorized)])
+        )
+
+        XCTAssertEqual(diagnosis.cause, .pairingRequired)
+    }
+
+    /// A failed listing is a fault on the Mac, not evidence about the phone.
+    func testFailedListingIsADBUnavailable() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(
+                devices: [makeDevice(serial: wiredSerial)],
+                listingError: PixelDesktopError.adbTransportError("adb server not responding")
+            )
+        )
+
+        XCTAssertEqual(diagnosis.cause, .adbUnavailable)
+    }
+
+    // MARK: Priority — the order is the decision
+
+    /// A failed listing wins even when a device appears to be attached: the listing is the
+    /// evidence, and when it fails nothing is known.
+    func testListingFailureBeatsUnauthorizedDevice() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(
+                devices: [makeDevice(serial: wiredSerial, state: .unauthorized)],
+                listingError: PixelDesktopError.adbTransportError("boom")
+            )
+        )
+
+        XCTAssertEqual(diagnosis.cause, .adbUnavailable)
+    }
+
+    /// An unauthorised device wins over a remembered endpoint: the phone is physically present,
+    /// so "tap Allow" is a different and better instruction than "re-enable wireless".
+    func testUnauthorizedBeatsRememberedEndpoint() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(
+                devices: [makeDevice(serial: wiredSerial, state: .unauthorized)],
+                rememberedEndpoint: wirelessEndpoint
+            )
+        )
+
+        XCTAssertEqual(diagnosis.cause, .pairingRequired)
+    }
+
+    // MARK: Presentation
+
+    /// Every cause must be actionable: a summary without an action is a dead end for the user.
+    func testEveryCauseHasSummaryAndAction() {
+        for cause in TransportCause.allCases {
+            XCTAssertFalse(cause.summary.isEmpty, "\(cause) has no summary")
+            XCTAssertFalse(cause.action.isEmpty, "\(cause) has no action")
+        }
+    }
+
+    /// A reconnect in flight is visible, so the UI shows progress rather than a dead end.
+    func testRecoveringStateIsVisible() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(rememberedEndpoint: wirelessEndpoint, isReconnecting: true, reconnectAttempt: 2)
+        )
+
+        XCTAssertTrue(diagnosis.isRecovering)
+        XCTAssertEqual(diagnosis.reconnectAttempt, 2)
+    }
+
+    /// A remembered endpoint is not proof of reachability, so it is carried as context rather
+    /// than reported as a connection.
+    func testRememberedEndpointDoesNotMakeItConnected() {
+        let diagnosis = TransportDiagnoser.classify(
+            context(rememberedEndpoint: wirelessEndpoint)
+        )
+
+        XCTAssertFalse(diagnosis.isConnected)
+        XCTAssertNotNil(diagnosis.rememberedEndpoint)
+    }
+
+    /// The diagnosis survives a round trip, so it can be persisted or published as JSON.
+    func testDiagnosisRoundTripsThroughCodable() throws {
+        let diagnosis = TransportDiagnoser.classify(
+            context(
+                transportState: TransportState(mode: .wireless, deviceSerial: wirelessSerial),
+                rememberedEndpoint: wirelessEndpoint
+            )
+        )
+
+        let decoded = try JSONDecoder().decode(
+            TransportDiagnosis.self,
+            from: JSONEncoder().encode(diagnosis)
+        )
+
+        XCTAssertEqual(decoded, diagnosis)
+    }
+
+    // MARK: Integration — DeviceManager publishes the diagnosis
+
+    @MainActor
+    private func makeManager(
+        transport: MockTransport,
+        defaults: UserDefaults
+    ) -> DeviceManager {
+        DeviceManager(
+            transport: transport,
+            pathMonitor: MockNetworkPathMonitor(),
+            defaults: defaults,
+            reconnectScheduler: fastScheduler
+        )
+    }
+
+    @MainActor
+    func testDeviceManagerPublishesNoDeviceDetectedWhenNothingAttached() async {
+        let transport = MockTransport()
+        await transport.setDeviceList([])
+        let manager = makeManager(transport: transport, defaults: freshDefaults())
+
+        await manager.refreshDevices()
+
+        XCTAssertNil(manager.transportState)
+        XCTAssertEqual(manager.diagnosis?.cause, .noDeviceDetected)
+    }
+
+    @MainActor
+    func testDeviceManagerPublishesPairingRequiredForUnauthorizedDevice() async {
+        let transport = MockTransport()
+        await transport.setDeviceList([makeDevice(serial: wiredSerial, state: .unauthorized)])
+        let manager = makeManager(transport: transport, defaults: freshDefaults())
+
+        await manager.refreshDevices()
+
+        XCTAssertEqual(manager.diagnosis?.cause, .pairingRequired)
+        XCTAssertNotNil(manager.diagnosis?.action)
+    }
+
+    @MainActor
+    func testDeviceManagerPublishesConnectedDiagnosisWithNoCause() async {
+        let transport = MockTransport()
+        await transport.setDeviceList([makeDevice(serial: wiredSerial)])
+        let manager = makeManager(transport: transport, defaults: freshDefaults())
+
+        await manager.refreshDevices()
+
+        XCTAssertEqual(manager.transportState, TransportState(mode: .wired, deviceSerial: wiredSerial))
+        XCTAssertEqual(manager.diagnosis?.isConnected, true)
+        XCTAssertNil(manager.diagnosis?.cause)
+    }
+
+    /// A listing failure is diagnosed as an adb fault, not as an absent device — the distinction
+    /// that stops the user being sent to the phone when the fault is on the Mac.
+    @MainActor
+    func testDeviceManagerPublishesADBUnavailableOnListingFailure() async {
+        let manager = DeviceManager(
+            transport: ListingFailureTransport(),
+            pathMonitor: MockNetworkPathMonitor(),
+            defaults: freshDefaults(),
+            reconnectScheduler: fastScheduler
+        )
+
+        await manager.refreshDevices()
+
+        XCTAssertNotNil(manager.lastError)
+        XCTAssertNil(manager.transportState)
+        XCTAssertEqual(manager.diagnosis?.cause, .adbUnavailable)
+    }
+
+    /// AppState mirrors the diagnosis for status UI delivery.
+    @MainActor
+    func testAppStateMirrorsDiagnosis() async {
+        let transport = MockTransport()
+        await transport.setDeviceList([])
+        let manager = makeManager(transport: transport, defaults: freshDefaults())
+        let state = AppState(deviceManager: manager, transport: transport)
+
+        await state.refreshDevices()
+
+        XCTAssertEqual(state.diagnosis?.cause, .noDeviceDetected)
+        XCTAssertEqual(state.diagnosis?.summary, "No device detected")
     }
 }

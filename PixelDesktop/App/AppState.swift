@@ -13,6 +13,12 @@ final class AppState: ObservableObject {
     /// `DeviceManager.refreshDevices` selected; Phase 3 renders it in status UI.
     @Published var transportState: TransportState?
 
+    /// Why the system is not connected, in terms a user can act on (ADR-017, Option C).
+    ///
+    /// `nil` until the first discovery pass completes, so the UI never shows a diagnosed cause
+    /// before anything has actually been read.
+    @Published var diagnosis: TransportDiagnosis?
+
     // MARK: - Storage state (Phase 3)
     //
     // These expose the StorageService to the UI. The service is created on-demand
@@ -108,6 +114,10 @@ final class AppState: ObservableObject {
         deviceManager.$transportState
             .receive(on: DispatchQueue.main)
             .assign(to: &$transportState)
+
+        deviceManager.$diagnosis
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$diagnosis)
     }
 
     /// Starts discovery and returns once it has begun.
@@ -145,6 +155,16 @@ final class AppState: ObservableObject {
         // Set self.devices before enrichment: enrichConnectedDevice() reads selectedSerial
         // from self.devices, so it must be populated first.
         self.devices = await deviceManager.devices
+
+        // Mirror the transport readings directly, for the same reason `devices` is read
+        // directly above: the Combine binding is eventual, and its delivery depends on the main
+        // runloop turning over. When no device is connected, `enrichConnectedDevice()` returns
+        // without awaiting anything, so nothing forces that turn — and the mirrored values would
+        // still be stale on return. Reading them here makes the postcondition unconditional for
+        // every published field, not just `devices`.
+        self.transportState = await deviceManager.transportState
+        self.diagnosis = await deviceManager.diagnosis
+
         await enrichConnectedDevice()
         // Re-read: enrichConnectedDevice may have updated deviceManager.devices in place
         // via enrichDevice, and we need our copy to reflect the enriched values.

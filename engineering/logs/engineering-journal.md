@@ -2246,3 +2246,96 @@ All Phase 10 objectives from the master prompt are satisfied:
 **Next action:** None. PixelDesktop is complete.
 
 **Artifacts:** `phases/phase-10-step-6-remaining-reviews.md`
+
+---
+
+## 2026-10-24 — ADR-017: Wireless Transport Persistence, and Option C (connection diagnosis)
+
+**Phase:** 1 (Connection Foundation, revisited)
+**Task:** Decide the wireless-transport persistence mechanism; implement the diagnosability option.
+
+**Grounding first.** The two existing design docs (`wireless-adb-persistence-design.md`,
+`usb-aware-transport-design.md`) both concluded *"do not implement yet"* on three blockers.
+Re-deriving from the live device rather than from those documents showed **all three are now
+resolved or moot**:
+
+| Blocker in the docs | Verified 2026-10-24 |
+|---|---|
+| "Wireless debugging is off, so nothing can be verified" | **On.** `adb_wifi_enabled=1`, `service.adb.tcp.port=5555` |
+| "Whether `adb -s <serial>` works for a wireless device is the load-bearing untested assumption" | **Verified.** `adb -s 192.168.1.7:5555 shell getprop ro.product.model` → `Pixel 7a` |
+| "The physical USB fault is still unresolved (FAIL-006)" | **Moot.** FAIL-006 is `COMPLETE` |
+
+Wireless transport was also found to be **already implemented** (`TransportState`,
+`TransportSelector`, `WirelessEndpoint`, `ConnectionManager` reconnect with backoff and endpoint
+persistence, `ADBTransport.connect(host:port:)`, `NetworkPathMonitor`) — so the open question is
+not *which transport* but *what restores the connection after Android disables the radio*, which
+Mac-side reconnect structurally cannot do.
+
+**Governance gap found:** ADR-002 is the only ADR mentioning wireless, and it **rejects** it. The
+wireless work shipped under `docs/PROPOSAL-REMOTE-STORAGE.md` with no ADR, so
+`engineering/decisions/` alone said the opposite of what the code does. ADR-017 closes that.
+
+**Premise verified, and stronger than proposed:** `TransportProtocol` is device-targeted
+(`Transport.swift:3` — every method takes `deviceSerial:`), so both transports satisfy it
+unchanged. Whichever persistence option wins, the seam is untouched.
+
+**Implemented — Option C (accepted):** a pure, device-free diagnosis of *why* the system is
+offline, replacing the single word "Offline" with a cause and an actionable next step.
+
+- `PixelDesktop/Device/TransportDiagnosis.swift` (new): `TransportCause`, `TransportDiagnosis`,
+  `TransportDiagnosisContext`, pure `TransportDiagnoser.classify`.
+- `DeviceManager` publishes `diagnosis`, recomputed after every listing attempt.
+- `AppState` mirrors it; `StorageBrowserView` renders summary + action.
+- 16 new tests in `ConnectionFoundationTests.swift`.
+
+**Two defects found and fixed while implementing:**
+
+1. `MockTransport.listDevices` never throws, so `adbUnavailable` was untestable through the
+   shared mock → added a dedicated `ListingFailureTransport` double.
+2. **`AppState` mirrored `transportState` only eventually** — `refreshDevices()` read `devices`
+   directly but left `transportState` to Combine timing, and with no device connected nothing
+   forces the runloop to turn over. `testAppStateMirrorsTransportState` passed only by luck (its
+   connected device made enrichment await). Fixed by reading both transport readings directly.
+   **Pre-existing latent bug, not introduced here.**
+
+**Verification:** `xcodebuild test -project PixelDesktop.xcodeproj -scheme PixelDesktop
+-destination 'platform=macOS'` → **609 tests, 22 skipped, 0 failures**; the CLI target
+(`scheme pixel-desktop`) **builds and runs** — `capability --json` emits contract v3 and
+`observe --json` returns a live observation (`deviceReachable: true`,
+`deviceSerial: 3C261JEHN25632`).
+
+**Correction to that verification claim (same day).** The journal previously said running
+`observe` "proves the new types link and the binary executes rather than merely type-checking",
+and implied it exercised the transport path. Both were overstated:
+
+- The CLI target's sources phase **does** include `TransportDiagnosis.swift` (46 files), so the
+  link claim holds.
+- But `CLICommands.observe` calls `PixelEvidenceReader` over a bare `ADBTransport()`
+  (`PixelDesktopCLI/main.swift:45`) — it never instantiates `ConnectionManager` or
+  `DeviceManager`. `TransportDiagnoser.classify` has exactly **three** call sites, all in
+  `DeviceManager.updateDiagnosis`; `ADBTransport` has **zero** references to
+  `TransportDiagnosis`. So `observe` proves `ADBTransport` still works; it does **not** exercise
+  the Option C classification path, which is covered solely by the 16 `TransportDiagnosisTests`.
+
+**Decision, revised same day:** Option C accepted and implemented. Option B (phone-side WebSocket
+bridge) **not adopted** — its motivating premise is **unobserved**. A live re-measurement found
+wireless ADB *up and surviving a forced sleep*: `adb_wifi_enabled=1`,
+`wifi_sleep_policy=2` (`WIFI_SLEEP_POLICY_NEVER`), charging (`AC powered: true`, `level: 100`),
+`mWakefulness=Dozing`, and `adb -s 192.168.1.7:5555 shell 'echo ALIVE'` still answering after
+`input keyevent KEYCODE_SLEEP`. The owner **cannot name an observed instance of the failure**
+(confirmed in chat). So the §5 capability probe is the wrong gate — it would answer whether a
+Termux daemon *can* re-enable wireless debugging while the *need* is undemonstrated, at the cost
+of installing a third-party app and rebooting the phone. **Not run. Not recommended.** Option B
+is recorded as blocked-on-unobserved-problem, not blocked-on-capability.
+
+This also corrected an internal contradiction in ADR-017 itself: §1.1 already recorded that
+wireless debugging is on and reachable, while §2 still argued from the old failure mode as live.
+
+Internet-wide access is tracked separately (§9.2): it is a **tunnel** decision, not a bridge
+decision, and must not be smuggled in as "persistence".
+
+**Not performed:** no device settings changed; no app installed; no key material read; no
+wireless transport modified; no WebSocket bridge built.
+
+**Artifacts:** `engineering/decisions/ADR-017-wireless-transport-persistence.md`,
+`PixelDesktop/Device/TransportDiagnosis.swift`

@@ -66,6 +66,8 @@
 		84278C2FD9B8F73A5BFC1B3C /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1C96AAA82CA14C8156167C /* DeviceManager.swift */; };
 		88734F2F7885AD8FE31556CD /* DeviceEnricher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */; };
 		8955A287EEA4FF086B4E514C /* CLIRunCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05323F79C16955B82D257199 /* CLIRunCommand.swift */; };
+		8BFE8EC771DB91A55DB3E255 /* TransportDiagnosis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7369D2845BC12C92F2531360 /* TransportDiagnosis.swift */; };
+		8D89B2D24298824F8DBB772E /* TransportDiagnosis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7369D2845BC12C92F2531360 /* TransportDiagnosis.swift */; };
 		91AE4ACF395191517B183109 /* PixelDesktopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045B4B73580F62547149ED08 /* PixelDesktopError.swift */; };
 		91FB42A3B9A659EBFAAC2A2E /* PixelDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D676E635C6B9AABC5B4A065F /* PixelDesktopApp.swift */; };
 		93B505C15A54ADCAD95A91E7 /* ConnectionFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE502E2871C61F3AFF7DD25 /* ConnectionFoundationTests.swift */; };
@@ -166,6 +168,7 @@
 		6547148E3D29CCC7C15A62D3 /* WorkerStreamRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerStreamRunner.swift; sourceTree = "<group>"; };
 		6D4B8B5F2820A1729CFAC5A6 /* LlmJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LlmJob.swift; sourceTree = "<group>"; };
 		7239B55108175EF8E05F1637 /* Phase7Amendment3PathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Phase7Amendment3PathTests.swift; sourceTree = "<group>"; };
+		7369D2845BC12C92F2531360 /* TransportDiagnosis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransportDiagnosis.swift; sourceTree = "<group>"; };
 		7543419EDF15DCB3727A1D81 /* AndroidDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AndroidDevice.swift; sourceTree = "<group>"; };
 		7556F07519B9F11B81110152 /* CLIInvocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIInvocation.swift; sourceTree = "<group>"; };
 		7A1E177AF6227A5996CA07B3 /* WorkerInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkerInstaller.swift; sourceTree = "<group>"; };
@@ -370,6 +373,7 @@
 				B9A10606B2053730B5D6819A /* DeviceDiscovery.swift */,
 				DBE2D4255F513D2DD5524635 /* DeviceEnricher.swift */,
 				EE1C96AAA82CA14C8156167C /* DeviceManager.swift */,
+				7369D2845BC12C92F2531360 /* TransportDiagnosis.swift */,
 				FA1EB441C1082FD481CA476D /* TransportState.swift */,
 			);
 			path = Device;
@@ -622,6 +626,7 @@
 				C017CED895FCDD6AB6E90724 /* StorageService.swift in Sources */,
 				9D42D997FA0ABF58F1D30900 /* StorageTransfer.swift in Sources */,
 				C509AA489ECE6BD065F831B5 /* Transport.swift in Sources */,
+				8D89B2D24298824F8DBB772E /* TransportDiagnosis.swift in Sources */,
 				3A1F4137CEAD82116D9A41C6 /* TransportState.swift in Sources */,
 				A0611BD58F83B1A4B64FE1F3 /* WorkerComputeProof.swift in Sources */,
 				45D925383CFE970F56CB7F4C /* WorkerInstaller.swift in Sources */,
@@ -672,6 +677,7 @@
 				FDC91239F6900A812BA121F5 /* StorageTransfer.swift in Sources */,
 				DCEFA86FD4ED3E6F868F1090 /* StorageTransferView.swift in Sources */,
 				6588C60ED7417106754355CB /* Transport.swift in Sources */,
+				8BFE8EC771DB91A55DB3E255 /* TransportDiagnosis.swift in Sources */,
 				FCA27B9193CB018607D31A0E /* TransportState.swift in Sources */,
 				EFB4F801B6B07AFAC5090BFE /* WorkerComputeProof.swift in Sources */,
 				70635EF1BAFDE1C6600A49A6 /* WorkerInstaller.swift in Sources */,

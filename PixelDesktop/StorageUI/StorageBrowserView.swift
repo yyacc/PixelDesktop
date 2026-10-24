@@ -29,9 +29,20 @@ struct StorageBrowserView: View {
     @State private var showingNewFolderAlert = false
     @State private var showingRenameAlert = false
     @State private var showingDeleteConfirmation = false
+    @State private var showingPreview = false
     @State private var newItemName = ""
+    @State private var searchText = ""
     @State private var itemToRename: StorageItem?
     @State private var itemToDelete: StorageItem?
+
+    var filteredItems: [StorageItem] {
+        if searchText.isEmpty {
+            return appState.storageItems
+        }
+        return appState.storageItems.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     private var currentPath: String {
         pathStack.last ?? StorageService.storageRoot
@@ -44,6 +55,29 @@ struct StorageBrowserView: View {
     var body: some View {
         VStack(spacing: 0) {
             connectionStatusBar
+            Divider()
+
+            // Search bar
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Filter files", text: $searchText)
+                    .textFieldStyle(.plain)
+                    .help("Filter by filename")
+                if !searchText.isEmpty {
+                    Button {
+                        searchText = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(.quaternary.opacity(0.15))
+
             Divider()
 
             if let progress = appState.storageTransferProgress, !progress.isComplete {
@@ -69,8 +103,16 @@ struct StorageBrowserView: View {
                         itemToRename = selectedItem
                         showingRenameAlert = true
                     },
-                    onDownload: { showingSavePanel = true }
+                    onDownload: { showingSavePanel = true },
+                    onPreview: {
+                        showingPreview = true
+                    }
                 )
+            }
+        }
+        .sheet(isPresented: $showingPreview) {
+            if let item = selectedItem {
+                FilePreviewView(item: item, appState: appState)
             }
         }
         .task(id: appState.selectedSerial) {
@@ -153,20 +195,38 @@ struct StorageBrowserView: View {
     // MARK: - Connection Status Bar
 
     private var connectionStatusBar: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(statusColor)
-                .frame(width: 8, height: 8)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(statusColor)
+                    .frame(width: 8, height: 8)
 
-            Text(statusText)
-                .font(.caption)
-
-            Spacer()
-
-            if let diskSpace = appState.storageDiskSpace {
-                Text("Storage: \(byteCount(diskSpace.used)) of \(byteCount(diskSpace.total)) used")
+                Text(statusText)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                if let diskSpace = appState.storageDiskSpace {
+                    Text("Storage: \(byteCount(diskSpace.used)) of \(byteCount(diskSpace.total)) used")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            // The actionable next step, shown only when the system is offline *and* knows why.
+            // This is the point of ADR-017 Option C: "Offline" alone cannot tell the user whether
+            // to reach for the USB cable or for the phone's Wireless Debugging toggle, and those
+            // are different errands.
+            if let action = statusAction {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+
+                    Text(action)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .padding(.horizontal, 12)
@@ -191,7 +251,7 @@ struct StorageBrowserView: View {
                 .buttonStyle(.plain)
             }
 
-            ForEach(appState.storageItems) { item in
+            ForEach(filteredItems) { item in
                 StorageItemRow(
                     item: item,
                     isSelected: selectedItem?.id == item.id
@@ -201,6 +261,20 @@ struct StorageBrowserView: View {
             }
         }
         .listStyle(.plain)
+        .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+            handleDrop(providers: providers)
+        }
+    }
+
+    private func handleDrop(providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+        _ = provider.loadObject(ofClass: URL.self) { url, error in
+            guard let url = url else { return }
+            let filename = url.lastPathComponent
+            let remotePath = currentPath + "/" + filename
+            Task { await appState.uploadFile(localPath: url.path, remotePath: remotePath) }
+        }
+        return true
     }
 
     // MARK: - Empty State
@@ -288,9 +362,17 @@ struct StorageBrowserView: View {
 
     private var statusText: String {
         guard let state = appState.transportState else {
-            return "Offline"
+            // "Checking…" rather than "Offline": before the first discovery pass completes we
+            // have no evidence either way, and claiming offline would be a guess.
+            return appState.diagnosis?.summary ?? "Checking…"
         }
         return state.mode.displayName
+    }
+
+    /// What the user should do next, when the system is offline and the cause is known.
+    private var statusAction: String? {
+        guard appState.transportState == nil else { return nil }
+        return appState.diagnosis?.action
     }
 
     private func byteCount(_ bytes: UInt64) -> String {
@@ -381,5 +463,139 @@ struct SavePanelPresenter: NSViewRepresentable {
                 }
             }
         }
+    }
+}
+
+// MARK: - File Preview
+
+/// Quick-look style preview for a remote file.
+///
+/// Downloads the file to a temp location, then renders it as an image (for image formats),
+/// text (for text formats), or a metadata-only fallback for unsupported types.
+/// Files larger than 10 MB are not previewed.
+struct FilePreviewView: View {
+    let item: StorageItem
+    let appState: AppState
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var previewState: PreviewState = .loading
+
+    enum PreviewState {
+        case loading
+        case image(NSImage)
+        case text(String)
+        case unavailable(String)
+        case error(String)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text(item.name)
+                    .font(.headline)
+                    .lineLimit(1)
+                Spacer()
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding()
+            .background(.quaternary.opacity(0.1))
+
+            Divider()
+
+            // Content
+            contentView
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(minWidth: 500, minHeight: 400)
+        .task {
+            await loadPreview()
+        }
+    }
+
+    @ViewBuilder
+    private var contentView: some View {
+        switch previewState {
+        case .loading:
+            ProgressView("Loading preview...")
+        case .image(let image):
+            ScrollView {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding()
+            }
+        case .text(let text):
+            ScrollView {
+                Text(text)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        case .unavailable(let message):
+            ContentUnavailableView(
+                "Preview Unavailable",
+                systemImage: "eye.slash",
+                description: Text(message)
+            )
+        case .error(let message):
+            ContentUnavailableView(
+                "Error",
+                systemImage: "exclamationmark.triangle",
+                description: Text(message)
+            )
+        }
+    }
+
+    private func loadPreview() async {
+        // Don't preview files larger than 10 MB
+        if item.size > 10_000_000 {
+            previewState = .unavailable("File is too large to preview (\(byteCount(item.size))).")
+            return
+        }
+
+        let tempDir = FileManager.default.temporaryDirectory
+        let tempURL = tempDir.appendingPathComponent(UUID().uuidString + "_" + item.name)
+
+        await appState.downloadFile(remotePath: item.path, localPath: tempURL.path)
+
+        guard FileManager.default.fileExists(atPath: tempURL.path) else {
+            previewState = .error("Failed to download file for preview.")
+            return
+        }
+
+        // Try image first
+        if let image = NSImage(contentsOf: tempURL) {
+            previewState = .image(image)
+            return
+        }
+
+        // Try text (UTF-8)
+        if let text = try? String(contentsOf: tempURL, encoding: .utf8), text.count < 100_000 {
+            previewState = .text(text)
+            return
+        }
+
+        // Try UTF-16
+        if let text = try? String(contentsOf: tempURL, encoding: .utf16), text.count < 100_000 {
+            previewState = .text(text)
+            return
+        }
+
+        previewState = .unavailable("Preview not available for this file type.")
+    }
+
+    private func byteCount(_ bytes: UInt64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .binary
+        formatter.allowsNonnumericFormatting = false
+        return formatter.string(fromByteCount: Int64(bytes))
     }
 }
