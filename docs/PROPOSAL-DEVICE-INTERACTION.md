@@ -345,8 +345,8 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 |---|---|---|
 | Q2b | **Is wireless debugging actually on?** | rnz said yes; device reports `adb_wifi_enabled=0` (re-verified 2026-10-24) and is connected over USB. **`ADR-017` §1.1's `adb_wifi_enabled=1` / `192.168.1.7:5555` is a point-in-time reading and is now stale** — that endpoint is `offline` and `adb connect` times out. Confirm before designing the reconnect path. |
 | Q4b | **Is OEM unlock available?** | `ro.oem_unlock_supported` unset. Needs the Developer Options screen — requires unlocking the phone first. Only matters if the root decision reverses. |
-| Q8 | **Should the phone be left unlocked?** | Compute-node services (Termux, llama-server) behave far better unlocked. Trade-off is physical security of an unattended device. |
-| Q9 | **Thermal policy for sustained inference?** | LITTLE cluster at 67 °C while idle-charging. Sustained inference will throttle. Do we cap context size / batch, or accept throttling? |
+| ~~Q8~~ | ~~Should the phone be left unlocked?~~ | **Resolved 2026-10-24 — ADR-018.** Phone stays unlocked (`stay_on_while_plugged_in 7`, `lockscreen.disabled 1`, `locksettings set-disabled true`), verified by sleep/wake cycle: zero keyguard nodes in UI dump, `mIsShowing=false`, launcher focused. |
+| ~~Q9~~ | ~~Thermal policy for sustained inference?~~ | **Resolved 2026-10-24 — ADR-018.** No context/batch cap; rnz runs an external cooler and accepts throttling. Alert must fire on `Thermal Status >= 4 (CRITICAL)` from `dumpsys thermalservice`; delivery lands in Phase 2/3. |
 
 ---
 
