@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-24
 **Author:** Ciel
-**Status:** DRAFT — REVISED 2026-10-24, pending rnz approval
+**Status:** **APPROVED** 2026-10-24 (rnz). Revision 2 is the binding plan; §8 is the phasing authority, one gate per phase.
 **Revision 2 (2026-10-24):** **A1 (screen mirroring) is dropped as a PixelDesktop subsystem** — rnz chose option (a): scrcpy stays an external tool. See §2.1 and §6.4.
 **Supersedes:** nothing. Complements `docs/PROPOSAL-REMOTE-STORAGE.md` (storage/transport).
 
@@ -354,7 +354,7 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 
 | Phase | Name | Contents | Gate |
 |---|---|---|---|
-| 0 | **Control plane** | A4 UI dump wired in · A6 logcat · B3 port forwarding · A2 screenshot-as-evidence · delete dead `Video/` scaffold · document scrcpy invocation (no subsystem) | rnz approval |
+| 0 | **Control plane** | A4 UI dump wired in · A6 logcat · B3 port forwarding · A2 screenshot-as-evidence · delete dead `Video/` scaffold · document scrcpy invocation (no subsystem) | ✅ **done 2026-10-24** — `engineering/phases/phase-00-control-plane.md` |
 | 1 | **The node** | C1 Termux + llama-server · B2 host service management · C2 inference jobs | rnz approval |
 | 2 | **Hands** | B1 input injection (dry-run gated) · A7 telemetry + thermal history | rnz approval + ADR |
 | 3 | **Durability** | A5 notifications · C4 scheduled tasks · C3 remote shell · B4/B5 · D1–D4 | rnz approval |
