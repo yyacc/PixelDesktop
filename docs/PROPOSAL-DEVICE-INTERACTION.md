@@ -90,7 +90,7 @@ scrcpy runs against this device over USB and mirrors it. Two runs exited 0.
 
 ## 3. Current State Assessment
 
-Verified against the working tree at `3d703cb` (Phase 3 Storage UI, uncommitted).
+Verified against `HEAD` (`87eb2d7`), working tree clean.
 
 | Capability | Status | Where |
 |---|---|---|
@@ -117,7 +117,7 @@ Verified against the working tree at `3d703cb` (Phase 3 Storage UI, uncommitted)
 
 `PixelDesktop/Video/` existing but empty is itself a finding: mirroring was anticipated and never started. It is now **dead scaffold** — decision (a) forbids the subsystem, so Phase 0 deletes the directory rather than filling it.
 
-**Baseline:** 593 tests, 0 failures, 22 skipped at `3d703cb` (full suite re-run 2026-10-24).
+**Baseline:** **609 tests, 0 failures, 22 skipped** at `87eb2d7` (full suite re-run 2026-10-24). Supersedes the earlier 593 @ `3d703cb` figure, which predated two test commits.
 
 ---
 
@@ -375,7 +375,7 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 
 1. rnz can operate the Pixel 7a headlessly — browse files, run a service, drive an app, read its state — **without touching the phone**. Visual feedback comes from externally-run scrcpy (§6.4); PixelDesktop needs no video path to satisfy this.
 2. Every command issued produces a visible, logged result in PixelDesktop.
-3. The full test suite passes with no regression (currently 593 tests / 0 failures / 22 skipped at `3d703cb`).
+3. The full test suite passes with no regression (**609 tests / 0 failures / 22 skipped** at `87eb2d7`).
 4. No personal data is read without an explicit, persisted, revocable consent.
 5. Blind input (B1) cannot execute without a previewed, confirmed target.
 6. A model runs on the phone and is reachable from the Mac, with no root.
