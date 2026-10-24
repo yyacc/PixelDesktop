@@ -1343,6 +1343,51 @@
       "task_id": "phase-13-store-integration",
       "purpose": "Store-level integration test: drives ZenoObservabilityStore.refresh() against a real temp opencode.db fixture (cold start newest-200, incremental poll, new-session pickup with overlapping per-session seq, no duplicates, bounded memory, DB-unavailable recovery, malformed-row cursor advance)",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase5IntegrationTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-17T00:00:00Z",
+      "phase": 5,
+      "task_id": "RNZM-67",
+      "purpose": "Phase 5 integration and end-to-end tests: file lifecycle, transport priority, connection persistence, edge cases, large file transfers, AppState storage integration, Zeno removal verification",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Device/TransportDiagnosis.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 1,
+      "task_id": "ADR-017-option-c",
+      "purpose": "ADR-017 Option C: pure TransportDiagnoser + TransportCause/TransportDiagnosis types distinguishing the four offline causes (no device, wireless unreachable, pairing required, adb unavailable). No device dependency; the classification order is the decision and is unit-tested.",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-017-wireless-transport-persistence.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 1,
+      "task_id": "ADR-017",
+      "purpose": "ADR-017: records that wireless transport is accepted (superseding ADR-002's ADB-only decision, closing a governance gap where the code contradicted the only transport ADR), and decides the persistence mechanism. Option C accepted and implemented (pure TransportDiagnoser). Option B (phone-side WebSocket bridge) NOT adopted 2026-10-24: its motivating premise \u2014 Android disables Wireless Debugging \u2014 is unobserved on this device (wireless ADB survives a forced sleep; wifi_sleep_policy=2; charging), so the capability probe is the wrong gate (ADR-017 \u00a75.2).",
+      "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/docs/PROPOSAL-DEVICE-INTERACTION.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 1,
+      "task_id": "device-interaction-proposal",
+      "purpose": "DRAFT feature proposal (326 lines): PixelDesktop as the phone's only interface given the broken screen. Status DRAFT \u2014 pending rnz approval. NOT implemented; design gate.",
+      "status": "draft-pending-approval"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/device-probe-lockscreen-20261024.png",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 1,
+      "task_id": "device-probe-lockscreen",
+      "purpose": "Screenshot evidence from the live device probe (lockscreen state) supporting the ADR-017 \u00a72 re-measurement",
+      "status": "active"
     }
   ],
   "evidence_artifacts_outside_repo": [
