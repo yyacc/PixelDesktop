@@ -67,7 +67,29 @@ PixelDesktop (macOS app)
 
 **No `Video/` subsystem exists, and none is planned.** scrcpy is not a PixelDesktop
 subsystem — see [ADR-007] context and the master prompt's "not a better scrcpy frontend"
-constraint.
+constraint. The empty `PixelDesktop/Video/` directory was removed in Phase 0;
+`docs/SCRCPY-EXTERNAL-TOOL.md` records the rule and what a reversal would require.
+
+### 2b. Perception (Phase 0)
+
+`PixelDesktop/Perception/` is the read-only half of the device control plane. Foundation-only,
+so the app and the CLI target share one implementation.
+
+| File | Delivers |
+|---|---|
+| `UIElement.swift` | `UIElementBounds`, `UIElement`, `UIHierarchy` — the dump as data |
+| `UIHierarchyParser.swift` | `XMLParser` parser; rejects partial documents |
+| `DevicePerceptionProtocol.swift` | `uiHierarchy` / `screenshot` seam, `ScreenshotStore`, `PNGSignature` |
+| `ADBDevicePerception.swift` | implementation over `TransportProtocol` |
+| `LogcatLine.swift` | `threadtime` line parser, validated `LogcatFilter` |
+| `LogcatStream.swift` | bounded `LogcatBuffer`, live stream over `shellStreaming` |
+| `PortForwarding.swift` | `PortForwardingProtocol`, `ADBPortForwarding` |
+
+Transport support: `execOut` → `TransportBinaryResult`, because `execute` decodes stdout as
+UTF-8 and would turn a PNG into an empty string with exit code 0.
+
+There is **no input injection** in this layer and none in the UI. Tap/type/swipe is Phase 2
+and is gated behind a dry-run preview (proposal P3).
 
 ---
 

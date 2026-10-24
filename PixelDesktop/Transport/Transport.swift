@@ -59,6 +59,26 @@ protocol TransportProtocol: AnyObject, Sendable {
         cancellation: CancellationHandle
     ) async throws -> Int32
 
+    /// Runs `adb -s <serial> exec-out <arguments...>` and returns **stdout as bytes**.
+    ///
+    /// `exec-out` is the binary-safe sibling of `shell`: it hands back raw device stdout with
+    /// no CRLF translation and no terminal allocation. `execute` and `shell` both decode stdout
+    /// as UTF-8, which silently destroys a PNG (`screencap`) or any other binary payload, so a
+    /// byte-preserving primitive is required rather than convenient.
+    ///
+    /// **Transport primitive.** It takes structured arguments, never a caller-supplied command
+    /// string, and performs no interpretation of the payload. Containment belongs to the
+    /// operations layer: `exec-out` can read anything the device shell can read, and this
+    /// device is neither rooted nor debuggable, which bounds but does not remove that reach.
+    ///
+    /// - Returns: exit code, stdout bytes and stderr text. A non-zero exit is returned rather
+    ///   than thrown, matching `shell`'s convention.
+    func execOut(
+        deviceSerial: String,
+        arguments: [String],
+        timeout: TimeInterval
+    ) async throws -> TransportBinaryResult
+
     /// Copies a local file to the device via `adb -s <serial> push`.
     ///
     /// **Transport primitive.** It takes already-validated absolute paths and performs no
@@ -104,6 +124,21 @@ protocol TransportProtocol: AnyObject, Sendable {
 struct TransportResult: Equatable {
     let exitCode: Int32
     let stdout: String
+    let stderr: String
+
+    var isSuccess: Bool {
+        exitCode == 0
+    }
+}
+
+/// The result of a binary-safe device read (`exec-out`).
+///
+/// stdout is `Data` on purpose: the payload is a PNG or another opaque byte stream, and
+/// decoding it as text is precisely the defect this type exists to avoid. stderr stays text
+/// because ADB diagnostics are text and must never be mistaken for payload.
+struct TransportBinaryResult: Equatable {
+    let exitCode: Int32
+    let stdout: Data
     let stderr: String
 
     var isSuccess: Bool {

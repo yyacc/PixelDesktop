@@ -553,6 +553,99 @@ actor ADBTransport: TransportProtocol, ConnectionTransporting {
         return process.terminationStatus
     }
 
+    // MARK: - Binary-safe read
+
+    /// Runs `adb -s <serial> exec-out <arguments...>` and returns stdout as raw bytes.
+    ///
+    /// ## Why this is not `execute`
+    ///
+    /// `execute` builds `String(data: stdout, encoding: .utf8) ?? ""`. For a PNG that decode
+    /// fails and the payload becomes an **empty string** with exit code 0 — a silent data
+    /// loss that looks like a successful but blank capture. The drain structure is otherwise
+    /// identical, because the deadlock it avoids is a property of `Pipe` on macOS (a 65,536-byte
+    /// buffer, measured), not of text versus bytes.
+    ///
+    /// ## Termination
+    ///
+    /// A timeout throws `PixelDesktopError.timeout` at the point it is detected, matching
+    /// `execute`. A launch failure is returned as exit code `-1` with the reason in stderr,
+    /// which is distinguishable from a device-side non-zero exit by the caller that cares.
+    func execOut(
+        deviceSerial: String,
+        arguments: [String],
+        timeout: TimeInterval
+    ) async throws -> TransportBinaryResult {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: adbPath)
+        process.arguments = ["-s", deviceSerial, "exec-out"] + arguments
+
+        let stdoutPipe = Pipe()
+        let stderrPipe = Pipe()
+        process.standardOutput = stdoutPipe
+        process.standardError = stderrPipe
+
+        let effectiveTimeout = timeout > 0 ? timeout : defaultTimeout
+
+        return try await withThrowingTaskGroup(of: TransportBinaryResult?.self) { group in
+            group.addTask {
+                do {
+                    try process.run()
+                } catch {
+                    return TransportBinaryResult(
+                        exitCode: -1,
+                        stdout: Data(),
+                        stderr: "Failed to launch ADB: \(error.localizedDescription)"
+                    )
+                }
+
+                // Drain both pipes while the child runs — see `execute` for why reading after
+                // `waitUntilExit()` deadlocks at the pipe buffer size.
+                let payloads = PipePayloads()
+                let drain = DispatchGroup()
+
+                drain.enter()
+                DispatchQueue.global(qos: .userInitiated).async {
+                    payloads.setStdout(stdoutPipe.fileHandleForReading.readDataToEndOfFile())
+                    drain.leave()
+                }
+                drain.enter()
+                DispatchQueue.global(qos: .userInitiated).async {
+                    payloads.setStderr(stderrPipe.fileHandleForReading.readDataToEndOfFile())
+                    drain.leave()
+                }
+
+                process.waitUntilExit()
+                _ = drain.wait(timeout: .now() + 5.0)
+
+                return TransportBinaryResult(
+                    exitCode: process.terminationStatus,
+                    stdout: payloads.stdout,
+                    stderr: String(data: payloads.stderr, encoding: .utf8) ?? ""
+                )
+            }
+
+            group.addTask {
+                try? await Task.sleep(nanoseconds: UInt64(effectiveTimeout * 1_000_000_000))
+                if process.isRunning {
+                    process.terminate()
+                    throw PixelDesktopError.timeout(
+                        operation: "adb -s \(deviceSerial) exec-out \(arguments.joined(separator: " "))",
+                        duration: effectiveTimeout
+                    )
+                }
+                return nil
+            }
+
+            guard let first = try await group.next(), let result = first else {
+                group.cancelAll()
+                throw PixelDesktopError.unknown("No result from ADB exec-out")
+            }
+
+            group.cancelAll()
+            return result
+        }
+    }
+
     func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] {
         let result = try await execute(
             command: "-s",

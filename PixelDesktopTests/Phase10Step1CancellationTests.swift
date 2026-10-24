@@ -116,6 +116,10 @@ final class SuspendingTransport: TransportProtocol, @unchecked Sendable {
 
     func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] { [:] }
 
+    func execOut(deviceSerial: String, arguments: [String], timeout: TimeInterval) async throws -> TransportBinaryResult {
+        TransportBinaryResult(exitCode: 1, stdout: Data(), stderr: "execOut is not used by this test double")
+    }
+
     /// A streaming call that suspends until the cancellation handler releases it.
     ///
     /// The test knows the transport is suspended when `waitUntilSuspended()` returns.

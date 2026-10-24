@@ -51,6 +51,30 @@ final class AppState: ObservableObject {
         return StorageService(deviceSerial: serial, transport: transport)
     }
 
+    // MARK: - Phase 0 (control plane) accessors
+    //
+    // Read-only perception and forward management, exposed the same way the storage and
+    // application layers are: through a named protocol, never through the transport. There is
+    // deliberately no `tap` or `type` here — input injection is Phase 2 and does not exist.
+
+    /// Read-only screen perception (UI hierarchy, screenshot).
+    var perception: DevicePerceptionProtocol {
+        ADBDevicePerception(transport: transport)
+    }
+
+    /// Host→device port forwards.
+    var portForwarding: PortForwardingProtocol {
+        ADBPortForwarding(transport: transport)
+    }
+
+    /// A fresh logcat stream bound to the same transport.
+    ///
+    /// Returned rather than stored because a stream is a session: the view owns its lifetime,
+    /// and a shared instance would let one pane stop another pane's stream.
+    func makeLogcatStream(capacity: Int = 2000) -> LogcatStream {
+        LogcatStream(transport: transport, capacity: capacity)
+    }
+
     // MARK: - Phase 8 (UI) additions
     //
     // These expose backend capability that already existed and was already verified on real

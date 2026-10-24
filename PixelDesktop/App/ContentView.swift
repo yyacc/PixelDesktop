@@ -116,6 +116,8 @@ struct ContentView: View {
                     LogView()
                 case .storage:
                     StorageBrowserView()
+                case .perception:
+                    PerceptionView()
                 }
             }
         } else if appState.devices.isEmpty {
@@ -138,7 +140,7 @@ struct ContentView: View {
 }
 
 enum DeviceTab: String, CaseIterable, Identifiable {
-    case device, state, applications, log, storage
+    case device, state, applications, log, storage, perception
 
     var id: String { rawValue }
 
@@ -149,6 +151,7 @@ enum DeviceTab: String, CaseIterable, Identifiable {
         case .applications: return "Applications"
         case .log: return "Log"
         case .storage: return "Storage"
+        case .perception: return "Perception"
         }
     }
 }

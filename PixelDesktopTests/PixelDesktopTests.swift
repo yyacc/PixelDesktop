@@ -2448,6 +2448,28 @@ actor MockTransport: TransportProtocol {
         return defaultShellResult
     }
 
+    // MARK: - Binary-safe reads
+
+    private var execOutResponses: [String: TransportBinaryResult] = [:]
+    private var defaultExecOutResult = TransportBinaryResult(exitCode: 1, stdout: Data(), stderr: "execOut not configured")
+
+    /// Canned binary response, keyed by the first exec-out argument (e.g. `screencap`).
+    func setExecOutResponse(for key: String, _ result: TransportBinaryResult) {
+        execOutResponses[key] = result
+    }
+
+    func setDefaultExecOutResult(_ result: TransportBinaryResult) {
+        defaultExecOutResult = result
+    }
+
+    func execOut(deviceSerial: String, arguments: [String], timeout: TimeInterval) async throws -> TransportBinaryResult {
+        invocations.append(Invocation(command: "-s", arguments: [deviceSerial, "exec-out"] + arguments))
+        if let key = arguments.first, let response = execOutResponses[key] {
+            return response
+        }
+        return defaultExecOutResult
+    }
+
     // MARK: - Streaming
 
     private var streamingLines: [String] = []

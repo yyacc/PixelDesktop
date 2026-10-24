@@ -663,6 +663,10 @@ private actor ListingFailureTransport: TransportProtocol {
         1
     }
 
+    func execOut(deviceSerial: String, arguments: [String], timeout: TimeInterval) async throws -> TransportBinaryResult {
+        TransportBinaryResult(exitCode: 1, stdout: Data(), stderr: "execOut is not used by this test double")
+    }
+
     func push(deviceSerial: String, localPath: String, remotePath: String, timeout: TimeInterval) async throws -> TransportResult {
         TransportResult(exitCode: 1, stdout: "", stderr: "unavailable")
     }

@@ -1377,8 +1377,8 @@
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 1,
       "task_id": "device-interaction-proposal",
-      "purpose": "DRAFT feature proposal (326 lines): PixelDesktop as the phone's only interface given the broken screen. Status DRAFT \u2014 pending rnz approval. NOT implemented; design gate.",
-      "status": "draft-pending-approval"
+      "purpose": "Feature proposal, revision 2 \u2014 APPROVED by rnz 2026-10-24 (option (a): A1 dropped, scrcpy external). \u00a78 phasing table is the authority for Phase 0-3; each phase has its own gate.",
+      "status": "approved"
     },
     {
       "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/device-probe-lockscreen-20261024.png",
@@ -1417,20 +1417,153 @@
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
       "task_id": "device-interaction-proposal",
-      "purpose": "Session handoff for the PixelDesktop device-interaction proposal work (2026-10-24).",
+      "purpose": "Session handoff (2026-10-24, Phase 0 control plane): implemented + device-verified, Phase 1 not approved, pitfalls incl. logcat tag padding and the screenshot size-threshold trap.",
       "status": "active",
-      "sha256": "5ee522d6c6f82d390aa11fd50edd2bab2ec5e6822c13e73b64af0d771c8f34bd",
-      "bytes": 7875
+      "sha256": "5b61021707cba93c9f0d61e8ba426447e42f5c9ecc77705963377d79990264e5",
+      "bytes": 4610
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Video/",
-      "created_by": "pre-existing",
-      "created_at": "2026-10-01T00:00:00Z",
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/UIElement.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
-      "task_id": "device-interaction-proposal",
-      "purpose": "Dead scaffold for the legacy scrcpy video subsystem. Verified empty (0 files) 2026-10-24; the two 0-byte source files from phase-00 \u00a735-36 no longer exist and were never tracked.",
-      "status": "scheduled_for_removal",
-      "note": "Registered so Phase 0 may rmdir it per rnz decision (a) \u2014 no Video/ subsystem (docs/PROPOSAL-DEVICE-INTERACTION.md \u00a76.4)."
+      "task_id": "phase-00-control-plane",
+      "purpose": "UIElementBounds / UIElement / UIHierarchy \u2014 the uiautomator dump as data, Foundation-only so the CLI target shares it",
+      "status": "active",
+      "sha256": "4b799a884f9b95a38aa5f9d4d7efdd8fffe079825baddeebbf58ee7a749c0b99",
+      "bytes": 6881
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/UIHierarchyParser.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "XMLParser-based hierarchy parser; rejects partial documents instead of returning a plausible subtree",
+      "status": "active",
+      "sha256": "d88b8cff9a0a7b98167508cc007f833cd86c0b264cc1fee35bf4e4890a702521",
+      "bytes": 5611
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/DevicePerceptionProtocol.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "Perception seam (uiHierarchy/screenshot), ScreenshotStore, PNGSignature incl. IHDR dimensions",
+      "status": "active",
+      "sha256": "332a49d56603522c920102255d4fdd87307d5c2df3a79a80975f49b153d0be37",
+      "bytes": 5947
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/ADBDevicePerception.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "Perception over TransportProtocol: uiautomator dump + binary-safe read; screencap with payload verification",
+      "status": "active",
+      "sha256": "58d680b9942f297e01f51851630e04428a949b9a531cf80958d60d06f4daa1a3",
+      "bytes": 4313
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/LogcatLine.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "logcat -v threadtime line parser and validated LogcatFilter (tag is a shell-interpolated field, so it is checked)",
+      "status": "active",
+      "sha256": "197a86298dc30786146072594fa004d4e9c657ffb98980f4ac58922250bb4a0b",
+      "bytes": 7938
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/LogcatStream.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "Bounded LogcatBuffer + live stream over shellStreaming, with stop()/isRunning truth",
+      "status": "active",
+      "sha256": "81f0cbfd0cd68c972367e20dd5991fdff9514a765fb4b135032dc739ffb7d7a5",
+      "bytes": 6376
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/PortForwarding.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "PortForwardingProtocol + ADBPortForwarding (forward/list/remove, ports validated 1...65535)",
+      "status": "active",
+      "sha256": "37b14ae2219a0dc0932639765ce65de2bb2cf535695b841964466654a6d4f73b",
+      "bytes": 6175
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/PerceptionView.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "Perception tab: hierarchy + filter, screenshot with preview, logcat, forwards, scrcpy commands as copyable text",
+      "status": "active",
+      "sha256": "3caf3b6e27bc4a5f55bc78a854eb6f13fdfd7ab7e43b55e9fd08bb4ac0015a76",
+      "bytes": 17267
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase0PerceptionTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "35 hermetic tests: bounds, XML parsing, entity decoding, tap targets, PNG signature/dimensions, logcat parse/filter/buffer, forwards",
+      "status": "active",
+      "sha256": "b6bcce54094c89e6200ec77ada84dc6f1a6e35811f72b9fe524f73a327ec1a74",
+      "bytes": 18800
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase0DeviceVerificationTests.swift",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "4 device-gated tests (XCTSkip without PIXELDESKTOP_DEVICE_SERIAL) for hierarchy, screenshot, logcat, forwards",
+      "status": "active",
+      "sha256": "5067c04c13efa459b77b83d738432da7c222d764964283c356e0790c25df9d5a",
+      "bytes": 7883
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/docs/SCRCPY-EXTERNAL-TOOL.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "Binding record: scrcpy stays external, no Video/ subsystem; the three governing sources; what a reversal would require",
+      "status": "active",
+      "sha256": "0ade196b1c98bf11eefa7448e72c0d88f030ab00768baa1ae09980db072a07a7",
+      "bytes": 2805
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-00-control-plane.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "Phase 0 engineering log: deliverables, real-device evidence, 3 defects found and fixed, scope boundaries",
+      "status": "active",
+      "sha256": "82c7aa3ec59c476ee4adb802095ad20382ca9053644866d3559a96bf7d038ac4",
+      "bytes": 6645
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/device-screenshot-phase0.png",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "phase-00-control-plane",
+      "purpose": "Real-device screenshot captured through ADBDevicePerception; 1080x2400 PNG, byte-identical to raw adb exec-out screencap. Written by the verification harness.",
+      "status": "active",
+      "sha256": "46347d0137822dc9c6e942063b63b14fbd9efac25487e8447dadea9f6637fd9d",
+      "bytes": 15580
     }
   ],
   "evidence_artifacts_outside_repo": [
@@ -1484,6 +1617,19 @@
       "reason": "Superseded by AndroidDevice (ADR-008). Removed with git rm; recoverable from git history at commit c65b404.",
       "created_by_agent": true,
       "status": "removed"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Video/",
+      "created_by": "pre-existing",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "device-interaction-proposal",
+      "purpose": "Dead scaffold for the legacy scrcpy video subsystem. Verified empty (0 files) 2026-10-24; the two 0-byte source files from phase-00 \u00a735-36 no longer exist and were never tracked.",
+      "status": "removed",
+      "removed_by": "Hermes",
+      "removed_at": "2026-10-24T00:00:00Z",
+      "reason": "Empty directory (0 files) rmdir'd per rnz decision (a): no Video/ subsystem. Nothing was lost; the two 0-byte scaffolds from phase-00 \u00a735-36 were never tracked by git.",
+      "created_by_agent": false
     }
   ]
 }

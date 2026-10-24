@@ -499,6 +499,10 @@ actor RunTransport: TransportProtocol {
     }
     func getprop(deviceSerial: String, key: String, timeout: TimeInterval) async throws -> String { "" }
     func getSystemProperties(deviceSerial: String, timeout: TimeInterval) async throws -> [String: String] { [:] }
+    func execOut(deviceSerial: String, arguments: [String], timeout: TimeInterval) async throws -> TransportBinaryResult {
+        TransportBinaryResult(exitCode: 1, stdout: Data(), stderr: "execOut is not used by this test double")
+    }
+
     func push(deviceSerial: String, localPath: String, remotePath: String, timeout: TimeInterval) async throws -> TransportResult {
         pushCount += 1
         return TransportResult(exitCode: 0, stdout: "", stderr: "")
