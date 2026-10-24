@@ -1388,6 +1388,49 @@
       "task_id": "device-probe-lockscreen",
       "purpose": "Screenshot evidence from the live device probe (lockscreen state) supporting the ADR-017 \u00a72 re-measurement",
       "status": "active"
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/scrcpy-frame-20261024.png",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "device-interaction-proposal",
+      "purpose": "scrcpy frame evidence: Pixel 7a mirrored over USB (TikTok open, 4:40, 100% charging). Proves framebuffer is alive with a dead OLED panel. Cited by docs/PROPOSAL-DEVICE-INTERACTION.md \u00a72.1.",
+      "status": "active",
+      "sha256": "1a07497c7e9cab867ef2a4a920d65dfac75fe92cbd7100c09acabbf2c8f9d492",
+      "bytes": 860973
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/scrcpy-recording-20261024.mkv",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "device-interaction-proposal",
+      "purpose": "scrcpy --record session evidence, 52.3 s / 15.9 MB, exit 0, container verified with ffprobe. Ground truth independent of window stacking. Cited by docs/PROPOSAL-DEVICE-INTERACTION.md \u00a72.1.",
+      "status": "active",
+      "sha256": "c63965f98ba70b30921ff5e68303815d18e68e11ae028ad3e744ba5e3f74ff86",
+      "bytes": 15873727
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/HANDOFF.md",
+      "created_by": "Hermes",
+      "created_at": "2026-10-24T00:00:00Z",
+      "phase": 0,
+      "task_id": "device-interaction-proposal",
+      "purpose": "Session handoff for the PixelDesktop device-interaction proposal work (2026-10-24).",
+      "status": "active",
+      "sha256": "5ee522d6c6f82d390aa11fd50edd2bab2ec5e6822c13e73b64af0d771c8f34bd",
+      "bytes": 7875
+    },
+    {
+      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Video/",
+      "created_by": "pre-existing",
+      "created_at": "2026-10-01T00:00:00Z",
+      "phase": 0,
+      "task_id": "device-interaction-proposal",
+      "purpose": "Dead scaffold for the legacy scrcpy video subsystem. Verified empty (0 files) 2026-10-24; the two 0-byte source files from phase-00 \u00a735-36 no longer exist and were never tracked.",
+      "status": "scheduled_for_removal",
+      "note": "Registered so Phase 0 may rmdir it per rnz decision (a) \u2014 no Video/ subsystem (docs/PROPOSAL-DEVICE-INTERACTION.md \u00a76.4)."
     }
   ],
   "evidence_artifacts_outside_repo": [

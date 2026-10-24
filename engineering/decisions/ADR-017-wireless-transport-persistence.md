@@ -75,6 +75,13 @@ Three facts this establishes, each of which contradicts a premise in the earlier
 The prior recommendation — *"Do not implement yet"* — was correct when written and is now stale.
 It is not evidence against proceeding; it is evidence that the world moved.
 
+**Status update, later on 2026-10-24 — §1.1 is a point-in-time capability recording, not a
+standing claim.** Re-verified the same day: `adb_wifi_enabled` now reads **`0`**, and
+`192.168.1.7:5555` is **`offline`** — `adb connect` times out. Wireless ADB is presently **off**;
+USB is the working transport. This does not invalidate §1.1 (the wireless code path and
+`adb -s <wireless>` addressing were proven functional) — it means the *setting* has since been
+turned off. **Do not cite §1.1 as evidence that wireless is currently reachable.**
+
 ---
 
 ## 2. Problem

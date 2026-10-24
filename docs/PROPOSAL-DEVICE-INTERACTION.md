@@ -2,7 +2,8 @@
 
 **Date:** 2026-10-24
 **Author:** Ciel
-**Status:** DRAFT — Pending rnz approval
+**Status:** DRAFT — REVISED 2026-10-24, pending rnz approval
+**Revision 2 (2026-10-24):** **A1 (screen mirroring) is dropped as a PixelDesktop subsystem** — rnz chose option (a): scrcpy stays an external tool. See §2.1 and §6.4.
 **Supersedes:** nothing. Complements `docs/PROPOSAL-REMOTE-STORAGE.md` (storage/transport).
 
 ---
@@ -49,7 +50,7 @@ Not from documentation — read off the device over ADB. Evidence image: `engine
 | Wireless debugging | **`adb_wifi_enabled=0`** | ⚠ Contradicts assumption — verify (§7) |
 | Root present | No `su` binary | Not rooted, as stated |
 | Termux / Shizuku / Magisk / llama | **none installed** | Compute node is unbuilt |
-| Screen state | **Lock screen**, rendering correctly | Needs one-time unlock |
+| Screen state | **Unlocked and in use** — scrcpy frame shows TikTok open, no lock screen, clock 4:40, 100% charging | The OLED panel is physically dead (§2.1) but the device is awake and usable |
 | Display | 1080×2400, density 420 (override 460) | Coordinate space for input injection |
 | **Framebuffer** | ✅ **`screencap` returned a real 1080×2400 PNG (924 KB)** | **Mirroring is viable** |
 | **UI hierarchy** | ✅ **`uiautomator dump` returned 18 KB of real XML** | **A4 works today** |
@@ -57,10 +58,33 @@ Not from documentation — read off the device over ADB. Evidence image: `engine
 
 ### What this settles
 
-- **Q1 (screen type) — ANSWERED.** Physically broken, but the framebuffer renders cleanly. `screencap` works. **A1 mirroring, A2 screenshot, A3 recording are all viable.** The P0 go/no-go is resolved: **GO**.
+- **Q1 (screen type) — ANSWERED.** The OLED panel is physically dead, but the framebuffer renders cleanly. `screencap` works and scrcpy mirrors the device over USB (§2.1). **A2 is viable in-app; A3 is a flag on external scrcpy; A1 is dropped (§6.4).** The P0 go/no-go is resolved: **GO**.
 - **Q7 (Android version) — ANSWERED.** Android 16, SDK 36.
 - **A4 (UI hierarchy) — VERIFIED WORKING**, not merely proposed.
 - **A2 (screenshot) — VERIFIED WORKING**, and doubles as evidence.
+
+### 2.1 Verified scrcpy baseline — external tool (2026-10-24)
+
+scrcpy runs against this device over USB and mirrors it. Two runs exited 0.
+
+| Observation | Value |
+|---|---|
+| Video | `Texture: 1080x2400`, `Renderer: metal` |
+| Audio | Forwarding works |
+| Frame evidence | `engineering/evidence/scrcpy-frame-20261024.png` |
+| Recording | `engineering/evidence/scrcpy-recording-20261024.mkv` (52.3 s, 15.9 MB — `ffprobe`-verified, container valid) |
+
+**The dead OLED is settled — do not re-probe the device to re-derive it.** rnz confirmed it directly ("it doesn't display. the oled is broken"). The framebuffer rendering cleanly is *why* `screencap` and scrcpy both work: both read the framebuffer, not the panel.
+
+**Governance constraint.** Three sources forbid reimplementing scrcpy inside PixelDesktop:
+
+| Source | Says |
+|---|---|
+| `engineering/architecture/overview.md` §68 | "**No `Video/` subsystem exists, and none is planned.** scrcpy is not a PixelDesktop subsystem." |
+| `ADR-008-android-device-model.md` §176 | A `Video/` subsystem "conflicts with the master prompt's *'not a better scrcpy frontend'* constraint" |
+| `phase-00-clean-start-audit.md` §279 | "**Do not revive the legacy scrcpy/video architecture**" without an ADR that requires it |
+
+`PixelDesktop/Video/` exists as an **empty directory** — verified 2026-10-24: zero files. The two 0-byte scaffolds recorded in `phase-00-clean-start-audit.md` §35–36 (`ScrcpyProcessService.swift`, `ScrcpyVideoTransport.swift`) no longer exist and were never tracked by git. It is dead scaffold, not a foundation, and Phase 0 removes it (§6.4, §8).
 
 ---
 
@@ -81,7 +105,7 @@ Verified against the working tree at `3d703cb` (Phase 3 Storage UI, uncommitted)
 | Evidence / verification harness | ✅ Working | `Verification/ResultVerifier.swift` |
 | **Screenshot (A2)** | ✅ **Verified on device** | — |
 | **UI hierarchy (A4)** | ✅ **Verified on device** | — |
-| **Screen mirroring (A1)** | ❌ Empty dir | `PixelDesktop/Video/` — scaffold exists, zero files |
+| **Screen mirroring** | ✅ Working — **external** (`scrcpy`), deliberately not a PixelDesktop subsystem | §2.1, §6.4 |
 | **Screen recording (A3)** | ❌ Missing | — |
 | **Notification stream (A5)** | ❌ Missing | — |
 | **Log stream (A6)** | ❌ Missing | — |
@@ -91,7 +115,7 @@ Verified against the working tree at `3d703cb` (Phase 3 Storage UI, uncommitted)
 | **App install / uninstall (B4)** | ❌ Missing | `ADBAppOperations` covers launch/stop/list only |
 | **Reboot control (B5)** | ❌ Missing | — |
 
-`PixelDesktop/Video/` existing but empty is itself a finding: mirroring was anticipated and never started.
+`PixelDesktop/Video/` existing but empty is itself a finding: mirroring was anticipated and never started. It is now **dead scaffold** — decision (a) forbids the subsystem, so Phase 0 deletes the directory rather than filling it.
 
 **Baseline:** 593 tests, 0 failures, 22 skipped at `3d703cb` (full suite re-run 2026-10-24).
 
@@ -117,13 +141,20 @@ Verified against the working tree at `3d703cb` (Phase 3 Storage UI, uncommitted)
 
 ### Group A — Perception (the missing half)
 
-**A1. Screen mirroring** — *flagship*
-Stream the framebuffer to the Mac as video (`scrcpy` protocol over the existing ADB transport), rendered in a SwiftUI view. **Verified viable** — the framebuffer renders with the panel broken.
+**A1. Screen mirroring — ❌ DROPPED as a PixelDesktop subsystem (2026-10-24, rnz decision (a))**
+scrcpy already provides the eyes and stays an **external tool**. PixelDesktop documents the invocation, owns no `Video/` subsystem, and speaks no part of the scrcpy protocol. Rationale and the ADR conflict: §2.1, §6.4.
 
-**A2. Screenshot capture** — ✅ **already proven working on device**
-`adb exec-out screencap -p`. Doubles as an evidence artifact (fits the existing provenance culture).
+```
+scrcpy                                # live mirror over USB
+scrcpy --no-playback --record=s.mkv   # record only, no window   (= A3)
+scrcpy --record=session.mkv           # mirror + record          (= A3)
+```
 
-**A3. Screen recording** — `adb shell screenrecord`, streamed or saved. Evidence/provenance for anything hard to reproduce.
+**A2. Screenshot capture** — ✅ **already proven working on device** — *in-app*
+`adb exec-out screencap -p`. The one perception primitive PixelDesktop owns outright: a single ADB call returning a PNG on stdout, no protocol and no video pipeline. Doubles as an evidence artifact (fits the existing provenance culture).
+
+**A3. Screen recording — a flag on the chosen dependency, not a subsystem**
+`scrcpy --record` for live sessions; `adb shell screenrecord` where scrcpy is unavailable. Both are documented invocations surfaced in the UI as a copyable command plus its output path. **No capture pipeline is built in-app.**
 
 **A4. UI hierarchy dump** — ✅ **already proven working on device**
 `adb shell uiautomator dump` → parsed element tree (text, resource-id, bounds, enabled/clickable). This is what makes blind operation *targeted*: you address "the element labelled 'Allow'" instead of "the pixel at (412, 1033)".
@@ -178,8 +209,9 @@ This is the strategic layer, and where the broken screen stops mattering at all.
 
 | # | Question | Answer | Effect |
 |---|---|---|---|
-| Q1 | Screen broken how? | **Physically broken; framebuffer streams to Mac** | A1/A2/A3 viable — confirmed empirically |
-| Q2 | Wireless debugging on? | **Yes** — ⚠ but `adb_wifi_enabled=0` on device | Verify; USB works today |
+| Q1 | Screen broken how? | **Physically broken; framebuffer streams to Mac** | A2 viable in-app; A3 via external scrcpy; A1 reclassified (§6.4) |
+| Q2 | Wireless debugging on? | **Yes** — ⚠ but `adb_wifi_enabled=0` on device (re-verified 2026-10-24) | Verify; USB works today (§7 Q2b) |
+| Q8 | May PixelDesktop show the phone's screen? | **(a) No — scrcpy stays external** | No `Video/` subsystem; A1 dropped; scaffold deleted (§6.4) |
 | Q3 | Personal data access? | **Yes** | A5, B6 unblocked; D1/D2 still required |
 | Q4 | Rooted? | **No** — weigh it (§6.3) | Analysis below |
 | Q5 | Input injection — what is it? | *explained* | Definition below |
@@ -192,7 +224,7 @@ This is the strategic layer, and where the broken screen stops mattering at all.
 1. **A4 UI hierarchy** ✅ verified working → wire into PixelDesktop
 2. **A6 log stream** — debuggability
 3. **B3 port forwarding / reverse tunnel** — *the* unlock for Group C
-4. **A1 mirroring** ✅ viable — the eyes
+4. **A1 mirroring** — **not built**; scrcpy documented as the external eyes (§6.4)
 5. **B1 input injection** — the hands (gated, §6.2)
 
 **P1 — The node**
@@ -281,6 +313,28 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 11. `adb install` the Magisk APK — no UI interaction needed.
 12. Root achieved.
 
+### 6.4 A1 / screen mirroring — decision (2026-10-24)
+
+**Question:** Is PixelDesktop allowed to show the phone's screen at all — and if so, how?
+
+**rnz's answer: (a) — drop A1 entirely.**
+
+| Option | Meaning | Verdict |
+|---|---|---|
+| **(a)** | scrcpy stays an external tool the user runs; PixelDesktop only documents the command. No `Video/` subsystem. | ✅ **CHOSEN 2026-10-24** |
+| (b) | ADR exception for a thin scrcpy launcher/lifecycle wrapper (spawn, start/stop, window) — explicitly not a protocol reimplementation | ✗ not chosen |
+| (c) | Leave A1 out of Phase 0; "eyes" treated as purely a user-side concern | ✗ not chosen — (a) is stronger, it also forbids the wrapper |
+
+**Why (a).** scrcpy already works (§2.1), so A1 as originally written was a **subtraction, not an addition**: it would have rebuilt a working tool inside an app whose master prompt says it is "not a better scrcpy frontend". Option (a) is the only choice that keeps the ADR set intact without writing a new exception, and it keeps scope honest — **PixelDesktop owns headless perception and control, not video.**
+
+**Consequences (binding):**
+1. No `Video/` subsystem. No scrcpy protocol implementation, no video decode, no Metal rendering of the device in-app.
+2. `PixelDesktop/Video/` (verified empty — 0 files) is **deleted** in Phase 0.
+3. A3 recording is a documented `scrcpy --record` invocation, not an in-app capture pipeline.
+4. If a launcher/lifecycle wrapper is ever wanted, it is option (b) and needs **its own ADR** — not an increment on this proposal.
+
+---
+
 **Android 16 caveat:** Android 16 ships strengthened boot-integrity verification that breaks standard Magisk installs. Magisk **v28.0+** is required. KernelSU-Next on a Wild GKI kernel is the alternative (kernel-level root, no boot patching). **Verify current Magisk/KernelSU support for this exact build (`BP3A.251005.004.B1`) before planning a root attempt.**
 
 ---
@@ -289,7 +343,7 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 
 | # | Question | Note |
 |---|---|---|
-| Q2b | **Is wireless debugging actually on?** | rnz said yes; device reports `adb_wifi_enabled=0` and is connected over USB. Worth confirming before designing the reconnect path. |
+| Q2b | **Is wireless debugging actually on?** | rnz said yes; device reports `adb_wifi_enabled=0` (re-verified 2026-10-24) and is connected over USB. **`ADR-017` §1.1's `adb_wifi_enabled=1` / `192.168.1.7:5555` is a point-in-time reading and is now stale** — that endpoint is `offline` and `adb connect` times out. Confirm before designing the reconnect path. |
 | Q4b | **Is OEM unlock available?** | `ro.oem_unlock_supported` unset. Needs the Developer Options screen — requires unlocking the phone first. Only matters if the root decision reverses. |
 | Q8 | **Should the phone be left unlocked?** | Compute-node services (Termux, llama-server) behave far better unlocked. Trade-off is physical security of an unattended device. |
 | Q9 | **Thermal policy for sustained inference?** | LITTLE cluster at 67 °C while idle-charging. Sustained inference will throttle. Do we cap context size / batch, or accept throttling? |
@@ -300,7 +354,7 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 
 | Phase | Name | Contents | Gate |
 |---|---|---|---|
-| 0 | **Control plane** | A4 UI dump wired in · A6 logcat · B3 port forwarding · A1 mirroring · A2 screenshot-as-evidence | rnz approval |
+| 0 | **Control plane** | A4 UI dump wired in · A6 logcat · B3 port forwarding · A2 screenshot-as-evidence · delete dead `Video/` scaffold · document scrcpy invocation (no subsystem) | rnz approval |
 | 1 | **The node** | C1 Termux + llama-server · B2 host service management · C2 inference jobs | rnz approval |
 | 2 | **Hands** | B1 input injection (dry-run gated) · A7 telemetry + thermal history | rnz approval + ADR |
 | 3 | **Durability** | A5 notifications · C4 scheduled tasks · C3 remote shell · B4/B5 · D1–D4 | rnz approval |
@@ -312,13 +366,14 @@ Everything below is driven from the Mac. The only phone-side actions are **physi
 - Rebuilding the storage/transport/app-ops/worker/inference layers — they exist and work.
 - Cloud relay / remote access over the internet — direct device-to-Mac only (ADR-002, ADR-014).
 - Rooting the device (§6.3 — not recommended).
+- **Any `Video/` subsystem** — scrcpy protocol, video decode, in-app mirroring, or a scrcpy launcher wrapper (§6.4, decision (a)). scrcpy is an external tool.
 - Anything requiring the phone's screen to be usable.
 
 ---
 
 ## 10. Success Criteria
 
-1. rnz can operate the Pixel 7a end-to-end — browse files, run a service, drive an app, read its state — **without ever looking at the phone**.
+1. rnz can operate the Pixel 7a headlessly — browse files, run a service, drive an app, read its state — **without touching the phone**. Visual feedback comes from externally-run scrcpy (§6.4); PixelDesktop needs no video path to satisfy this.
 2. Every command issued produces a visible, logged result in PixelDesktop.
 3. The full test suite passes with no regression (currently 593 tests / 0 failures / 22 skipped at `3d703cb`).
 4. No personal data is read without an explicit, persisted, revocable consent.
