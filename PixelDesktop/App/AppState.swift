@@ -67,6 +67,17 @@ final class AppState: ObservableObject {
         ADBPortForwarding(transport: transport)
     }
 
+    /// Phase 1 (C1) — Termux + llama-server provisioning.
+    var termuxInstaller: TermuxNodeInstallerProtocol {
+        ADBTermuxNodeInstaller(transport: transport)
+    }
+
+    /// Phase 1 (C1) — on-device llama-server lifecycle.
+    var llamaServer: LlamaServerServiceProtocol {
+        ADBLlamaServerService(transport: transport)
+    }
+
+
     /// A fresh logcat stream bound to the same transport.
     ///
     /// Returned rather than stored because a stream is a session: the view owns its lifetime,
