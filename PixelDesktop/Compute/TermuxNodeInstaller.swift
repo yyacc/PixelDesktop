@@ -1,66 +1,92 @@
 //
-//  LlamaServerService.swift
+//  TermuxNodeInstaller.swift
 //  PixelDesktop
 //
-//  Phase 1 (C1) — lifecycle for the on-device llama-server (Termux).
+//  Phase 1 (C1) — Termux + llama-server provisioning on the Pixel 7a.
+//
+//  Scope: package identity for `com.termux`, install from a supplied APK path,
+//  bootstrap storage, and install the `llama-cpp` package inside Termux.
+//  Deliberately narrow: no arbitrary package management, no data clearing.
+//
+//  ## Channel status — verified on real hardware 2026-10-24
+//
+//  `installedState` and `installTermux` work: both are plain `adb` operations.
+//
+//  `bootstrapStorage` and `installLlamaCpp` are **not reachable**, for the same reason
+//  `LlamaServerService.start` is not — see that file's channel table. Termux 0.118 has no
+//  `com.termux.execute` extra and its `RunCommandService` needs a permission the adb shell
+//  cannot hold. Both are kept as the correct *request* rather than deleted, because the
+//  unblock is a user action on the device, not a code change.
 //
 
 import Foundation
 
-enum LlamaServerStatus: Equatable, Sendable {
-    case unknown
-    case stopped
-    case starting
-    case running(port: Int, pid: Int?)
-    case failed(String)
+/// Result of checking whether Termux is installed.
+enum TermuxInstallState: Equatable, Sendable {
+    case notInstalled
+    case installed(versionCode: Int)
 }
 
-protocol LlamaServerServiceProtocol: Sendable {
-    func start(deviceSerial: String, port: Int, modelPath: String, timeout: TimeInterval) async throws -> TransportResult
-    func stop(deviceSerial: String, timeout: TimeInterval) async throws -> TransportResult
-    func status(deviceSerial: String, port: Int, timeout: TimeInterval) async throws -> LlamaServerStatus
-    func healthCheck(localPort: Int, timeout: TimeInterval) async -> Bool
+protocol TermuxNodeInstallerProtocol: Sendable {
+    func installedState(deviceSerial: String, timeout: TimeInterval) async throws -> TermuxInstallState
+    func installTermux(deviceSerial: String, apkPath: String, timeout: TimeInterval) async throws -> TransportResult
+    func bootstrapStorage(deviceSerial: String, timeout: TimeInterval) async throws -> TransportResult
+    func installLlamaCpp(deviceSerial: String, timeout: TimeInterval) async throws -> TransportResult
 }
 
-struct ADBLlamaServerService: LlamaServerServiceProtocol {
+struct ADBTermuxNodeInstaller: TermuxNodeInstallerProtocol {
     private let transport: TransportProtocol
+    static let termuxPackageName = "com.termux"
 
     init(transport: TransportProtocol) {
         self.transport = transport
     }
 
-    func start(deviceSerial: String, port: Int, modelPath: String, timeout: TimeInterval) async throws -> TransportResult {
-        let cmd = "am start -n com.termux/.app.TermuxActivity -e com.termux.execute \"llama-server -m \(modelPath) --host 0.0.0.0 --port \(port)\""
-        return try await transport.shell(deviceSerial: deviceSerial, command: cmd, timeout: timeout)
-    }
-
-    func stop(deviceSerial: String, timeout: TimeInterval) async throws -> TransportResult {
-        try await transport.shell(deviceSerial: deviceSerial, command: "pkill -f llama-server", timeout: timeout)
-    }
-
-    func status(deviceSerial: String, port: Int, timeout: TimeInterval) async throws -> LlamaServerStatus {
+    func installedState(deviceSerial: String, timeout: TimeInterval) async throws -> TermuxInstallState {
         let result = try await transport.shell(
             deviceSerial: deviceSerial,
-            command: "pgrep -f llama-server || echo NONE",
+            command: "dumpsys package \(Self.termuxPackageName)",
             timeout: timeout
         )
-        let out = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
-        if out == "NONE" || out.isEmpty { return .stopped }
-        if let pid = Int(out.split(separator: "\n").first ?? "") {
-            return .running(port: port, pid: pid)
+        // versionCode parse
+        for line in result.stdout.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("versionCode=") {
+                let value = trimmed.dropFirst("versionCode=".count)
+                if let code = Int(value.split(separator: " ").first ?? "") {
+                    return .installed(versionCode: code)
+                }
+            }
         }
-        return .running(port: port, pid: nil)
+        return .notInstalled
     }
 
-    func healthCheck(localPort: Int, timeout: TimeInterval) async -> Bool {
-        guard let url = URL(string: "http://127.0.0.1:\(localPort)/health") else { return false }
-        var req = URLRequest(url: url)
-        req.timeoutInterval = timeout
-        do {
-            let (_, resp) = try await URLSession.shared.data(for: req)
-            return (resp as? HTTPURLResponse)?.statusCode == 200
-        } catch {
-            return false
-        }
+    func installTermux(deviceSerial: String, apkPath: String, timeout: TimeInterval) async throws -> TransportResult {
+        try await transport.execute(
+            command: "-s",
+            arguments: [deviceSerial, "install", "-r", apkPath],
+            timeout: timeout
+        )
+    }
+
+    func bootstrapStorage(deviceSerial: String, timeout: TimeInterval) async throws -> TransportResult {
+        // The real action is `termux-setup-storage` *inside* Termux, which raises a system
+        // permission dialog the host cannot answer. Bringing the activity forward is all that
+        // is reachable; the grant itself is a device-side step.
+        try await transport.shell(
+            deviceSerial: deviceSerial,
+            command: "am start -n com.termux/.app.TermuxActivity && sleep 1 && input keyevent 4",
+            timeout: timeout
+        )
+    }
+
+    func installLlamaCpp(deviceSerial: String, timeout: TimeInterval) async throws -> TransportResult {
+        // Blocked channel — see the header. The package itself installs fine once Termux can
+        // be commanded (verified: `llama-cpp` 0.7.0, `apt-get install -y llama-cpp`).
+        try await transport.shell(
+            deviceSerial: deviceSerial,
+            command: "am start -n com.termux/.app.TermuxActivity -e com.termux.execute \"pkg install -y llama-cpp\"",
+            timeout: timeout
+        )
     }
 }

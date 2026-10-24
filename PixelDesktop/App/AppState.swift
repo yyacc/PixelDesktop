@@ -77,6 +77,148 @@ final class AppState: ObservableObject {
         ADBLlamaServerService(transport: transport)
     }
 
+    // MARK: - Phase 1 (C1 + C2) — on-device compute node
+    //
+    // These expose the two Compute types that were instantiated here but never surfaced
+    // (handoff step 8). Nothing is computed in the UI: every value comes from the service or
+    // the job runner, and an operation the device cannot perform is reported as a failure
+    // rather than rendered as a plausible default.
+    //
+    // `start`/`stop` are **blocked on the current device** by a Termux 0.118 permission the
+    // adb shell cannot hold — see `LlamaServerService.swift`'s channel table. `status`,
+    // `healthCheck` and the inference path all work; the real-device evidence is in
+    // `docs/handoffs/handoff-pixeldesktop-phase1-device-verification.md`.
+
+    /// The port the on-device server is expected to listen on, and the local port
+    /// `adb forward` maps it to. One value because the two must agree.
+    static let llamaServerPort = 8080
+
+    /// The last known server status, or `.unknown` before the first read.
+    @Published var llamaStatus: LlamaServerStatus = .unknown
+
+    /// Whether a start or stop request is in flight.
+    @Published var llamaIsBusy: Bool = false
+
+    /// The result of the last health probe: `true`/`false`, or `nil` before one has run.
+    ///
+    /// Tri-state on purpose — "not probed yet" and "probed and down" are different answers.
+    @Published var llamaHealthy: Bool?
+
+    /// The last completed inference result, or `nil` before one has run.
+    @Published var inferenceResult: InferenceJobResult?
+
+    /// Whether an inference job is running.
+    @Published var inferenceIsRunning: Bool = false
+
+    /// The prompt the next inference job will send.
+    @Published var inferencePrompt: String = ""
+
+    /// The token budget for the next inference job.
+    @Published var inferenceMaxTokens: Int = 64
+
+    /// The runner used for inference jobs. Injectable so the job path is testable without a
+    /// live server; the production default talks to the forwarded port over HTTP.
+    private let inferenceRunner: OnDeviceInferenceJobRunnerProtocol
+
+    /// The local port the on-device server is forwarded to.
+    var llamaLocalPort: Int { Self.llamaServerPort }
+
+    /// Reads the server's process status from the device.
+    func refreshLlamaStatus() async {
+        guard let serial = selectedSerial else {
+            llamaStatus = .unknown
+            return
+        }
+        llamaStatus = .unknown
+        do {
+            llamaStatus = try await llamaServer.status(
+                deviceSerial: serial, port: Self.llamaServerPort, timeout: 15
+            )
+        } catch {
+            llamaStatus = .failed(error.localizedDescription)
+        }
+    }
+
+    /// Probes the forwarded `/health` endpoint.
+    ///
+    /// Host-side HTTP against `127.0.0.1`, so it succeeds or fails on the Mac's side of the
+    /// tunnel and never touches the device shell.
+    func checkLlamaHealth() async {
+        llamaHealthy = await llamaServer.healthCheck(
+            localPort: Self.llamaServerPort, timeout: 5
+        )
+    }
+
+    /// Requests the server start and records the outcome.
+    ///
+    /// The request is issued and its result recorded verbatim. On the current device the
+    /// channel is blocked, so the expected outcome is a failure surfaced through `lastError`
+    /// — reported, not hidden.
+    func startLlamaServer(modelPath: String) async {
+        guard let serial = selectedSerial else {
+            lastError = PixelDesktopError.deviceNotFound
+            return
+        }
+        llamaIsBusy = true
+        defer { llamaIsBusy = false }
+        do {
+            _ = try await llamaServer.start(
+                deviceSerial: serial,
+                port: Self.llamaServerPort,
+                modelPath: modelPath,
+                timeout: 30
+            )
+            await refreshLlamaStatus()
+        } catch {
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+            await refreshLlamaStatus()
+        }
+    }
+
+    /// Requests the server stop and records the outcome.
+    func stopLlamaServer() async {
+        guard let serial = selectedSerial else {
+            lastError = PixelDesktopError.deviceNotFound
+            return
+        }
+        llamaIsBusy = true
+        defer { llamaIsBusy = false }
+        do {
+            _ = try await llamaServer.stop(deviceSerial: serial, timeout: 15)
+            await refreshLlamaStatus()
+        } catch {
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+            await refreshLlamaStatus()
+        }
+    }
+
+    /// Runs one inference job against the forwarded port and publishes the result.
+    ///
+    /// Failures clear the previous result: a failed job is not a result, and leaving the last
+    /// successful answer on screen would let a stale answer read as the answer to a new prompt.
+    func runInferenceJob() async {
+        guard !inferencePrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            lastError = PixelDesktopError.invalidInput("Inference prompt is empty")
+            return
+        }
+        inferenceIsRunning = true
+        defer { inferenceIsRunning = false }
+        do {
+            inferenceResult = try await inferenceRunner.run(
+                localPort: Self.llamaServerPort,
+                request: InferenceJobRequest(
+                    prompt: inferencePrompt,
+                    maxTokens: inferenceMaxTokens,
+                    temperature: 0.1
+                ),
+                timeout: 300
+            )
+        } catch {
+            inferenceResult = nil
+            lastError = (error as? PixelDesktopError) ?? .unknown(error.localizedDescription)
+        }
+    }
+
 
     /// A fresh logcat stream bound to the same transport.
     ///
@@ -120,12 +262,14 @@ final class AppState: ObservableObject {
     init(
         deviceManager: DeviceManager? = nil,
         transport: TransportProtocol? = nil,
-        appOperations: AppOperationsProtocol? = nil
+        appOperations: AppOperationsProtocol? = nil,
+        inferenceRunner: OnDeviceInferenceJobRunnerProtocol? = nil
     ) {
         let resolvedTransport = transport ?? ADBTransport()
         self.transport = resolvedTransport
         self.appOperations = appOperations ?? ADBAppOperations(transport: resolvedTransport)
         self.deviceManager = deviceManager ?? DeviceManager()
+        self.inferenceRunner = inferenceRunner ?? URLSessionOnDeviceInferenceJobRunner()
         setupBindings()
     }
 
