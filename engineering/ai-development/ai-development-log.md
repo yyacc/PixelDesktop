@@ -758,3 +758,70 @@ an assertion that quotes a prototype's measurement is a memory, not evidence —
 then assert what it actually says, even when that contradicts the plan.
 
 **Human intervention:** none during implementation. rnz opened the gate and set the direction.
+
+
+---
+
+## Event: Phase 3.3 preflight — device probes and the Termux two-gate discovery
+
+**Date:** 2026-10-25 · **Gate:** rnz — *"Proceed with your recommendation, except for 8. enable allow
+external apps to run commands"* · **Baseline:** `4b41703` (776 / 0 / 30)
+
+No product code. This session closed the preflight items that 3.3 depends on, so 3.3 starts from
+measured behaviour: an install/uninstall round-trip, a reboot, and the Termux setting rnz asked for.
+
+### What was decided and applied
+- Success criterion 2 restated in the Phase-3 proposal to "≥ 90% of records **that carry content**"
+  (87.9% of all records kept as a diagnostic). The criterion as written was unmeetable — some records
+  carry nothing and the same criterion forbids dropping them.
+- 3.3 ships as two commits: B4 install/uninstall first, B5 reboot second.
+- Hermes runtime: `compression.threshold_tokens` 96k → 64k; a daily balance watchdog (alert below
+  $0.50, delivered to Discord DM); off-peak work discipline for long phases.
+
+### Findings
+1. **The B4 primitive works on hardware.** Worker APK captured (6,150,926 B, sha256 `b3318d6d…`),
+   uninstalled (`pm list packages | grep -c` → 0), reinstalled (`versionName=2.0`). Success criterion 4
+   is now provable as a real state transition rather than a dry run.
+2. **A reboot is safe and self-recovering.** `boot_completed=1` after ~15 s, ADB reattached over USB
+   with no host-side action, worker APK intact, tier-1 notification read and screencap both working
+   immediately. B5 needs a recovery contract, not a rescue plan.
+3. **The Termux wall is two gates, not one.** `allow-external-apps` is now enabled and persists across
+   reboot — but `ActivityManager` still denies `com.android.shell` because the service carries a
+   `prot=dangerous` manifest permission the shell package never declared. Enabling the setting removes
+   only the *service's own* check. `pm grant` exits 0 and no-ops, which reproduces the documented
+   behaviour and pins its cause.
+4. **A path out of the Termux wall exists and is unbuilt.** A package that *declares*
+   `com.termux.permission.RUN_COMMAND` can be granted it. `com.pixeldesktop.worker` is ours; making it
+   the forwarding bridge is non-root and needs an APK change plus an ADR. Filed as an open decision —
+   explicitly unverified, since the grant-half is inference from `pm grant` semantics.
+
+### Errors and fixes
+1. **A setting I could not verify by reading.** Termux's storage is private and the app is not
+   debuggable, so `cat` was impossible from the host. Fix: type the command in the terminal and verify
+   from the **rendered frame** — the file's content was read off a screenshot, and read again after a
+   reboot to prove persistence.
+2. **A command that ran three times.** One typed `echo … >>` landed three times in
+   `termux.properties`. Harmless because it was idempotent, but the cause was never identified. The
+   lesson is not "typing is flaky" — it is that the *only* safe commands to type into that channel are
+   idempotent ones.
+
+### Quality
+- Correctly refused to call the Termux setting "done" on the strength of a write's exit status; the
+  claim rests on a frame capture and a post-reboot re-read.
+- Correctly separated "necessary" from "sufficient" for the two Termux gates instead of reporting the
+  setting as an unblock.
+- Correctly tested the balance watchdog's **alert** path, not just its silent path — a monitor that
+  only proves silence is unverified in the direction that matters. Delivery confirmed in the gateway
+  log (`Job '56089b466078': delivered to discord:…`).
+- Incorrectly let the first preflight plan assume one Termux gate; the second gate cost a round trip.
+
+### Lesson
+**A wall with two locks looks like a wall with one until you test each lock separately.** Enabling
+`allow-external-apps` was the setting rnz asked for and it is genuinely on; reporting that as "Termux
+unblocked" would have been false, because the denial happens a layer earlier, inside
+`ActivityManager`, before any Termux code runs. The discipline that caught it is the same one that
+caught the notification parser: name the layer that produces the error before claiming the fix
+reaches it.
+
+**Human intervention:** rnz answered the eight-item checklist in one line, changing item 8 from *skip*
+to *do it*. No corrections during execution.

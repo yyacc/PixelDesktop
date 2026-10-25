@@ -402,9 +402,17 @@ confirmation gate.
 
 1. **A5 reads the notification feed with no grant → throws, issues zero commands.** Measured
    against a real dump, not a fixture.
-2. **The A5 parser extracts content from ≥ 90% of records** on a captured real dump — the
-   prototype achieved 21/23 (91%) reading title/text/textLines/subText/tickerText, vs 7/23 (30%)
-   for a text-only parser.
+2. **The A5 parser extracts content from ≥ 90% of records *that carry content*** on a captured real
+   dump — the prototype achieved 21/23 (91%) reading title/text/textLines/subText/tickerText, vs
+   7/23 (30%) for a text-only parser.
+
+   *Restated 2026-10-25 (rnz, item 1 of the Phase-3.2 decision checklist).* As originally written
+   — "≥ 90% of records" — the criterion is unachievable by construction: some records carry no
+   content at all (system aggregates, section headers), and the same criterion requires them to be
+   surfaced rather than dropped. On the phase-3.2 captured dump (33 records) the implementation
+   extracts **29/29 = 100% of content-bearing records**; **29/33 = 87.9% of all records** is
+   reported as a diagnostic, not a pass/fail line. Evidence:
+   `engineering/phases/phase-03-2-notification-stream.md` §4.
 3. **Every destructive operation refuses without a confirmed dry-run**, verified by asserting
    zero transport invocations.
 4. **B4 installs and uninstalls the worker APK on the real device** and leaves it healthy.

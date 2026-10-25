@@ -80,7 +80,7 @@ AI-company stack (Ciel = CEO/orchestrator, Qwen = worker, LongCat = escalation/f
 ## 2. Context
 
 **Repo:** `~/AICompany/PixelDesktop` · working tree clean at the Phase 3.1 commit
-**Suite:** **746 tests, 26 skipped, 0 failures** (full suite, `xcodebuild test -scheme PixelDesktop`)
+**Suite:** **776 tests, 30 skipped, 0 failures** (full suite, `xcodebuild test -scheme PixelDesktop`)
 **Device:** Pixel 7a (`lynx`), Android 16 / SDK 36, serial `3C261JEHN25632`, **USB only**
 
 **The phone's OLED is dead. It does not display. Do not probe to re-establish this.** The
@@ -134,8 +134,8 @@ notification stream → **3.3** B4 install/uninstall + B5 reboot → **3.4** C4 
 | Sub-phase | Status | What exists |
 |---|---|---|
 | 3.1 Trust foundation | ✅ done 2026-10-25 | `Trust/ConsentRegistry.swift`, `Trust/DryRun.swift`, `Audit/DeviceAuditLog.swift`, `App/TrustView.swift` (new **Trust** tab), ADR-020, 31 tests |
-| 3.2 A5 notifications | ⬜ next | nothing yet — the D1 gate it must use is ready |
-| 3.3 B4/B5 | ⬜ | `DestructiveActionPlan` ready; no operation builds one |
+| 3.2 A5 notifications | ✅ done 2026-10-25 | `Perception/Notifications*` (parser, reader, stream), two-tier read gated **inside** the reader, **Perception** panel, ADR-021, 30 tests (26 hermetic + 4 device-gated) |
+| 3.3 B4/B5 | 🟨 next | `DestructiveActionPlan` ready; install/uninstall and reboot measured on hardware (preflight record) |
 | 3.4 C4 Mac scheduler | ⬜ | — |
 | 3.5 D4 kill switch | ⬜ | — |
 
@@ -176,32 +176,47 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 
 ## 5. Next task
 
-1. **Build Phase 3.2 — A5 notification stream**, read-only (Q1a), gated by `ConsentGate` on
-   `.notifications`. Three pieces, in this order:
-   - **the two-tier reader**: poll `cmd notification list` (1,731 B) for the key set; fetch
-     `dumpsys notification --noredact` (777,677 B) **only when the key set changed**;
-   - **the five-field parser**: `android.title`, `android.text`, `android.textLines` (a *list*),
-     `android.subText`, `tickerText` — a text-only parser drops 16 of 23 records (70%). Records with
-     no extractable content are surfaced as `contentless`, never dropped;
-   - **the view**, plus a `.notificationRead` audit record per read.
-   Target: parser extracts content from **≥ 90%** of records on a captured real dump (prototype
-   achieved 21/23 = 91%).
-2. **Then 3.3 → 3.4 → 3.5** in order. Nothing else in Phase 3 needs a decision from rnz, except:
-3. **Two probes still need rnz's authorization** because they mutate the device: an `adb uninstall`
-   round-trip of the worker APK (needed by 3.3), and `cmd notification allow_listener` (needs an APK
-   with a listener service, which does not exist — only relevant if push is ever wanted over polling).
-4. **Verify the Termux setting** — Settings → Termux → "Allow external apps to run commands" — then
-   re-test `am startservice … RunCommandService`. It is no longer on the critical path (Q3a moved the
+**3.3 is next, shipped as two commits** (rnz, 2026-10-25 — decision 4): **B4 first, then B5**. Both
+are authorized, and both primitives are already measured on the device — see
+`engineering/phases/phase-03-3-preflight-device-probes.md`.
+
+1. **Commit 1 — B4 install/uninstall.** Build `DestructiveActionPlan`s for `pm install` / `pm
+   uninstall` of `com.pixeldesktop.worker` behind the D1 consent gate and the D3 dry run. Acceptance
+   asserts a **real** present → absent → present transition (the preflight probe proves the device
+   cooperates), plus zero transport calls when consent or dry-run confirmation is missing. A captured
+   APK already exists at `engineering/evidence/b4-b5-probes/worker-backup.apk`, so the test does not
+   need a build step.
+2. **Commit 2 — B5 reboot.** `adb reboot` behind the same gate, with the recovery contract the
+   preflight measured: the issuing transport dies with the command, so the operation must
+   `wait-for-device`, poll `sys.boot_completed`, then **re-establish perception itself** (screencap +
+   tier-1 notification read) and record the outcome in the audit trail. Bounded by a timeout, and it
+   must fail loudly — not silently — if the device never returns.
+3. **Then 3.4 (Mac scheduler, Q3a) and 3.5 (D4 kill switch).** Nothing else in Phase 3 needs a
+   decision from rnz.
+4. **Open decision, not a task: the Termux wall.** `allow-external-apps` is now **enabled and
+   persisted** (preflight §4), but it is necessary and not sufficient — `com.android.shell` cannot
+   hold `com.termux.permission.RUN_COMMAND`, so `RunCommandService` still refuses an ADB caller.
+   Candidate fix (needs an ADR + an APK change): declare the permission in `com.pixeldesktop.worker`
+   and grant it to that package. **Nothing in 3.3 or 3.4 may plan on `RunCommandService` until that is
+   decided and built.**re-test `am startservice … RunCommandService`. It is no longer on the critical path (Q3a moved the
    scheduler to the Mac), so this is now optional reconnaissance.
 
 ---
 
 ## 6. Pitfalls hit (do not repeat)
 
+- **`allow-external-apps` and the Termux permission are two separate gates.** Enabling the setting
+  (done 2026-10-25, `termux.properties`, persists across reboot) removes only the *service's* check.
+  `ActivityManager` still denies `com.android.shell` at the manifest level, so the ADB caller is
+  refused exactly as before. Necessary ≠ sufficient.
 - **The Termux wall is real and silent.** `pm grant com.android.shell
   com.termux.permission.RUN_COMMAND` **exits 0 and does nothing**. Do not trust the exit code —
   read the granted list afterwards. `adb root` is refused; `run-as com.termux` says "not
-  debuggable".
+  debuggable". `pm grant` only works for a package that **declares** the permission.
+- **Typed input through `input text` can deliver a command more than once.** A single `echo … >>`
+  into `termux.properties` landed **three** times (preflight §4.5). Each run was idempotent so it was
+  harmless — which is exactly why the rule matters: type only idempotent commands into Termux; never
+  `rm`, `mv`, or anything whose repetition changes state.
 - **`logcat -v threadtime` does not space the tag's colon.** Short tags are padded
   (`chatty  : msg`), long ones are not (`ActivityManager: msg`). Split on the first `": "`, not
   `" : "`.
@@ -237,8 +252,8 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 | **Phase 3 proposal** | `docs/PROPOSAL-PHASE-3-DURABILITY.md` |
 | Remote storage proposal | `docs/PROPOSAL-REMOTE-STORAGE.md` |
 | scrcpy (external tool) | `docs/SCRCPY-EXTERNAL-TOOL.md` |
-| Phase records | `engineering/phases/` (Phase 3.1: `phase-03-1-trust-foundation.md`) |
-| ADRs (20) | `engineering/decisions/` (newest: **ADR-020 trust foundation**) |
+| Phase records | `engineering/phases/` (3.1: `phase-03-1-trust-foundation.md` · 3.2: `phase-03-2-notification-stream.md` · 3.3 preflight: `phase-03-3-preflight-device-probes.md`) |
+| ADRs (21) | `engineering/decisions/` (newest: **ADR-021 notification stream**) |
 | Phase 1 handoff | `docs/handoffs/handoff-pixeldesktop-phase1-device-verification.md` |
 | Phase 2 handoff | `docs/handoffs/handoff-pixeldesktop-phase2-hands.md` |
 | Phase 0 handoff (archived) | `docs/handoffs/handoff-pixeldesktop-phase0-control-plane.md` |
@@ -258,6 +273,8 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 
 - Date: 2026-10-25
 - Agent: Ciel (Hermes)
-- Session id: `20261024_213642_77b4ea`
-- Model: `meituan/longcat-2.5-preview:free` via nous
-- Last commit: `1f3994b` — Phase 3.1 (D1+D2+D3), suite **746 / 0 / 26** (baseline 715 / 0 / 26)
+- Session id: `20261025_103259_f7df47`
+- Model: `deepseek-chat` (direct DeepSeek API), off-peak
+- Last feature commit: `4b41703` — Phase 3.2 (A5), suite **776 / 0 / 30**
+- Since then: `engineering/phases/phase-03-3-preflight-device-probes.md`, criterion-2 restatement in
+  the Phase-3 proposal, and this handoff
