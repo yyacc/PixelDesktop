@@ -56,3 +56,10 @@ models/
 
 # B4 disposable test package build output (rebuild with disposable/build-disposable-apk.sh)
 engineering/evidence/b4-b5-probes/disposable/out/
+
+# Delegation scratch (Pi, via pi_delegate.py)
+# Each run writes <timestamp>.json (the task, its warnings, model, duration) and
+# <timestamp>.patch (the working-tree diff Pi produced). Diagnostic only: the code these
+# patches describe is committed on its own merits, and nothing in the tree reads this
+# directory. Kept on disk for auditing a run; never committed.
+.pi-delegation/
