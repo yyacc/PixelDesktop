@@ -2,7 +2,9 @@
 
 **Date:** 2026-10-25
 **Author:** Ciel
-**Status:** **DRAFT — awaiting rnz approval.** No implementation has started.
+**Status:** **APPROVED 2026-10-25** — rnz opened the Phase 3 gate (*"proceed with the implementation"*);
+§7.2 decisions taken as recommended (Q1a–Q5a), recorded in ADR-020. **Phase 3.1 (trust foundation)
+is implemented**; 3.2–3.5 are not started.
 **Elaborates:** `docs/PROPOSAL-DEVICE-INTERACTION.md` §8, row 3 ("Durability"), which is the phasing authority.
 **Supersedes:** nothing. Complements the master proposal; does not amend it.
 **Baseline measured at:** `e3c9579`, working tree clean — **715 tests, 26 skipped, 0 failures**.

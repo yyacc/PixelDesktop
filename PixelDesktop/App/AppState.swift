@@ -264,18 +264,25 @@ final class AppState: ObservableObject {
         transport: TransportProtocol? = nil,
         appOperations: AppOperationsProtocol? = nil,
         inferenceRunner: OnDeviceInferenceJobRunnerProtocol? = nil,
-        inputAuditLog: InputAuditLog? = nil
+        deviceAuditLog: DeviceAuditLog? = nil,
+        consentRegistry: ConsentRegistry? = nil
     ) {
         let resolvedTransport = transport ?? ADBTransport()
         self.transport = resolvedTransport
         self.appOperations = appOperations ?? ADBAppOperations(transport: resolvedTransport)
         self.deviceManager = deviceManager ?? DeviceManager()
         self.inferenceRunner = inferenceRunner ?? URLSessionOnDeviceInferenceJobRunner()
-        // Phase 2 (B1): the audit trail persists by default, so a tap on a dead-screen phone
-        // is reviewable after the fact. A test injects its own log (or an in-memory one) and
-        // the suite never writes into Application Support.
-        self.inputAuditLog = inputAuditLog
-            ?? InputAuditLog(fileURL: try? InputAuditLog.applicationDefaultURL())
+        // Phase 2 (B1) / Phase 3 (D2): the audit trail persists by default, so an action on a
+        // dead-screen phone is reviewable after the fact. A test injects its own log (or an
+        // in-memory one) and the suite never writes into Application Support.
+        self.deviceAuditLog = deviceAuditLog
+            ?? DeviceAuditLog(fileURL: try? DeviceAuditLog.applicationDefaultURL())
+        // Phase 3 (D1): consent defaults to deny. An empty registry denies every data class until
+        // the owner grants one with a reason — there is no seed that opens anything.
+        self.consentRegistry = consentRegistry
+            ?? ConsentRegistry(fileURL: try? ConsentRegistry.applicationDefaultURL())
+        self.consentGrants = self.consentRegistry.grants
+        self.inputAuditRecords = self.deviceAuditLog.records(for: .inputInject)
         setupBindings()
     }
 
@@ -725,8 +732,11 @@ final class AppState: ObservableObject {
     // wrappers are what the UI drives: propose → render the preview → confirm → execute.
     // There is no path here that executes without a proposal the user saw.
 
-    /// The persistent audit trail (proposal D2).
-    let inputAuditLog: InputAuditLog
+    /// The persistent device audit trail (Phase 3 D2 — generalised from the Phase 2 input-only log).
+    let deviceAuditLog: DeviceAuditLog
+
+    /// The persisted consent store (Phase 3 D1).
+    let consentRegistry: ConsentRegistry
 
     /// The plan awaiting confirmation, or `nil` when nothing is proposed.
     @Published var pendingInputPlan: InputActionPlan?
@@ -742,15 +752,29 @@ final class AppState: ObservableObject {
 
     @Published var inputIsBusy: Bool = false
 
-    /// A snapshot of the audit trail, for rendering.
+    /// A snapshot of the input records, for rendering.
     ///
-    /// `InputAuditLog` is a reference type whose mutations SwiftUI cannot observe, so the view
+    /// `DeviceAuditLog` is a reference type whose mutations SwiftUI cannot observe, so the view
     /// reads this published copy instead of reaching into the log. Refreshed after every
-    /// execution.
-    @Published var inputAuditRecords: [InputAuditRecord] = []
+    /// execution. Input is a projection of the shared trail, not a second trail.
+    @Published var inputAuditRecords: [DeviceAuditRecord] = []
+
+    /// A snapshot of every device record, newest last. The Phase 3 trust view renders this.
+    @Published var deviceAuditRecords: [DeviceAuditRecord] = []
+
+    /// A snapshot of the consent decisions, in data-class order.
+    @Published var consentGrants: [ConsentGrant] = []
+
+    /// The last consent refusal, or `nil`.
+    @Published var consentError: ConsentError?
 
     var deviceInput: DeviceInputProtocol {
-        ADBDeviceInput(transport: transport, auditLog: inputAuditLog)
+        ADBDeviceInput(transport: transport, auditLog: deviceAuditLog)
+    }
+
+    /// The consent gate, for any read of a P4 data class (Phase 3 D1).
+    var consentGate: ConsentGate {
+        ConsentGate(registry: consentRegistry, auditLog: deviceAuditLog)
     }
 
     /// Proposes a tap on the single element matching `query`, against a fresh dump.
@@ -848,7 +872,7 @@ final class AppState: ObservableObject {
         inputIsBusy = true
         defer {
             inputIsBusy = false
-            inputAuditRecords = inputAuditLog.records
+            refreshAuditSnapshots()
         }
         do {
             lastInputResult = try await deviceInput.execute(
@@ -871,5 +895,46 @@ final class AppState: ObservableObject {
         pendingInputPlan = nil
         inputRefusal = nil
         inputCandidates = []
+    }
+
+    // MARK: - Phase 3 (D1/D2) — consent and the shared trail
+
+    /// Re-reads both published snapshots from the log.
+    ///
+    /// The log is the source of truth and is append-only; the views read these copies because a
+    /// reference type's mutations are invisible to SwiftUI.
+    func refreshAuditSnapshots() {
+        deviceAuditRecords = deviceAuditLog.records
+        inputAuditRecords = deviceAuditLog.records(for: .inputInject)
+    }
+
+    /// Grants a data class. A reason is required by the registry, and a refusal is surfaced rather
+    /// than swallowed: an empty reason is a decision the registry will not record.
+    func grantConsent(_ dataClass: ConsentDataClass, reason: String) {
+        do {
+            try consentRegistry.grant(dataClass, reason: reason)
+            consentError = nil
+        } catch let error as ConsentError {
+            consentError = error
+        } catch {
+            consentError = .consentRequired(dataClass: dataClass)
+        }
+        refreshConsent()
+    }
+
+    /// Withdraws a data class. Immediate and sticky — the next read throws.
+    func revokeConsent(_ dataClass: ConsentDataClass) {
+        consentRegistry.revoke(dataClass)
+        consentError = nil
+        refreshConsent()
+    }
+
+    /// Whether a read of this class is currently permitted.
+    func isConsentGranted(_ dataClass: ConsentDataClass) -> Bool {
+        consentRegistry.isGranted(dataClass)
+    }
+
+    func refreshConsent() {
+        consentGrants = consentRegistry.grants
     }
 }

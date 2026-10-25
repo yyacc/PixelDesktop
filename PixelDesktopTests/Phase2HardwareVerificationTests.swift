@@ -115,7 +115,7 @@ final class Phase2HardwareVerificationTests: XCTestCase {
             throw XCTSkip("no interactive element on the current screen to resolve")
         }
 
-        let log = InputAuditLog()
+        let log = DeviceAuditLog()
         let input = ADBDeviceInput(transport: transport, auditLog: log)
 
         let plan = try input.planTap(hierarchy: hierarchy, elementIndex: first.index)
@@ -130,13 +130,13 @@ final class Phase2HardwareVerificationTests: XCTestCase {
             XCTAssertEqual(refusal, .planNotConfirmed)
         }
 
-        XCTAssertEqual(log.latest?.outcome, InputAuditRecord.refused)
+        XCTAssertEqual(log.latest?.outcome, DeviceAuditRecord.refused)
     }
 
     /// Proves the execute path works end to end with the least destructive action available.
     func testConfirmedKeyEventExecutesOnRealDevice() async throws {
         let serial = try await requireDevice()
-        let log = InputAuditLog()
+        let log = DeviceAuditLog()
         let input = ADBDeviceInput(transport: ADBTransport(), auditLog: log)
 
         let plan = try input.planKeyEvent("KEYCODE_WAKEUP").confirming()
@@ -144,8 +144,8 @@ final class Phase2HardwareVerificationTests: XCTestCase {
 
         XCTAssertEqual(result.exitCode, 0)
         XCTAssertEqual(result.command, "input keyevent KEYCODE_WAKEUP")
-        XCTAssertEqual(log.latest?.outcome, InputAuditRecord.executed)
-        XCTAssertEqual(log.latest?.payload, "KEYCODE_WAKEUP")
+        XCTAssertEqual(log.latest?.outcome, DeviceAuditRecord.executed)
+        XCTAssertEqual(log.latest?.input?.payload, "KEYCODE_WAKEUP")
     }
 
     /// The containment claim, checked against the device shell rather than a mock: text with

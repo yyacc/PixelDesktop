@@ -43,7 +43,7 @@ struct InputView: View {
             .padding()
         }
         .onAppear {
-            appState.inputAuditRecords = appState.inputAuditLog.records
+            appState.refreshAuditSnapshots()
         }
     }
 
@@ -206,28 +206,28 @@ struct InputView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(Array(appState.inputAuditRecords.suffix(25).reversed()), id: \.timestamp) { record in
+                ForEach(Array(appState.inputAuditRecords.suffix(25).reversed()), id: \.id) { record in
                     HStack(alignment: .top, spacing: 8) {
-                        Text(record.outcome)
+                        Text(record.outcome.rawValue)
                             .font(.caption2.monospaced())
                             .foregroundStyle(color(for: record.outcome))
                             .frame(width: 62, alignment: .leading)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("\(record.kind) \(record.targetLabel ?? record.payload ?? "")")
+                            Text(record.summary)
                                 .font(.caption)
-                            if let x = record.centerX, let y = record.centerY {
+                            if let x = record.input?.centerX, let y = record.input?.centerY {
                                 Text("centre (\(x), \(y))")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                             }
-                            Text(record.detail)
+                            Text(record.detail ?? "")
                                 .font(.caption2.monospaced())
                                 .foregroundStyle(.secondary)
                                 .textSelection(.enabled)
                         }
                         Spacer()
-                        Text(record.timestamp.formatted(date: .omitted, time: .standard))
+                        Text(record.at.formatted(date: .omitted, time: .standard))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -238,11 +238,12 @@ struct InputView: View {
 
     // MARK: - Helpers
 
-    private func color(for outcome: String) -> Color {
+    private func color(for outcome: DeviceAuditOutcome) -> Color {
         switch outcome {
-        case InputAuditRecord.executed: return .green
-        case InputAuditRecord.refused: return .orange
-        default: return .red
+        case .executed: return .green
+        case .refused: return .orange
+        case .pending: return .secondary
+        case .failed: return .red
         }
     }
 

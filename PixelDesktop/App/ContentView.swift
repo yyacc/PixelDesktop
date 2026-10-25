@@ -44,11 +44,19 @@ struct ContentView: View {
         .background(
             ForEach(DeviceTab.allCases.indices, id: \.self) { index in
                 Button("") { selection = DeviceTab.allCases[index] }
-                    .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: .command)
+                    .keyboardShortcut(Self.shortcut(for: index), modifiers: .command)
                     .opacity(0)
                     .allowsHitTesting(false)
             }
         )
+    }
+
+    /// ⌘1–⌘9 for the first nine tabs, ⌘0 for the tenth.
+    ///
+    /// A bare `Character("\(index + 1)")` traps at runtime for a two-digit index, so adding a
+    /// tenth tab without this mapping would have crashed the view on first render.
+    private static func shortcut(for index: Int) -> KeyEquivalent {
+        index < 9 ? KeyEquivalent(Character("\(index + 1)")) : KeyEquivalent("0")
     }
 
     // MARK: - Sidebar
@@ -124,6 +132,8 @@ struct ContentView: View {
                     TelemetryView()
                 case .input:
                     InputView()
+                case .trust:
+                    TrustView()
                 }
             }
         } else if appState.devices.isEmpty {
@@ -146,7 +156,7 @@ struct ContentView: View {
 }
 
 enum DeviceTab: String, CaseIterable, Identifiable {
-    case device, state, applications, log, storage, perception, inference, telemetry, input
+    case device, state, applications, log, storage, perception, inference, telemetry, input, trust
 
     var id: String { rawValue }
 
@@ -161,6 +171,7 @@ enum DeviceTab: String, CaseIterable, Identifiable {
         case .inference: return "Inference"
         case .telemetry: return "Telemetry"
         case .input: return "Input"
+        case .trust: return "Trust"
         }
     }
 }

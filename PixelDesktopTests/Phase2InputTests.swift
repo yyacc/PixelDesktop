@@ -30,7 +30,7 @@ final class Phase2InputTests: XCTestCase {
     /// The core requirement: a plan that was never previewed cannot run, and nothing is sent.
     func testUnconfirmedPlanIsRefusedAndNothingReachesTheDevice() async throws {
         let transport = MockTransport()
-        let log = InputAuditLog()
+        let log = DeviceAuditLog()
         let input = ADBDeviceInput(transport: transport, auditLog: log)
 
         let plan = try input.planTap(hierarchy: hierarchy([allowButton()]), matching: "allow")
@@ -45,12 +45,12 @@ final class Phase2InputTests: XCTestCase {
 
         let invocations = await transport.invocations
         XCTAssertTrue(invocations.isEmpty, "a refused plan must issue no device command")
-        XCTAssertEqual(log.latest?.outcome, InputAuditRecord.refused)
+        XCTAssertEqual(log.latest?.outcome, DeviceAuditRecord.refused)
     }
 
     func testConfirmingProducesALivePlanAndTheOriginalStaysDead() async throws {
         let transport = MockTransport()
-        let input = ADBDeviceInput(transport: transport, auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: transport, auditLog: DeviceAuditLog())
 
         let proposed = try input.planTap(hierarchy: hierarchy([allowButton()]), matching: "allow")
         let approved = proposed.confirming()
@@ -67,7 +67,7 @@ final class Phase2InputTests: XCTestCase {
     // MARK: - Element addressing
 
     func testTapResolvesTheElementCentre() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         let button = allowButton()
 
         let plan = try input.planTap(hierarchy: hierarchy([button]), matching: "allow")
@@ -80,7 +80,7 @@ final class Phase2InputTests: XCTestCase {
     }
 
     func testAmbiguousQueryIsRefusedWithCandidates() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         let first = allowButton(index: 1, top: 100)
         let second = allowButton(index: 2, top: 400)
 
@@ -96,7 +96,7 @@ final class Phase2InputTests: XCTestCase {
     }
 
     func testDisambiguationByElementIndex() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         let first = allowButton(index: 1, top: 100)
         let second = allowButton(index: 2, top: 400)
 
@@ -107,7 +107,7 @@ final class Phase2InputTests: XCTestCase {
     }
 
     func testUnknownQueryIsRefused() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
 
         do {
             _ = try input.planTap(hierarchy: hierarchy([allowButton()]), matching: "deny")
@@ -122,7 +122,7 @@ final class Phase2InputTests: XCTestCase {
     /// A match that exists but cannot be tapped is a different mistake from a wrong query, and
     /// the refusal says so.
     func testNonInteractiveMatchIsRefusedAsUntappable() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         let label = element(index: 3, text: "Allow", clickable: false)
 
         do {
@@ -136,7 +136,7 @@ final class Phase2InputTests: XCTestCase {
     }
 
     func testOffScreenElementIsNotOfferedAsATarget() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         let zeroArea = element(
             index: 4,
             text: "Allow",
@@ -156,26 +156,26 @@ final class Phase2InputTests: XCTestCase {
     // MARK: - Text containment
 
     func testTextRejectsEmpty() {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         XCTAssertThrowsError(try input.planText("")) { error in
             XCTAssertEqual(error as? InputRefusal, .textRejected(reason: "text is empty"))
         }
     }
 
     func testTextRejectsLineBreaks() {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         XCTAssertThrowsError(try input.planText("first\nsecond"))
     }
 
     func testTextRejectsOverlongPayloads() {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         XCTAssertThrowsError(try input.planText(String(repeating: "a", count: 513)))
     }
 
     /// The reason for quoting rather than an allowlist: a password containing `$` must be
     /// deliverable, and the shell must not expand it.
     func testTextIsSingleQuotedSoTheShellCannotExpandIt() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         let plan = try input.planText("$(whoami) `id` ; reboot").confirming()
 
         let command = try input.buildCommand(for: plan)
@@ -199,13 +199,13 @@ final class Phase2InputTests: XCTestCase {
     // MARK: - Keys
 
     func testKeyAllowlistAcceptsKnownNames() throws {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         let plan = try input.planKeyEvent("keycode_back")
         XCTAssertEqual(plan.payload, "KEYCODE_BACK", "input is normalised to upper case")
     }
 
     func testKeyAllowlistRejectsAnythingElse() {
-        let input = ADBDeviceInput(transport: MockTransport(), auditLog: InputAuditLog())
+        let input = ADBDeviceInput(transport: MockTransport(), auditLog: DeviceAuditLog())
         XCTAssertThrowsError(try input.planKeyEvent("KEYCODE_BACK; reboot")) { error in
             guard case .keyRejected = (error as? InputRefusal) else {
                 return XCTFail("expected keyRejected, got \(error)")
@@ -217,33 +217,35 @@ final class Phase2InputTests: XCTestCase {
 
     func testExecutionIsAuditedWithResolvedTarget() async throws {
         let transport = MockTransport()
-        let log = InputAuditLog()
+        let log = DeviceAuditLog()
         let input = ADBDeviceInput(transport: transport, auditLog: log)
 
         let plan = try input.planTap(hierarchy: hierarchy([allowButton()]), matching: "allow")
         _ = try await input.execute(plan.confirming(), deviceSerial: serial, timeout: 10)
 
         let record = try XCTUnwrap(log.latest)
-        XCTAssertEqual(record.outcome, InputAuditRecord.executed)
-        XCTAssertEqual(record.targetLabel, "Allow")
-        XCTAssertEqual(record.targetResourceID, "com.android.settings:id/allow_button")
-        XCTAssertEqual(record.centerX, 200)
-        XCTAssertEqual(record.centerY, 230)
+        XCTAssertEqual(record.outcome, DeviceAuditRecord.executed)
+        XCTAssertEqual(record.target, "Allow")
+        XCTAssertEqual(record.input?.targetLabel, "Allow")
+        XCTAssertEqual(record.input?.targetResourceID, "com.android.settings:id/allow_button")
+        XCTAssertEqual(record.input?.centerX, 200)
+        XCTAssertEqual(record.input?.centerY, 230)
         XCTAssertEqual(record.detail, "input tap 200 230")
+        XCTAssertEqual(record.operation, .inputInject)
     }
 
     func testAuditLogIsBounded() {
-        let log = InputAuditLog(capacity: 2)
+        let log = DeviceAuditLog(capacity: 2)
         let plan = InputActionPlan(kind: .keyEvent, payload: "KEYCODE_BACK", confirmed: true)
 
         for index in 0..<5 {
             log.append(
-                InputAuditRecord(plan: plan, outcome: InputAuditRecord.executed, detail: "\(index)")
+                DeviceAuditRecord(plan: plan, outcome: DeviceAuditRecord.executed, detail: "\(index)")
             )
         }
 
         XCTAssertEqual(log.records.count, 2)
-        XCTAssertEqual(log.records.map(\.detail), ["3", "4"])
+        XCTAssertEqual(log.records.compactMap(\.detail), ["3", "4"])
     }
 
     func testAuditLogPersistsAndReloads() throws {
@@ -253,12 +255,12 @@ final class Phase2InputTests: XCTestCase {
         let url = directory.appendingPathComponent("audit.json")
 
         let plan = InputActionPlan(kind: .keyEvent, payload: "KEYCODE_HOME", confirmed: true)
-        let log = InputAuditLog(capacity: 10, fileURL: url)
-        log.append(InputAuditRecord(plan: plan, outcome: InputAuditRecord.executed, detail: "x"))
+        let log = DeviceAuditLog(capacity: 10, fileURL: url)
+        log.append(DeviceAuditRecord(plan: plan, outcome: DeviceAuditRecord.executed, detail: "x"))
 
-        let reloaded = InputAuditLog(capacity: 10, fileURL: url)
+        let reloaded = DeviceAuditLog(capacity: 10, fileURL: url)
         XCTAssertEqual(reloaded.records.count, 1)
-        XCTAssertEqual(reloaded.latest?.payload, "KEYCODE_HOME")
+        XCTAssertEqual(reloaded.latest?.input?.payload, "KEYCODE_HOME")
     }
 
     func testFailedCommandIsAuditedAsFailed() async throws {
@@ -266,7 +268,7 @@ final class Phase2InputTests: XCTestCase {
         await transport.setDefaultShellResult(
             TransportResult(exitCode: 1, stdout: "", stderr: "INJECT_EVENTS denied")
         )
-        let log = InputAuditLog()
+        let log = DeviceAuditLog()
         let input = ADBDeviceInput(transport: transport, auditLog: log)
 
         let plan = try input.planTap(hierarchy: hierarchy([allowButton()]), matching: "allow")
@@ -280,7 +282,7 @@ final class Phase2InputTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(log.latest?.outcome, InputAuditRecord.failed)
+        XCTAssertEqual(log.latest?.outcome, DeviceAuditRecord.failed)
     }
 
     // MARK: - Fixtures

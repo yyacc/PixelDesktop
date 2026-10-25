@@ -1,7 +1,9 @@
 # Handoff: PixelDesktop — project context and goals
 
-**Written:** 2026-10-25 · **Agent:** Ciel · **Session:** `20261024_213642_77b4ea`
-**Status:** Phase 3 proposal designed and committed (`23f0bb5`), **awaiting rnz's 5 decisions**. No Phase 3 implementation has started.
+**Written:** 2026-10-25 · **Agent:** Ciel · **Session:** `20261024_213642_77b4ea` (updated `20261025_1037`)
+**Status:** **Phase 3 APPROVED and 3.1 complete.** Trust foundation (D1 consent · D2 generalised audit ·
+D3 universal dry run) is implemented, committed, and green at **746 tests / 26 skipped / 0 failures**.
+**Next: Phase 3.2 (A5 notification stream).** 3.2–3.5 not started.
 **Supersedes:** the Phase 0 handoff, archived to `docs/handoffs/handoff-pixeldesktop-phase0-control-plane.md`.
 
 > This file is the entry point. It carries **the goal of the project** and the minimum context to
@@ -73,8 +75,8 @@ AI-company stack (Ciel = CEO/orchestrator, Qwen = worker, LongCat = escalation/f
 
 ## 2. Context
 
-**Repo:** `~/AICompany/PixelDesktop` · working tree clean at `23f0bb5`
-**Suite:** **715 tests, 26 skipped, 0 failures** (full suite, `xcodebuild test -scheme PixelDesktop`)
+**Repo:** `~/AICompany/PixelDesktop` · working tree clean at the Phase 3.1 commit
+**Suite:** **746 tests, 26 skipped, 0 failures** (full suite, `xcodebuild test -scheme PixelDesktop`)
 **Device:** Pixel 7a (`lynx`), Android 16 / SDK 36, serial `3C261JEHN25632`, **USB only**
 
 **The phone's OLED is dead. It does not display. Do not probe to re-establish this.** The
@@ -112,17 +114,26 @@ It is the path that would unblock Termux cron for C4 (proposal §4.1, decision Q
 | 0 | **Control plane** | A4 UI dump · A6 logcat · B3 port forwarding · A2 screenshot · scrcpy documented | ✅ done 2026-10-24 |
 | 1 | **The node** | C1 Termux + llama-server · B2 host service management · C2 inference jobs | ✅ done |
 | 2 | **Hands** | B1 input injection (dry-run gated) · A7 telemetry + thermal history | ✅ done 2026-10-25, ADR-019 |
-| 3 | **Durability** | A5 notifications · C4 scheduled tasks · C3 remote shell · B4/B5 · D1–D4 | ⏸ **proposal only — 5 decisions open** |
+| 3 | **Durability** | A5 notifications · C4 scheduled tasks · C3 remote shell · B4/B5 · D1–D4 | 🔨 **3.1 done** — 3.2–3.5 open |
 
-**Phase 3 is designed but not approved.** The proposal is
-`docs/PROPOSAL-PHASE-3-DURABILITY.md` (committed `23f0bb5`). Its §7.2 holds five open decisions
-and §5.1–5.8 hold the concrete specs.
+**Phase 3 is approved and in progress.** Proposal
+`docs/PROPOSAL-PHASE-3-DURABILITY.md` (committed `23f0bb5`); all five §7.2 decisions taken as
+recommended (**Q1a–Q5a**) and recorded in `ADR-020`. Any of the five can still be re-opened by rnz
+before the sub-phase that depends on it ships — Q1 gates 3.2, Q2 gates 3.5, Q3 gates 3.4, Q5 gates 3.3.
 
 ### Phase 3's shape (5 sub-phases, trust layer first)
 
 **3.1** trust foundation (D1 consent · D2 generalized audit · D3 universal dry-run) → **3.2** A5
 notification stream → **3.3** B4 install/uninstall + B5 reboot → **3.4** C4 scheduled tasks →
-**3.5** C3 remote shell + D4 kill switch.
+**3.5** D4 kill switch (C3 remote shell deferred per Q2a).
+
+| Sub-phase | Status | What exists |
+|---|---|---|
+| 3.1 Trust foundation | ✅ done 2026-10-25 | `Trust/ConsentRegistry.swift`, `Trust/DryRun.swift`, `Audit/DeviceAuditLog.swift`, `App/TrustView.swift` (new **Trust** tab), ADR-020, 31 tests |
+| 3.2 A5 notifications | ⬜ next | nothing yet — the D1 gate it must use is ready |
+| 3.3 B4/B5 | ⬜ | `DestructiveActionPlan` ready; no operation builds one |
+| 3.4 C4 Mac scheduler | ⬜ | — |
+| 3.5 D4 kill switch | ⬜ | — |
 
 **Why 3.1 first:** A5 reads private messages and B4/B5 destroy state. Neither ships before the
 consent gate and dry-run exist.
@@ -161,15 +172,23 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 
 ## 5. Next task
 
-1. **Get rnz's answers to Phase 3 §7.2 Q1–Q5.** Recommendation on all five: **Q1(a)** read-only
-   notifications · **Q2(a)** defer C3 to its own ADR cycle · **Q3(a)** Mac-side scheduler ·
-   **Q4(a)** per data class · **Q5(a)** build B5 with a confirmation gate.
-2. **Then start Phase 3.1** (trust foundation) — it is the prerequisite for 3.2 and 3.3.
-3. **Two probes need rnz's authorization** because they mutate the device: an `adb uninstall`
-   round-trip of the worker APK, and `cmd notification allow_listener` (needs an APK with a
-   listener service, which does not exist yet). Listed in proposal §7.1.
-4. **Verify the Termux setting** — Settings → Termux → "Allow external apps to run commands" —
-   then re-test `am startservice … RunCommandService`. If it passes, C4 has a device-side option.
+1. **Build Phase 3.2 — A5 notification stream**, read-only (Q1a), gated by `ConsentGate` on
+   `.notifications`. Three pieces, in this order:
+   - **the two-tier reader**: poll `cmd notification list` (1,731 B) for the key set; fetch
+     `dumpsys notification --noredact` (777,677 B) **only when the key set changed**;
+   - **the five-field parser**: `android.title`, `android.text`, `android.textLines` (a *list*),
+     `android.subText`, `tickerText` — a text-only parser drops 16 of 23 records (70%). Records with
+     no extractable content are surfaced as `contentless`, never dropped;
+   - **the view**, plus a `.notificationRead` audit record per read.
+   Target: parser extracts content from **≥ 90%** of records on a captured real dump (prototype
+   achieved 21/23 = 91%).
+2. **Then 3.3 → 3.4 → 3.5** in order. Nothing else in Phase 3 needs a decision from rnz, except:
+3. **Two probes still need rnz's authorization** because they mutate the device: an `adb uninstall`
+   round-trip of the worker APK (needed by 3.3), and `cmd notification allow_listener` (needs an APK
+   with a listener service, which does not exist — only relevant if push is ever wanted over polling).
+4. **Verify the Termux setting** — Settings → Termux → "Allow external apps to run commands" — then
+   re-test `am startservice … RunCommandService`. It is no longer on the critical path (Q3a moved the
+   scheduler to the Mac), so this is now optional reconnaissance.
 
 ---
 
@@ -192,6 +211,17 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 - **`execute` decodes stdout as UTF-8 and falls back to `""`** — a PNG would arrive as zero bytes
   with exit code 0. That is why `TransportProtocol.execOut` → `TransportBinaryResult` exists.
 - **D2 and D3 are already half-built by Phase 2** (input-only). Generalize them; do not rebuild.
+  *(Done in 3.1: `InputAuditLog` is deleted, not extended — input is now a filter over
+  `DeviceAuditLog`.)*
+- **`Character("\(n)")` traps for a two-digit `n`.** `ContentView` built keyboard shortcuts that
+  way; a tenth tab (`trust`) would have crashed the app on first render. Use an explicit mapping
+  (⌘1–⌘9, ⌘0).
+- **Foundation's `.iso8601` JSON date strategy truncates to whole seconds.** That silently defeats
+  any millisecond-ordering requirement. Use a custom strategy with `.withFractionalSeconds`, and
+  assert the gap survives a disk round-trip.
+- **`MockTransport` cannot prove append-before-execute.** It records invocations but cannot read the
+  audit log mid-call, so an append-after-success log passes every assertion. Use a probe transport
+  that inspects the log inside `shell(...)`.
 
 ---
 
@@ -203,8 +233,8 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 | **Phase 3 proposal** | `docs/PROPOSAL-PHASE-3-DURABILITY.md` |
 | Remote storage proposal | `docs/PROPOSAL-REMOTE-STORAGE.md` |
 | scrcpy (external tool) | `docs/SCRCPY-EXTERNAL-TOOL.md` |
-| Phase records | `engineering/phases/` |
-| ADRs (19) | `engineering/decisions/` |
+| Phase records | `engineering/phases/` (Phase 3.1: `phase-03-1-trust-foundation.md`) |
+| ADRs (20) | `engineering/decisions/` (newest: **ADR-020 trust foundation**) |
 | Phase 1 handoff | `docs/handoffs/handoff-pixeldesktop-phase1-device-verification.md` |
 | Phase 2 handoff | `docs/handoffs/handoff-pixeldesktop-phase2-hands.md` |
 | Phase 0 handoff (archived) | `docs/handoffs/handoff-pixeldesktop-phase0-control-plane.md` |

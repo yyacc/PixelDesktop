@@ -15,11 +15,19 @@ import Foundation
 ///
 /// No caller-supplied string reaches the device unquoted, and no caller supplies coordinates
 /// at all.
+///
+/// ## Phase 3 — generalised trail, unchanged gate
+///
+/// The audit trail is now the shared `DeviceAuditLog` (D2) rather than an input-only log, and it
+/// is written **before** the command is issued (`begin`/`resolve`) rather than after. The gate
+/// itself is untouched: `InputActionPlan.confirmed` still decides whether anything runs. Input also
+/// joins the universal dry-run vocabulary via `dryRunReport(for:)` (D3), so a tap preview and an
+/// uninstall preview are the same artifact type.
 struct ADBDeviceInput: DeviceInputProtocol {
     private let transport: TransportProtocol
-    private let auditLog: InputAuditLog
+    private let auditLog: DeviceAuditLog
 
-    init(transport: TransportProtocol, auditLog: InputAuditLog) {
+    init(transport: TransportProtocol, auditLog: DeviceAuditLog) {
         self.transport = transport
         self.auditLog = auditLog
     }
@@ -74,6 +82,30 @@ struct ADBDeviceInput: DeviceInputProtocol {
         return InputActionPlan(kind: .keyEvent, payload: validated)
     }
 
+    // MARK: - Dry run (D3)
+
+    /// The shared dry-run report for an input plan.
+    ///
+    /// Input was the first operation to grow a gate (ADR-019); it is not a special case in the
+    /// Phase 3 vocabulary. An unbuildable plan still produces a report — with the failure as the
+    /// command — because "this plan cannot produce a command" is itself what the operator needs to
+    /// see before confirming.
+    func dryRunReport(for plan: InputActionPlan) -> DryRunReport {
+        let command: String
+        do {
+            command = try buildCommand(for: plan)
+        } catch {
+            command = "invalid plan: \(error)"
+        }
+        return DryRunReport(
+            operation: .inputInject,
+            target: plan.target?.label ?? plan.kind.rawValue,
+            command: command,
+            wouldExecute: plan.confirmed,
+            notes: [plan.preview]
+        )
+    }
+
     // MARK: - Execution
 
     func execute(
@@ -81,67 +113,70 @@ struct ADBDeviceInput: DeviceInputProtocol {
         deviceSerial: String,
         timeout: TimeInterval
     ) async throws -> InputActionResult {
+        let context = InputAuditContext(plan: plan)
+
         // The gate. An unconfirmed plan is refused before any command is built.
         guard plan.confirmed else {
             auditLog.append(
-                InputAuditRecord(
-                    plan: plan,
-                    outcome: InputAuditRecord.refused,
-                    detail: InputRefusal.planNotConfirmed.description
-                )
+                operation: .inputInject,
+                target: plan.target?.label,
+                outcome: .refused,
+                detail: InputRefusal.planNotConfirmed.description,
+                input: context
             )
             throw InputRefusal.planNotConfirmed
         }
 
         let command = try buildCommand(for: plan)
 
+        // Append-before-execute: the attempt is durable before the device is touched, so a crash
+        // mid-command still leaves evidence that it was issued.
+        let attempt = auditLog.begin(
+            operation: .inputInject,
+            target: plan.target?.label,
+            detail: command,
+            input: context
+        )
+
+        let result: TransportResult
         do {
-            let result = try await transport.shell(
+            result = try await transport.shell(
                 deviceSerial: deviceSerial,
                 command: command,
                 timeout: timeout
             )
-
-            guard result.isSuccess else {
-                auditLog.append(
-                    InputAuditRecord(
-                        plan: plan,
-                        outcome: InputAuditRecord.failed,
-                        detail: "\(command) exited \(result.exitCode): \(result.stderr)"
-                    )
-                )
-                throw PixelDesktopError.adbCommandFailed(
-                    command: command,
-                    exitCode: Int(result.exitCode),
-                    stderr: result.stderr
-                )
-            }
-
-            auditLog.append(
-                InputAuditRecord(plan: plan, outcome: InputAuditRecord.executed, detail: command)
-            )
-
-            return InputActionResult(
-                planID: plan.id,
-                kind: plan.kind,
-                command: command,
-                executedAt: Date(),
-                exitCode: result.exitCode,
-                stderr: result.stderr
-            )
-        } catch let error as PixelDesktopError {
-            // Already audited above; rethrown so the caller sees the typed failure.
-            throw error
         } catch {
-            auditLog.append(
-                InputAuditRecord(
-                    plan: plan,
-                    outcome: InputAuditRecord.failed,
-                    detail: "transport error: \(error.localizedDescription)"
-                )
+            auditLog.resolve(
+                attempt,
+                outcome: .failed,
+                detail: "transport error: \(error.localizedDescription)"
             )
             throw PixelDesktopError.adbTransportError(error.localizedDescription)
         }
+
+        guard result.isSuccess else {
+            auditLog.resolve(
+                attempt,
+                outcome: .failed,
+                detail: "\(command) exited \(result.exitCode): \(result.stderr)"
+            )
+            throw PixelDesktopError.adbCommandFailed(
+                command: command,
+                exitCode: Int(result.exitCode),
+                stderr: result.stderr
+            )
+        }
+
+        auditLog.resolve(attempt, outcome: .executed, detail: command)
+
+        return InputActionResult(
+            planID: plan.id,
+            kind: plan.kind,
+            command: command,
+            executedAt: Date(),
+            exitCode: result.exitCode,
+            stderr: result.stderr
+        )
     }
 
     /// Builds the device command for a confirmed plan.
