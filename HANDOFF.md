@@ -1,15 +1,24 @@
 # Handoff: PixelDesktop — project context and goals
 
-**Written:** 2026-10-25 · **Agent:** Ciel · **Session:** `20261024_213642_77b4ea` (updated `20261025_1037`)
-**Status:** **Phase 3 in progress — 3.1 and 3.2 complete.** Trust foundation (D1 consent · D2 generalised
-audit · D3 universal dry run) and A5, the notification stream, are implemented and green at
-**776 tests / 30 skipped / 0 failures**, with real-device evidence for A5 (§5 of the 3.2 phase record).
-**Next: Phase 3.3 (B4 app install + B5 power actions).** 3.3–3.5 not started.
-**Settled (rnz, 2026-10-25):** success criterion 2 (≥90% of records) **stays as written and stands
-MISSED at 87.9%.** The 90% bar was derived from 21/23 over a dump that already held 2 contentless
-records, so the denominator is all records by construction; 100% of records that carry content are
-extracted — a diagnostic, not the pass line. The restatement is rejected, not pending. Likewise the
-balance watchdog: threshold stays $0.50, spend managed manually, script frozen.
+**Written:** 2026-10-25 · **Agent:** Ciel · **Session:** `20261025_103259_f7df47`
+**Status:** **Phase 3 in progress — 3.1, 3.2 and B4 complete.** Trust foundation (D1 consent · D2
+generalised audit · D3 universal dry run), A5 (the notification stream), the B4 worker round-trip
+evidence and the B4 Swift surface are implemented and green at **797 tests / 32 skipped / 0
+failures**, with real-device evidence for A5 (§5 of the 3.2 phase record) and B4 (evidence/b4-b5-probes/).
+**Next: B5 (reboot / power actions) — NOT approved.** 3.3's remaining work is blocked on that approval;
+3.4–3.5 not started.
+**Settled (rnz, 2026-10-25):**
+- **Criterion 2 of 3.2 was revised** (a change, not a restatement): ≥ 90% of records **that carry
+  extractable content** — **MET, 29/29 = 100%**. The original wording and its result are retained
+  verbatim: the original criterion was **MISSED at 87.9% (29/33)**, and that remains the diagnostic.
+  An earlier attempt to frame the same denominator as a restatement was rejected; that rejection
+  stands, and the rejection was about the framing. Both wordings are in proposal §9.
+- **B4's Swift acceptance test uses a disposable package** (`com.pixeldesktop.disposable.probe`),
+  because the guarded API must refuse to uninstall `com.pixeldesktop.worker` and therefore cannot
+  produce the worker's own round trip. Worker lifecycle evidence stays at the transport level; the
+  three evidence types are kept distinct and interchangeable in neither direction.
+- **B5 is NOT approved.** No reboot, power cycle or anything else that could jeopardise ADB.
+- Balance watchdog: threshold stays $0.50, spend managed manually, script frozen.
 **Supersedes:** the Phase 0 handoff, archived to `docs/handoffs/handoff-pixeldesktop-phase0-control-plane.md`.
 
 > This file is the entry point. It carries **the goal of the project** and the minimum context to

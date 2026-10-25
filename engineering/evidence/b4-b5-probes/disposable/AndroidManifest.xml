@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Disposable package for the B4 Swift acceptance test.
+
+  Scope, stated in the manifest itself so the artifact is self-describing:
+
+  - package id: com.pixeldesktop.disposable.probe  (never shipped, never referenced by the product)
+  - zero <uses-permission> entries: it cannot read, write, network or observe anything
+  - zero components (no activity, service, receiver, provider): it cannot run, cannot be started,
+    cannot bind, cannot receive broadcasts
+  - hasCode="false": there is no dex, so there is no code to execute
+
+  It exists to be installed and uninstalled through the guarded API and nothing else. Its total
+  effect on the device is one package entry under /data/app plus an empty private data directory,
+  both removed by the uninstall that ends the test.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.pixeldesktop.disposable.probe"
+    android:versionCode="1"
+    android:versionName="1.0-disposable">
+
+    <uses-sdk android:minSdkVersion="31" android:targetSdkVersion="36" />
+
+    <application
+        android:label="PD Disposable Probe"
+        android:hasCode="false" />
+</manifest>

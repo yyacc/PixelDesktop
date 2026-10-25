@@ -103,8 +103,10 @@ protocol TransportProtocol: AnyObject, Sendable {
     /// Installs an APK via `adb -s <serial> install [-r] <apkPath>`.
     ///
     /// **Transport primitive.** It takes an already-validated absolute APK path and performs no
-    /// policy of its own. Installation is **state-changing**, unlike `push`/`pull`, so this must
-    /// be called only from `WorkerInstaller` and must never be exposed to the UI or to Hermes.
+    /// policy of its own. Installation is **state-changing**, unlike `push`/`pull`, so this must be
+    /// called only from two gated callers — `WorkerInstaller`, and `ADBPackageOperations` behind a
+    /// confirmed `DestructiveActionPlan` (B4) — and must never be exposed to the UI or to Hermes
+    /// directly.
     ///
     /// - Parameter replace: when `true`, passes `-r` so an existing install is replaced. This
     ///   makes install and reinstall the same operation.

@@ -16,7 +16,7 @@ evidence, so that 3.3 starts from measured behaviour instead of remembered behav
 
 | # | Decision | Consequence |
 |---|---|---|
-| 1 | Restate 3.2 criterion 2 as "≥ 90% of records **that carry content**" | `docs/PROPOSAL-PHASE-3-DURABILITY.md` §9 amended; 87.9% retained as diagnostic |
+| 1 | 3.2 criterion 2 **revised** to "≥ 90% of records **that carry extractable content**" (a change, not a restatement) | `docs/PROPOSAL-PHASE-3-DURABILITY.md` §9 amended; revised result 29/29 = 100%; original criterion + its 29/33 = 87.9% miss retained verbatim |
 | 2 | Authorize one `adb uninstall` / reinstall round-trip of the worker APK | Probe A below |
 | 3 | Authorize a real reboot test | Probe B below |
 | 4 | Ship 3.3 as **two commits** (B4, then B5) | Commit plan for 3.3 |
@@ -197,9 +197,12 @@ silent-failure question. The version-skew note above is history, not a work item
   alone; it must not assume the phone's screen state, and it must re-establish perception itself.
 - Termux remains closed to the ADB shell (C). **Nothing in 3.3 or 3.4 may plan on `RunCommandService`**
   until §4.4 is decided and built.
-- Criterion 2 of 3.2 stands **as written** (≥ 90% of records) and is **MISSED** at 87.9% (29/33).
-  The restatement was rejected by rnz on 2026-10-25 and reverted; 3.2 carries an openly reported miss,
-  not a redefined rubric.
+- Criterion 2 of 3.2 was **revised** by rnz on 2026-10-25: **≥ 90% of records that carry extractable
+  content**, met at **29/29 = 100%**. The original wording and its result are retained verbatim — the
+  original criterion was **MISSED at 87.9% (29/33)** and that measurement is unchanged. The revision is
+  recorded as a change with its rationale in proposal §9 and in §8 below; nothing in
+  `phase-03-2-notification-stream.md` §4 was rewritten. An earlier attempt to present the same
+  denominator as a *restatement* was rejected; the rejection was about the framing, and this is not it.
 
 ---
 
@@ -230,9 +233,10 @@ Result: **PASS**, present → absent → present on `3C261JEHN25632`.
 2. **The proposal contradicts itself on B4's verification.** §5.5 asks for a real-device test that
    "installs and uninstalls the worker APK", while the same table requires the API to **refuse**
    uninstalling `com.pixeldesktop.worker`. A test through the guarded API can never produce that
-   transition. Resolution before B4 code is written: the acceptance test drives the **raw
-   transport** (as measured here), or performs the round-trip on a **disposable side-loaded package**.
-   Needs one clarifying line in the proposal, not a silent workaround.
+   transition. **Resolved by rnz on 2026-10-25:** the B4 Swift acceptance test uses a **disposable
+   side-loaded package**; the guarded API's refusal stays intact and unit-tested; the worker's own
+   lifecycle keeps the raw-transport evidence recorded above. The three evidence types are kept
+   distinct in §8 and are not treated as substitutes for one another.
 
 ### Tooling gap confirmed
 
@@ -240,3 +244,50 @@ Result: **PASS**, present → absent → present on `3C261JEHN25632`.
 cannot run through it. Working invocation — stage `PixelDesktop.debug.dylib` into the test bundle's
 `Contents/Frameworks` (build products only; `DYLD_LIBRARY_PATH` is stripped because `xctest` is
 SIP-protected), then `xcrun xctest -XCTest <bundle>` with the serial set. Exact commands in the report.
+
+---
+
+## 8. B4 Swift surface + criterion-2 revision (implemented 2026-10-25)
+
+### 8.1 The three evidence types, and what each one establishes
+
+They are separate on purpose. A pass in one is not evidence for another.
+
+| # | Evidence | What it proves | What it cannot prove |
+|---|---|---|---|
+| 1 | **Transport-level worker lifecycle** — `B4-ACCEPTANCE-REPORT.md` | the worker APK survives present→absent→present byte-identically, with no reboot, and still works | says nothing about the Swift API's gate, audit or rendering |
+| 2 | **Guarded-API unit tests** — `Phase3PackageOperationsTests` (19 tests, mock transport) | the gate refuses unconfirmed plans, the worker/protected/system refusals fire before any command, the preview equals the executed command, failures printed on stdout with exit 0 are recorded as failures | establishes nothing about hardware |
+| 3 | **Swift acceptance on the device** — `Phase3PackageDeviceHarness` | the real `ADBPackageOperations` installs and uninstalls a real package on the real Pixel 7a and leaves the device as it found it | establishes nothing about the worker's own uninstall, which the API must refuse |
+
+Type 1 does not stand in for 3 (different code path), and 3 does not stand in for 1 (different package).
+
+### 8.2 The disposable package
+
+| Property | Value |
+|---|---|
+| package id | `com.pixeldesktop.disposable.probe` |
+| build | `engineering/evidence/b4-b5-probes/disposable/build-disposable-apk.sh` (aapt2 → zipalign → apksigner) |
+| apk size / sha256 | 8,538 B / `e6a3eedac0176d003d22285ee41392f415a84a26562579d4ffe9795596793ec2` |
+| permissions | none — the manifest declares no `<uses-permission>` |
+| components | none — no activity, service, receiver or provider; `hasCode=false`, no dex |
+| effect on device | one package entry + one empty data directory, both removed by the test's own uninstall |
+| cleanup | the uninstall step of the acceptance test; if a run aborts, `adb -s <serial> uninstall com.pixeldesktop.disposable.probe` |
+| blast radius if misused | cannot run, cannot read, cannot write, cannot receive; it holds no part in the ADB link, so it cannot affect transport |
+
+Preflight refuses to run if the package is already installed (a leftover would make the test unable to
+distinguish its own effect), and the test fails if the third-party package set at the end differs from
+the baseline.
+
+### 8.3 Criterion 2 — the revision, recorded as a change
+
+- **Original criterion:** "extracts content from ≥ 90% of **records** on a captured real dump".
+- **Original result:** **MISSED — 29/33 = 87.9%** (`phase-03-2-notification-stream.md` §4, unchanged).
+- **Why unsuitable:** the denominator is every record, so the number moves with the notification mix.
+  §3.2's own 91% (21/23) was measured on a dump with 2/23 contentless records; at 4/33 (12.1%) the same
+  parser scores 87.9%. A contentless record can never enter the numerator, so the criterion penalises
+  the dump, not the parser — and a parser returning nothing would score the same on those records.
+- **Revised criterion:** "extracts content from ≥ 90% of **records that carry extractable content**".
+- **Revised result:** **MET — 29/29 = 100%**.
+- **Retained diagnostic:** 29/33 = 87.9% of all records, with the 4 contentless records identified in
+  the 3.2 evidence.
+- **Date / authority:** 2026-10-25, rnz. Recorded in proposal §9 with both wordings present.

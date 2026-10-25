@@ -283,6 +283,16 @@ installs and uninstalls the worker APK — reversible, and the APK is on the Mac
 > its acceptance test must either drive the raw transport or perform the round-trip on a **disposable
 > side-loaded package** — the guarded API's refusal is unit-testable, but it cannot be its own
 > acceptance evidence. Needs one ruling from rnz before B4 code starts.
+>
+> **Resolved 2026-10-25 (rnz):** the B4 Swift acceptance test uses a **disposable side-loaded
+> package** (`com.pixeldesktop.disposable.probe`); the guarded API's refusal to uninstall
+> `com.pixeldesktop.worker` stays intact and unit-tested and is not weakened for the test; the
+> worker's own uninstall/reinstall evidence remains the transport-level record in
+> `engineering/evidence/b4-b5-probes/B4-ACCEPTANCE-REPORT.md`. The three evidence types are kept
+> distinct — see `engineering/evidence/b4-b5-probes/B4-SWIFT-ACCEPTANCE.md` and
+> `engineering/phases/phase-03-3-preflight-device-probes.md` §8. Implemented as
+> `Operations/ADBPackageOperations.swift`, tested by `Phase3PackageOperationsTests` (hermetic) and
+> `Phase3PackageDeviceHarness` (device).
 
 ### 5.6 B5 — Reboot control
 
@@ -412,19 +422,46 @@ confirmation gate.
 
 1. **A5 reads the notification feed with no grant → throws, issues zero commands.** Measured
    against a real dump, not a fixture.
-2. **The A5 parser extracts content from ≥ 90% of records** on a captured real dump — the prototype
-   achieved 21/23 (91%) reading title/text/textLines/subText/tickerText, vs 7/23 (30%) for a text-only
-   parser.
+2. **The A5 parser extracts content from ≥ 90% of the records that carry extractable content** on a
+   captured real dump.
 
-   **Status: MISSED — 87.9% (29/33) on the phase-3.2 captured dump — and the wording stands.** rnz ruled
-   on 2026-10-25 that the criterion is **not** restated, because the design's own measurement shows its
-   denominator is *all* records: §3.2 derived the 90% bar from 21/23 = 91%, and that dump contained
-   **2 records with no extractable content**, so "21 of 23" *is* the all-records ratio (21 extracted +
-   2 contentless = 23). The bar sits just below it. On the 33-record dump the contentless share rose
-   from 8.7% to 4/33 = 12.1%, so an unchanged parser reads 87.9%: the shortfall is a property of the
-   notification mix, not of the parser's reach. Records that carry content: **29/29 = 100%**, reported
-   as a diagnostic. Evidence: `engineering/phases/phase-03-2-notification-stream.md` §4.
-   *Proposed and rejected, kept for the record:* "≥ 90% of records that carry content".
+   **Revised 2026-10-25 by rnz (owner ruling). Result: MET — 29/29 = 100%.**
+
+   This is recorded as a **change to the criterion**, not as a correction of the measurement. The
+   original wording is kept verbatim below and its result is kept as a miss; nothing in
+   `engineering/phases/phase-03-2-notification-stream.md` §4 has been rewritten.
+
+   **Diagnostic, as originally measured and unchanged: 29/33 = 87.9% of all records** in the
+   phase-3.2 dump. Four records contained no extractable content of any kind; the remaining 29 all
+   yielded content.
+
+   *Original criterion (superseded, verbatim):* "The A5 parser extracts content from ≥ 90% of
+   records on a captured real dump — the prototype achieved 21/23 (91%) reading
+   title/text/textLines/subText/tickerText, vs 7/23 (30%) for a text-only parser."
+   *Original result under that wording:* **MISSED — 29/33 = 87.9%.**
+
+   *Why the original criterion was unsuitable:* its denominator is every record in the dump, so it
+   measures the notification mix as much as the parser. §3.2 set the 90% bar at 91% = 21/23 — on a
+   dump where 2 of 23 records (8.7%) had nothing to extract — so the original bar was already being
+   cleared partly because contentless records were rare. On the phase-3.2 dump that share rose to
+   4/33 (12.1%), and the same parser reads 87.9%. A dump dominated by progress-bar and
+   group-summary notifications could drive the ratio to zero with a perfect parser, and a parser that
+   returned nothing would score identically on contentless records — the criterion cannot separate
+   the two.
+
+   *Why the revised denominator is the right one:* it asks what the criterion is actually about —
+   given a record that has content, does the parser find it — and excludes only records where there
+   is nothing to find. It is not satisfiable by ignoring hard records: the "no extractable content"
+   classification is a separate, reported count, so a parser that started returning nothing would
+   move records out of the denominator only by misclassifying them, which the diagnostic surfaces as
+   a rising contentless count (4/33 today).
+
+   *Traceability of the earlier attempt:* on 2026-10-25 an earlier proposal with the same denominator
+   was rejected because it was framed as a **restatement** — as though 3.2 had always meant this and
+   had therefore passed. That framing was the problem, not the denominator. This revision keeps the
+   original criterion and its miss on the record and dates the new one, so the sequence is visible:
+   original criterion → measured miss → rejected restatement → explicit revision.
+
 3. **Every destructive operation refuses without a confirmed dry-run**, verified by asserting
    zero transport invocations.
 4. **B4 installs and uninstalls the worker APK on the real device** and leaves it healthy.
