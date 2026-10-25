@@ -1,9 +1,13 @@
 # Handoff: PixelDesktop — project context and goals
 
 **Written:** 2026-10-25 · **Agent:** Ciel · **Session:** `20261024_213642_77b4ea` (updated `20261025_1037`)
-**Status:** **Phase 3 APPROVED and 3.1 complete.** Trust foundation (D1 consent · D2 generalised audit ·
-D3 universal dry run) is implemented, committed, and green at **746 tests / 26 skipped / 0 failures**.
-**Next: Phase 3.2 (A5 notification stream).** 3.2–3.5 not started.
+**Status:** **Phase 3 in progress — 3.1 and 3.2 complete.** Trust foundation (D1 consent · D2 generalised
+audit · D3 universal dry run) and A5, the notification stream, are implemented and green at
+**776 tests / 30 skipped / 0 failures**, with real-device evidence for A5 (§5 of the 3.2 phase record).
+**Next: Phase 3.3 (B4 app install + B5 power actions).** 3.3–3.5 not started.
+**Open item for rnz:** phase-3.2 §4 — success criterion 2 (≥90% of records) measures 87.9% on the
+captured dump because 4 of 33 records carry no content at all; 100% of the records that carry content
+are extracted. Recommended restatement, not yet applied to the proposal.
 **Supersedes:** the Phase 0 handoff, archived to `docs/handoffs/handoff-pixeldesktop-phase0-control-plane.md`.
 
 > This file is the entry point. It carries **the goal of the project** and the minimum context to

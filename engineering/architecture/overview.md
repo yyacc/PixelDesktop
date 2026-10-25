@@ -84,9 +84,17 @@ so the app and the CLI target share one implementation.
 | `LogcatLine.swift` | `threadtime` line parser, validated `LogcatFilter` |
 | `LogcatStream.swift` | bounded `LogcatBuffer`, live stream over `shellStreaming` |
 | `PortForwarding.swift` | `PortForwardingProtocol`, `ADBPortForwarding` |
+| `Notifications.swift` | `NotificationKey`, `NotificationRecord`, visibility/importance (Phase 3.2, A5) |
+| `NotificationParser.swift` | `dumpsys notification --noredact` and `cmd notification list` parsers |
+| `NotificationStream.swift` | `NotificationReading`, gated `ADBNotificationReader`, two-tier `NotificationStream` |
 
 Transport support: `execOut` → `TransportBinaryResult`, because `execute` decodes stdout as
 UTF-8 and would turn a PNG into an empty string with exit code 0.
+
+**A5 (Phase 3.2)** is the first capability that reads a **P4** data class. Both tiers are wrapped in
+`ConsentGate.performing(.notifications, …)` inside `ADBNotificationReader`, and every command writes a
+content-free audit record (`tier 2: 6 records (2 contentless), 627757 B`). Tier 1 is 539 B live, tier 2
+is 627,757 B, and tier 2 is read only when the key set changes — see ADR-021.
 
 There is **no input injection** in this layer and none in the UI. Tap/type/swipe is Phase 2
 and is gated behind a dry-run preview (proposal P3).
@@ -356,7 +364,7 @@ Two tiers ([ADR-006](../decisions/ADR-006-test-isolation.md)):
 
 | Tier | File | Device needed | Runs by default |
 |---|---|---|---|
-| Hermetic unit tests | `PixelDesktopTests` (46 tests) | No | Yes — the regression gate |
+| Hermetic unit tests | `PixelDesktopTests` (776 tests, 30 skipped) | No | Yes — the regression gate |
 | Real-device integration | `PixelDeviceIntegrationTests` (3 tests) | Yes | No — skipped unless `PIXELDESKTOP_DEVICE_SERIAL` is set |
 
 Assertions about device-owned values check **well-formedness**, never a pinned version.

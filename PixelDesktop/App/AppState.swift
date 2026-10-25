@@ -777,6 +777,15 @@ final class AppState: ObservableObject {
         ConsentGate(registry: consentRegistry, auditLog: deviceAuditLog)
     }
 
+    /// The A5 two-tier notification read.
+    ///
+    /// Both tiers are P4: tier 1 carries package names and tags, tier 2 carries message bodies, so
+    /// the gate is inside the reader rather than at this seam — a caller cannot obtain a reader that
+    /// skips it.
+    var notificationReader: NotificationReading {
+        ADBNotificationReader(transport: transport, gate: consentGate)
+    }
+
     /// Proposes a tap on the single element matching `query`, against a fresh dump.
     ///
     /// The dump is read here rather than accepted from the caller because a plan resolved

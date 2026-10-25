@@ -1,0 +1,5608 @@
+T1
+  T2
+    NotificationRecord(0x03e4eec8: pkg=com.google.android.gm user=UserHandle{0} id=0 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|0|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=AUTO_CANCEL|GROUP_SUMMARY color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=92233702439589384500 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T3
+      opPkg=T4
+      icon=Icon (T5)
+      flags=T6
+      originalFlags=T7
+      pri=0
+      key=T8
+      seen=false
+      groupKey=T9
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T10
+            deleteIntent=T11
+            number=0
+            groupAlertBehavior=0
+            when=1792895837357/1792895837357
+            tickerText=T12
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T13
+            extras={
+                android.title=String (T14)
+                android.reduced.images=Boolean (T15)
+                android.textLines=CharSequence[] (6)
+                  [0] T16
+                  [1] T17
+                  [2] T18
+                  [3] T19
+                  [4] T20
+                  [5] T21
+                android.subText=String (T22)
+                android.template=String (T23)
+                android.showChronometer=Boolean (T24)
+                argAndroidAccount=Account (T25)
+                argPriorityScore=Float (T26)
+                android.people.list=ArrayList (T27)
+                android.text=null
+                android.progress=Integer (T28)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T29)
+                android.progressMax=Integer (T30)
+                android.appInfo=ApplicationInfo (T31)
+                android.showWhen=Boolean (T32)
+                android.largeIcon=null
+                android.infoText=null
+                argMustShow=Boolean (T33)
+                argNotificationType=String (T34)
+                android.progressIndeterminate=Boolean (T35)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T36
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843010/1792895843010
+            tickerText=T37
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T38
+            extras={
+                android.title=String (T39)
+                android.reduced.images=Boolean (T40)
+                android.subText=null
+                android.showChronometer=Boolean (T41)
+                android.people.list=ArrayList (T42)
+                android.text=null
+                android.progress=Integer (T43)
+                android.progressMax=Integer (T44)
+                android.appInfo=ApplicationInfo (T45)
+                android.showWhen=Boolean (T46)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T47)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T48
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T49
+      mAsstImportance=T50
+      mImportance=T51
+      mImportanceExplanation=T52
+      mProposedImportance=T53
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T54
+      mGlobalSortKey=T55
+      mRankingTimeMs=1792895837357
+      mCreationTimeMs=1792882753514
+      mVisibleSinceMs=1792894944106
+      mUpdateTimeMs=1792895843289
+      mInterruptionTimeMs=1792895843289
+      mSuppressedVisualEffects= 0
+      mSound=T56
+      mVibration=T57
+      mAttributes=T58
+      mLight=T59
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T60
+      mAdjustments=[]
+      shortcut=T61
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x04d15512: pkg=com.google.android.gm user=UserHandle{0} id=-2015457543 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|-2015457543|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243958938450-2015457543 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T62
+      opPkg=T63
+      icon=Icon (T64)
+      flags=T65
+      originalFlags=T66
+      pri=0
+      key=T67
+      seen=true
+      groupKey=T68
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T69
+            deleteIntent=T70
+            number=0
+            groupAlertBehavior=1
+            when=1792895837357/1792895837357
+            tickerText=T71
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T72
+            actions={
+                [0] T73
+                [1] T74
+                [2] T75
+              }
+            extras={
+                android.title=String (T76)
+                android.reduced.images=Boolean (T77)
+                android.subText=String (T78)
+                android.template=String (T79)
+                android.showChronometer=Boolean (T80)
+                argAndroidAccount=Account (T81)
+                argPriorityScore=Float (T82)
+                android.people.list=ArrayList (T83)
+                android.text=SpannableString (T84)
+                android.progress=Integer (T85)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T86)
+                android.progressMax=Integer (T87)
+                android.appInfo=ApplicationInfo (T88)
+                android.showWhen=Boolean (T89)
+                android.largeIcon=Icon (T90)
+                android.bigText=SpannableString (T91
+
+T92
+T93
+T94
+T95
+T96
+T97
+T98
+T99
+T100
+T101
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T102)
+                argMustShow=Boolean (T103)
+                argNotificationType=String (T104)
+                android.progressIndeterminate=Boolean (T105)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T106
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843169/1792895843169
+            tickerText=T107
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T108
+            extras={
+                android.title=String (T109)
+                android.reduced.images=Boolean (T110)
+                android.subText=null
+                android.showChronometer=Boolean (T111)
+                android.people.list=ArrayList (T112)
+                android.text=null
+                android.progress=Integer (T113)
+                android.progressMax=Integer (T114)
+                android.appInfo=ApplicationInfo (T115)
+                android.showWhen=Boolean (T116)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T117)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T118
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T119
+      mAsstImportance=T120
+      mImportance=T121
+      mImportanceExplanation=T122
+      mProposedImportance=T123
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T124
+      mGlobalSortKey=T125
+      mRankingTimeMs=1792895837357
+      mCreationTimeMs=1792895843666
+      mVisibleSinceMs=1792895844714
+      mUpdateTimeMs=1792895843666
+      mInterruptionTimeMs=1792895844715
+      mSuppressedVisualEffects= 0
+      mSound=T126
+      mVibration=T127
+      mAttributes=T128
+      mLight=T129
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T130
+      mAdjustments=[]
+      shortcut=T131
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x07742437: pkg=com.google.android.gm user=UserHandle{0} id=-791048057 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|-791048057|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243959055499-791048057 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T132
+      opPkg=T133
+      icon=Icon (T134)
+      flags=T135
+      originalFlags=T136
+      pri=0
+      key=T137
+      seen=false
+      groupKey=T138
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T139
+            deleteIntent=T140
+            number=0
+            groupAlertBehavior=1
+            when=1792895720308/1792895720308
+            tickerText=T141
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T142
+            actions={
+                [0] T143
+                [1] T144
+                [2] T145
+              }
+            extras={
+                android.title=String (T146)
+                android.reduced.images=Boolean (T147)
+                android.subText=String (T148)
+                android.template=String (T149)
+                android.showChronometer=Boolean (T150)
+                argAndroidAccount=Account (T151)
+                argPriorityScore=Float (T152)
+                android.people.list=ArrayList (T153)
+                android.text=SpannableString (T154)
+                android.progress=Integer (T155)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T156)
+                android.progressMax=Integer (T157)
+                android.appInfo=ApplicationInfo (T158)
+                android.showWhen=Boolean (T159)
+                android.largeIcon=Icon (T160)
+                android.bigText=SpannableString (T161
+T162
+T163
+T164
+T165
+T166
+T167
+T168
+T169
+T170
+T171
+T172
+T173
+T174
+T175
+T176
+T177
+T178
+T179
+T180
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T181)
+                argMustShow=Boolean (T182)
+                argNotificationType=String (T183)
+                android.progressIndeterminate=Boolean (T184)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T185
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843165/1792895843165
+            tickerText=T186
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T187
+            extras={
+                android.title=String (T188)
+                android.reduced.images=Boolean (T189)
+                android.subText=null
+                android.showChronometer=Boolean (T190)
+                android.people.list=ArrayList (T191)
+                android.text=null
+                android.progress=Integer (T192)
+                android.progressMax=Integer (T193)
+                android.appInfo=ApplicationInfo (T194)
+                android.showWhen=Boolean (T195)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T196)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T197
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T198
+      mAsstImportance=T199
+      mImportance=T200
+      mImportanceExplanation=T201
+      mProposedImportance=T202
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T203
+      mGlobalSortKey=T204
+      mRankingTimeMs=1792895720308
+      mCreationTimeMs=1792895725429
+      mVisibleSinceMs=1792895726492
+      mUpdateTimeMs=1792895843644
+      mInterruptionTimeMs=1792895843644
+      mSuppressedVisualEffects= 0
+      mSound=T205
+      mVibration=T206
+      mAttributes=T207
+      mLight=T208
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T209
+      mAdjustments=[]
+      shortcut=T210
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0d1f7128: pkg=com.google.android.gm user=UserHandle{0} id=956012910 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|956012910|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243959689149956012910 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T211
+      opPkg=T212
+      icon=Icon (T213)
+      flags=T214
+      originalFlags=T215
+      pri=0
+      key=T216
+      seen=false
+      groupKey=T217
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T218
+            deleteIntent=T219
+            number=0
+            groupAlertBehavior=1
+            when=1792895086658/1792895086658
+            tickerText=T220
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T221
+            actions={
+                [0] T222
+                [1] T223
+                [2] T224
+              }
+            extras={
+                android.title=String (T225)
+                android.reduced.images=Boolean (T226)
+                android.subText=String (T227)
+                android.template=String (T228)
+                android.showChronometer=Boolean (T229)
+                argAndroidAccount=Account (T230)
+                argPriorityScore=Float (T231)
+                android.people.list=ArrayList (T232)
+                android.text=SpannableString (T233)
+                android.progress=Integer (T234)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T235)
+                android.progressMax=Integer (T236)
+                android.appInfo=ApplicationInfo (T237)
+                android.showWhen=Boolean (T238)
+                android.largeIcon=Icon (T239)
+                android.bigText=SpannableString (T240
+T241
+T242
+T243
+T244
+T245
+T246
+T247
+T248
+T249
+T250
+T251
+T252
+T253
+T254
+T255
+T256
+T257
+T258
+T259
+T260
+T261
+T262
+T263
+T264
+T265
+T266
+T267
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T268)
+                argMustShow=Boolean (T269)
+                argNotificationType=String (T270)
+                android.progressIndeterminate=Boolean (T271)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T272
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843162/1792895843162
+            tickerText=T273
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T274
+            extras={
+                android.title=String (T275)
+                android.reduced.images=Boolean (T276)
+                android.subText=null
+                android.showChronometer=Boolean (T277)
+                android.people.list=ArrayList (T278)
+                android.text=null
+                android.progress=Integer (T279)
+                android.progressMax=Integer (T280)
+                android.appInfo=ApplicationInfo (T281)
+                android.showWhen=Boolean (T282)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T283)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T284
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T285
+      mAsstImportance=T286
+      mImportance=T287
+      mImportanceExplanation=T288
+      mProposedImportance=T289
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T290
+      mGlobalSortKey=T291
+      mRankingTimeMs=1792895086658
+      mCreationTimeMs=1792895092622
+      mVisibleSinceMs=1792895093590
+      mUpdateTimeMs=1792895843621
+      mInterruptionTimeMs=1792895843621
+      mSuppressedVisualEffects= 0
+      mSound=T292
+      mVibration=T293
+      mAttributes=T294
+      mLight=T295
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T296
+      mAdjustments=[]
+      shortcut=T297
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x01a42f35: pkg=com.google.android.gm user=UserHandle{0} id=-1827254415 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|-1827254415|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243959740182-1827254415 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T298
+      opPkg=T299
+      icon=Icon (T300)
+      flags=T301
+      originalFlags=T302
+      pri=0
+      key=T303
+      seen=false
+      groupKey=T304
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T305
+            deleteIntent=T306
+            number=0
+            groupAlertBehavior=1
+            when=1792895035625/1792895035625
+            tickerText=T307
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T308
+            actions={
+                [0] T309
+                [1] T310
+                [2] T311
+              }
+            extras={
+                android.title=String (T312)
+                android.reduced.images=Boolean (T313)
+                android.subText=String (T314)
+                android.template=String (T315)
+                android.showChronometer=Boolean (T316)
+                argAndroidAccount=Account (T317)
+                argPriorityScore=Float (T318)
+                android.people.list=ArrayList (T319)
+                android.text=SpannableString (T320)
+                android.progress=Integer (T321)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T322)
+                android.progressMax=Integer (T323)
+                android.appInfo=ApplicationInfo (T324)
+                android.showWhen=Boolean (T325)
+                android.largeIcon=Icon (T326)
+                android.bigText=SpannableString (T327
+T328
+T329
+T330
+T331
+T332
+T333
+T334
+T335
+T336
+T337
+T338
+T339
+T340
+T341
+T342
+T343
+T344
+T345
+1
+T346
+T347
+T348
+T349
+T350
+T351
+T352
+T353
+T354
+T355
+________________________________
+T356
+T357
+T358
+T359
+T360
+T361
+T362
+T363
+T364
+T365
+T366
+T367
+T368
+________________________________
+T369
+)
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T370)
+                argMustShow=Boolean (T371)
+                argNotificationType=String (T372)
+                android.progressIndeterminate=Boolean (T373)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T374
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843158/1792895843158
+            tickerText=T375
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T376
+            extras={
+                android.title=String (T377)
+                android.reduced.images=Boolean (T378)
+                android.subText=null
+                android.showChronometer=Boolean (T379)
+                android.people.list=ArrayList (T380)
+                android.text=null
+                android.progress=Integer (T381)
+                android.progressMax=Integer (T382)
+                android.appInfo=ApplicationInfo (T383)
+                android.showWhen=Boolean (T384)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T385)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T386
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T387
+      mAsstImportance=T388
+      mImportance=T389
+      mImportanceExplanation=T390
+      mProposedImportance=T391
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T392
+      mGlobalSortKey=T393
+      mRankingTimeMs=1792895035625
+      mCreationTimeMs=1792895042919
+      mVisibleSinceMs=1792895043913
+      mUpdateTimeMs=1792895843600
+      mInterruptionTimeMs=1792895843600
+      mSuppressedVisualEffects= 0
+      mSound=T394
+      mVibration=T395
+      mAttributes=T396
+      mLight=T397
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T398
+      mAdjustments=[]
+      shortcut=T399
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x02be0a6e: pkg=com.google.android.gm user=UserHandle{0} id=1253437127 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|1253437127|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=92233702439597741451253437127 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T400
+      opPkg=T401
+      icon=Icon (T402)
+      flags=T403
+      originalFlags=T404
+      pri=0
+      key=T405
+      seen=false
+      groupKey=T406
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T407
+            deleteIntent=T408
+            number=0
+            groupAlertBehavior=1
+            when=1792895001662/1792895001662
+            tickerText=T409
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T410
+            actions={
+                [0] T411
+                [1] T412
+                [2] T413
+              }
+            extras={
+                android.title=String (T414)
+                android.reduced.images=Boolean (T415)
+                android.subText=String (T416)
+                android.template=String (T417)
+                android.showChronometer=Boolean (T418)
+                argAndroidAccount=Account (T419)
+                argPriorityScore=Float (T420)
+                android.people.list=ArrayList (T421)
+                android.text=SpannableString (T422)
+                android.progress=Integer (T423)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T424)
+                android.progressMax=Integer (T425)
+                android.appInfo=ApplicationInfo (T426)
+                android.showWhen=Boolean (T427)
+                android.largeIcon=Icon (T428)
+                android.bigText=SpannableString (T429
+T430
+T431
+T432
+T433
+T434
+T435
+T436
+________________________________
+T437
+T438
+T439
+T440
+T441
+T442
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T443)
+                argMustShow=Boolean (T444)
+                argNotificationType=String (T445)
+                android.progressIndeterminate=Boolean (T446)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T447
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843153/1792895843153
+            tickerText=T448
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T449
+            extras={
+                android.title=String (T450)
+                android.reduced.images=Boolean (T451)
+                android.subText=null
+                android.showChronometer=Boolean (T452)
+                android.people.list=ArrayList (T453)
+                android.text=null
+                android.progress=Integer (T454)
+                android.progressMax=Integer (T455)
+                android.appInfo=ApplicationInfo (T456)
+                android.showWhen=Boolean (T457)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T458)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T459
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T460
+      mAsstImportance=T461
+      mImportance=T462
+      mImportanceExplanation=T463
+      mProposedImportance=T464
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T465
+      mGlobalSortKey=T466
+      mRankingTimeMs=1792895001662
+      mCreationTimeMs=1792895007468
+      mVisibleSinceMs=1792895008437
+      mUpdateTimeMs=1792895843579
+      mInterruptionTimeMs=1792895843579
+      mSuppressedVisualEffects= 0
+      mSound=T467
+      mVibration=T468
+      mAttributes=T469
+      mLight=T470
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T471
+      mAdjustments=[]
+      shortcut=T472
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x040faca3: pkg=com.google.android.gm user=UserHandle{0} id=-682286903 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|-682286903|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243960618220-682286903 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T473
+      opPkg=T474
+      icon=Icon (T475)
+      flags=T476
+      originalFlags=T477
+      pri=0
+      key=T478
+      seen=false
+      groupKey=T479
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T480
+            deleteIntent=T481
+            number=0
+            groupAlertBehavior=1
+            when=1792894157587/1792894157587
+            tickerText=T482
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T483
+            actions={
+                [0] T484
+                [1] T485
+                [2] T486
+              }
+            extras={
+                android.title=String (T487)
+                android.reduced.images=Boolean (T488)
+                android.subText=String (T489)
+                android.template=String (T490)
+                android.showChronometer=Boolean (T491)
+                argAndroidAccount=Account (T492)
+                argPriorityScore=Float (T493)
+                android.people.list=ArrayList (T494)
+                android.text=SpannableString (T495)
+                android.progress=Integer (T496)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T497)
+                android.progressMax=Integer (T498)
+                android.appInfo=ApplicationInfo (T499)
+                android.showWhen=Boolean (T500)
+                android.largeIcon=Icon (T501)
+                android.bigText=SpannableString (T502
+T503
+T504
+T505
+T506
+T507
+T508
+T509
+T510
+T511
+T512
+T513
+T514
+T515
+T516
+T517
+T518
+T519
+T520
+T521
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T522)
+                argMustShow=Boolean (T523)
+                argNotificationType=String (T524)
+                android.progressIndeterminate=Boolean (T525)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T526
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843133/1792895843133
+            tickerText=T527
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T528
+            extras={
+                android.title=String (T529)
+                android.reduced.images=Boolean (T530)
+                android.subText=null
+                android.showChronometer=Boolean (T531)
+                android.people.list=ArrayList (T532)
+                android.text=null
+                android.progress=Integer (T533)
+                android.progressMax=Integer (T534)
+                android.appInfo=ApplicationInfo (T535)
+                android.showWhen=Boolean (T536)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T537)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T538
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T539
+      mAsstImportance=T540
+      mImportance=T541
+      mImportanceExplanation=T542
+      mProposedImportance=T543
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T544
+      mGlobalSortKey=T545
+      mRankingTimeMs=1792894157587
+      mCreationTimeMs=1792894162389
+      mVisibleSinceMs=1792894944106
+      mUpdateTimeMs=1792895843551
+      mInterruptionTimeMs=1792895843551
+      mSuppressedVisualEffects= 0
+      mSound=T546
+      mVibration=T547
+      mAttributes=T548
+      mLight=T549
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T550
+      mAdjustments=[]
+      shortcut=T551
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x06a44e64: pkg=com.google.android.gm user=UserHandle{0} id=1173654158 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|1173654158|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=92233702439665110171173654158 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T552
+      opPkg=T553
+      icon=Icon (T554)
+      flags=T555
+      originalFlags=T556
+      pri=0
+      key=T557
+      seen=false
+      groupKey=T558
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T559
+            deleteIntent=T560
+            number=0
+            groupAlertBehavior=1
+            when=1792888264790/1792888264790
+            tickerText=T561
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T562
+            actions={
+                [0] T563
+                [1] T564
+                [2] T565
+              }
+            extras={
+                android.title=String (T566)
+                android.reduced.images=Boolean (T567)
+                android.subText=String (T568)
+                android.template=String (T569)
+                android.showChronometer=Boolean (T570)
+                argAndroidAccount=Account (T571)
+                argPriorityScore=Float (T572)
+                android.people.list=ArrayList (T573)
+                android.text=SpannableString (T574)
+                android.progress=Integer (T575)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T576)
+                android.progressMax=Integer (T577)
+                android.appInfo=ApplicationInfo (T578)
+                android.showWhen=Boolean (T579)
+                android.largeIcon=Icon (T580)
+                android.bigText=SpannableString (T581
+T582
+T583
+T584
+T585
+T586
+348
+182
+T587
+T588
+T589
+T590
+251
+161
+T591
+T592
+T593
+T594
+186
+102
+T595
+T596
+T597
+T598
+213
+130
+T599
+T600
+T601
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T602)
+                argMustShow=Boolean (T603)
+                argNotificationType=String (T604)
+                android.progressIndeterminate=Boolean (T605)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T606
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843108/1792895843108
+            tickerText=T607
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T608
+            extras={
+                android.title=String (T609)
+                android.reduced.images=Boolean (T610)
+                android.subText=null
+                android.showChronometer=Boolean (T611)
+                android.people.list=ArrayList (T612)
+                android.text=null
+                android.progress=Integer (T613)
+                android.progressMax=Integer (T614)
+                android.appInfo=ApplicationInfo (T615)
+                android.showWhen=Boolean (T616)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T617)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T618
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T619
+      mAsstImportance=T620
+      mImportance=T621
+      mImportanceExplanation=T622
+      mProposedImportance=T623
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T624
+      mGlobalSortKey=T625
+      mRankingTimeMs=1792888264790
+      mCreationTimeMs=1792888271169
+      mVisibleSinceMs=1792894944102
+      mUpdateTimeMs=1792895843499
+      mInterruptionTimeMs=1792895843499
+      mSuppressedVisualEffects= 0
+      mSound=T626
+      mVibration=T627
+      mAttributes=T628
+      mLight=T629
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T630
+      mAdjustments=[]
+      shortcut=T631
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x065be401: pkg=com.google.android.gm user=UserHandle{0} id=1939920797 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|1939920797|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=92233702439683379711939920797 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T632
+      opPkg=T633
+      icon=Icon (T634)
+      flags=T635
+      originalFlags=T636
+      pri=0
+      key=T637
+      seen=false
+      groupKey=T638
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T639
+            deleteIntent=T640
+            number=0
+            groupAlertBehavior=1
+            when=1792886437836/1792886437836
+            tickerText=T641
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T642
+            actions={
+                [0] T643
+                [1] T644
+                [2] T645
+              }
+            extras={
+                android.title=String (T646)
+                android.reduced.images=Boolean (T647)
+                android.subText=String (T648)
+                android.template=String (T649)
+                android.showChronometer=Boolean (T650)
+                argAndroidAccount=Account (T651)
+                argPriorityScore=Float (T652)
+                android.people.list=ArrayList (T653)
+                android.text=SpannableString (T654)
+                android.progress=Integer (T655)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T656)
+                android.progressMax=Integer (T657)
+                android.appInfo=ApplicationInfo (T658)
+                android.showWhen=Boolean (T659)
+                android.largeIcon=Icon (T660)
+                android.bigText=SpannableString (T661
+T662
+T663
+T664
+T665
+T666
+T667
+T668
+T669
+T670
+T671
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T672)
+                argMustShow=Boolean (T673)
+                argNotificationType=String (T674)
+                android.progressIndeterminate=Boolean (T675)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T676
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843062/1792895843062
+            tickerText=T677
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T678
+            extras={
+                android.title=String (T679)
+                android.reduced.images=Boolean (T680)
+                android.subText=null
+                android.showChronometer=Boolean (T681)
+                android.people.list=ArrayList (T682)
+                android.text=null
+                android.progress=Integer (T683)
+                android.progressMax=Integer (T684)
+                android.appInfo=ApplicationInfo (T685)
+                android.showWhen=Boolean (T686)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T687)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T688
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T689
+      mAsstImportance=T690
+      mImportance=T691
+      mImportanceExplanation=T692
+      mProposedImportance=T693
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T694
+      mGlobalSortKey=T695
+      mRankingTimeMs=1792886437836
+      mCreationTimeMs=1792886442499
+      mVisibleSinceMs=1792894944108
+      mUpdateTimeMs=1792895843470
+      mInterruptionTimeMs=1792895843470
+      mSuppressedVisualEffects= 0
+      mSound=T696
+      mVibration=T697
+      mAttributes=T698
+      mLight=T699
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T700
+      mAdjustments=[]
+      shortcut=T701
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0c57f68a: pkg=com.google.android.gm user=UserHandle{0} id=-382976719 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|-382976719|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243986674928-382976719 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T702
+      opPkg=T703
+      icon=Icon (T704)
+      flags=T705
+      originalFlags=T706
+      pri=0
+      key=T707
+      seen=false
+      groupKey=T708
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T709
+            deleteIntent=T710
+            number=0
+            groupAlertBehavior=1
+            when=1792868100879/1792868100879
+            tickerText=T711
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T712
+            actions={
+                [0] T713
+                [1] T714
+                [2] T715
+              }
+            extras={
+                android.title=String (T716)
+                android.reduced.images=Boolean (T717)
+                android.subText=String (T718)
+                android.template=String (T719)
+                android.showChronometer=Boolean (T720)
+                argAndroidAccount=Account (T721)
+                argPriorityScore=Float (T722)
+                android.people.list=ArrayList (T723)
+                android.text=SpannableString (T724)
+                android.progress=Integer (T725)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T726)
+                android.progressMax=Integer (T727)
+                android.appInfo=ApplicationInfo (T728)
+                android.showWhen=Boolean (T729)
+                android.largeIcon=Icon (T730)
+                android.bigText=SpannableString (T731
+T732
+͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­
+T733
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T734)
+                argMustShow=Boolean (T735)
+                argNotificationType=String (T736)
+                android.progressIndeterminate=Boolean (T737)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T738
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843059/1792895843059
+            tickerText=T739
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T740
+            extras={
+                android.title=String (T741)
+                android.reduced.images=Boolean (T742)
+                android.subText=null
+                android.showChronometer=Boolean (T743)
+                android.people.list=ArrayList (T744)
+                android.text=null
+                android.progress=Integer (T745)
+                android.progressMax=Integer (T746)
+                android.appInfo=ApplicationInfo (T747)
+                android.showWhen=Boolean (T748)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T749)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T750
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T751
+      mAsstImportance=T752
+      mImportance=T753
+      mImportanceExplanation=T754
+      mProposedImportance=T755
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T756
+      mGlobalSortKey=T757
+      mRankingTimeMs=1792868100879
+      mCreationTimeMs=1792882753664
+      mVisibleSinceMs=1792894944108
+      mUpdateTimeMs=1792895843433
+      mInterruptionTimeMs=1792895843433
+      mSuppressedVisualEffects= 0
+      mSound=T758
+      mVibration=T759
+      mAttributes=T760
+      mLight=T761
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T762
+      mAdjustments=[]
+      shortcut=T763
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0f94f8cf: pkg=com.google.android.gm user=UserHandle{0} id=-978073943 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|-978073943|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243990001268-978073943 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T764
+      opPkg=T765
+      icon=Icon (T766)
+      flags=T767
+      originalFlags=T768
+      pri=0
+      key=T769
+      seen=false
+      groupKey=T770
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T771
+            deleteIntent=T772
+            number=0
+            groupAlertBehavior=1
+            when=1792864774539/1792864774539
+            tickerText=T773
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T774
+            actions={
+                [0] T775
+                [1] T776
+                [2] T777
+              }
+            extras={
+                android.title=String (T778)
+                android.reduced.images=Boolean (T779)
+                android.subText=String (T780)
+                android.template=String (T781)
+                android.showChronometer=Boolean (T782)
+                argAndroidAccount=Account (T783)
+                argPriorityScore=Float (T784)
+                android.people.list=ArrayList (T785)
+                android.text=SpannableString (T786)
+                android.progress=Integer (T787)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T788)
+                android.progressMax=Integer (T789)
+                android.appInfo=ApplicationInfo (T790)
+                android.showWhen=Boolean (T791)
+                android.largeIcon=Icon (T792)
+                android.bigText=SpannableString (T793
+T794
+͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­
+T795
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T796)
+                argMustShow=Boolean (T797)
+                argNotificationType=String (T798)
+                android.progressIndeterminate=Boolean (T799)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T800
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843056/1792895843056
+            tickerText=T801
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T802
+            extras={
+                android.title=String (T803)
+                android.reduced.images=Boolean (T804)
+                android.subText=null
+                android.showChronometer=Boolean (T805)
+                android.people.list=ArrayList (T806)
+                android.text=null
+                android.progress=Integer (T807)
+                android.progressMax=Integer (T808)
+                android.appInfo=ApplicationInfo (T809)
+                android.showWhen=Boolean (T810)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T811)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T812
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T813
+      mAsstImportance=T814
+      mImportance=T815
+      mImportanceExplanation=T816
+      mProposedImportance=T817
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T818
+      mGlobalSortKey=T819
+      mRankingTimeMs=1792864774539
+      mCreationTimeMs=1792882753633
+      mVisibleSinceMs=1792894944104
+      mUpdateTimeMs=1792895843402
+      mInterruptionTimeMs=1792895843402
+      mSuppressedVisualEffects= 0
+      mSound=T820
+      mVibration=T821
+      mAttributes=T822
+      mLight=T823
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T824
+      mAdjustments=[]
+      shortcut=T825
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0122a860: pkg=com.google.android.gm user=UserHandle{0} id=-876664416 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|-876664416|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243991946310-876664416 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T826
+      opPkg=T827
+      icon=Icon (T828)
+      flags=T829
+      originalFlags=T830
+      pri=0
+      key=T831
+      seen=false
+      groupKey=T832
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T833
+            deleteIntent=T834
+            number=0
+            groupAlertBehavior=1
+            when=1792862829497/1792862829497
+            tickerText=T835
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T836
+            actions={
+                [0] T837
+                [1] T838
+                [2] T839
+              }
+            extras={
+                android.title=String (T840)
+                android.reduced.images=Boolean (T841)
+                android.subText=String (T842)
+                android.template=String (T843)
+                android.showChronometer=Boolean (T844)
+                argAndroidAccount=Account (T845)
+                argPriorityScore=Float (T846)
+                android.people.list=ArrayList (T847)
+                android.text=SpannableString (T848)
+                android.progress=Integer (T849)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T850)
+                android.progressMax=Integer (T851)
+                android.appInfo=ApplicationInfo (T852)
+                android.showWhen=Boolean (T853)
+                android.largeIcon=Icon (T854)
+                android.bigText=SpannableString (T855
+T856
+͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏  ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ ͏ 
+T857
+T858
+T859
+T860
+T861
+T862
+T863
+T864
+T865
+T866
+T867
+T868
+T869
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T870)
+                argMustShow=Boolean (T871)
+                argNotificationType=String (T872)
+                android.progressIndeterminate=Boolean (T873)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T874
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843054/1792895843054
+            tickerText=T875
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T876
+            extras={
+                android.title=String (T877)
+                android.reduced.images=Boolean (T878)
+                android.subText=null
+                android.showChronometer=Boolean (T879)
+                android.people.list=ArrayList (T880)
+                android.text=null
+                android.progress=Integer (T881)
+                android.progressMax=Integer (T882)
+                android.appInfo=ApplicationInfo (T883)
+                android.showWhen=Boolean (T884)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T885)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T886
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T887
+      mAsstImportance=T888
+      mImportance=T889
+      mImportanceExplanation=T890
+      mProposedImportance=T891
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T892
+      mGlobalSortKey=T893
+      mRankingTimeMs=1792862829497
+      mCreationTimeMs=1792882753603
+      mVisibleSinceMs=1792894944104
+      mUpdateTimeMs=1792895843376
+      mInterruptionTimeMs=1792895843376
+      mSuppressedVisualEffects= 0
+      mSound=T894
+      mVibration=T895
+      mAttributes=T896
+      mLight=T897
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T898
+      mAdjustments=[]
+      shortcut=T899
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0401ca8d: pkg=com.google.android.gm user=UserHandle{0} id=884482181 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|884482181|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=9223370243994665015884482181 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T900
+      opPkg=T901
+      icon=Icon (T902)
+      flags=T903
+      originalFlags=T904
+      pri=0
+      key=T905
+      seen=false
+      groupKey=T906
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T907
+            deleteIntent=T908
+            number=0
+            groupAlertBehavior=1
+            when=1792860110792/1792860110792
+            tickerText=T909
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T910
+            actions={
+                [0] T911
+                [1] T912
+                [2] T913
+              }
+            extras={
+                android.title=String (T914)
+                android.reduced.images=Boolean (T915)
+                android.subText=String (T916)
+                android.template=String (T917)
+                android.showChronometer=Boolean (T918)
+                argAndroidAccount=Account (T919)
+                argPriorityScore=Float (T920)
+                android.people.list=ArrayList (T921)
+                android.text=SpannableString (T922)
+                android.progress=Integer (T923)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T924)
+                android.progressMax=Integer (T925)
+                android.appInfo=ApplicationInfo (T926)
+                android.showWhen=Boolean (T927)
+                android.largeIcon=Icon (T928)
+                android.bigText=SpannableString (T929
+T930
+͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­ ͏­
+T931
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T932)
+                argMustShow=Boolean (T933)
+                argNotificationType=String (T934)
+                android.progressIndeterminate=Boolean (T935)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T936
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843050/1792895843050
+            tickerText=T937
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T938
+            extras={
+                android.title=String (T939)
+                android.reduced.images=Boolean (T940)
+                android.subText=null
+                android.showChronometer=Boolean (T941)
+                android.people.list=ArrayList (T942)
+                android.text=null
+                android.progress=Integer (T943)
+                android.progressMax=Integer (T944)
+                android.appInfo=ApplicationInfo (T945)
+                android.showWhen=Boolean (T946)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T947)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T948
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T949
+      mAsstImportance=T950
+      mImportance=T951
+      mImportanceExplanation=T952
+      mProposedImportance=T953
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T954
+      mGlobalSortKey=T955
+      mRankingTimeMs=1792860110792
+      mCreationTimeMs=1792882753575
+      mVisibleSinceMs=0
+      mUpdateTimeMs=1792895843350
+      mInterruptionTimeMs=1792895843350
+      mSuppressedVisualEffects= 0
+      mSound=T956
+      mVibration=T957
+      mAttributes=T958
+      mLight=T959
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T960
+      mAdjustments=[]
+      shortcut=T961
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x05ba5566: pkg=com.google.android.gm user=UserHandle{0} id=1832690254 tag=gig:-1955593338:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|1832690254|gig:-1955593338:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-1955593338:^sq_ig_i_personal sortKey=92233702439971021091832690254 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T962
+      opPkg=T963
+      icon=Icon (T964)
+      flags=T965
+      originalFlags=T966
+      pri=0
+      key=T967
+      seen=false
+      groupKey=T968
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T969
+            deleteIntent=T970
+            number=0
+            groupAlertBehavior=1
+            when=1792857673698/1792857673698
+            tickerText=T971
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T972
+            actions={
+                [0] T973
+                [1] T974
+                [2] T975
+              }
+            extras={
+                android.title=String (T976)
+                android.reduced.images=Boolean (T977)
+                android.subText=String (T978)
+                android.template=String (T979)
+                android.showChronometer=Boolean (T980)
+                argAndroidAccount=Account (T981)
+                argPriorityScore=Float (T982)
+                android.people.list=ArrayList (T983)
+                android.text=SpannableString (T984)
+                android.progress=Integer (T985)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T986)
+                android.progressMax=Integer (T987)
+                android.appInfo=ApplicationInfo (T988)
+                android.showWhen=Boolean (T989)
+                android.largeIcon=Icon (T990)
+                android.bigText=SpannableString (T991
+T992
+T993
+T994
+T995
+T996
+T997
+T998
+T999
+T1000
+)
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T1001)
+                argMustShow=Boolean (T1002)
+                argNotificationType=String (T1003)
+                android.progressIndeterminate=Boolean (T1004)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T1005
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792895843015/1792895843015
+            tickerText=T1006
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1007
+            extras={
+                android.title=String (T1008)
+                android.reduced.images=Boolean (T1009)
+                android.subText=null
+                android.showChronometer=Boolean (T1010)
+                android.people.list=ArrayList (T1011)
+                android.text=null
+                android.progress=Integer (T1012)
+                android.progressMax=Integer (T1013)
+                android.appInfo=ApplicationInfo (T1014)
+                android.showWhen=Boolean (T1015)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1016)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T1017
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1018
+      mAsstImportance=T1019
+      mImportance=T1020
+      mImportanceExplanation=T1021
+      mProposedImportance=T1022
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1023
+      mGlobalSortKey=T1024
+      mRankingTimeMs=1792857673698
+      mCreationTimeMs=1792882753540
+      mVisibleSinceMs=0
+      mUpdateTimeMs=1792895843328
+      mInterruptionTimeMs=1792895843328
+      mSuppressedVisualEffects= 0
+      mSound=T1025
+      mVibration=T1026
+      mAttributes=T1027
+      mLight=T1028
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1029
+      mAdjustments=[]
+      shortcut=T1030
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x063ed4bb: pkg=com.google.android.googlequicksearchbox user=UserHandle{0} id=0 tag=-1955593338::SUMMARY::wx importance=1 key=0|com.google.android.googlequicksearchbox|0|-1955593338::SUMMARY::wx|10167: Notification(channel=71 shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=GROUP_SUMMARY color=0x00000000 groupKey=-1955593338::SUMMARY::wx vis=PRIVATE publicVersion=Notification(channel=null shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=0 color=0x00000000 vis=PRIVATE)))
+      uid=T1031
+      opPkg=T1032
+      icon=Icon (T1033)
+      flags=T1034
+      originalFlags=T1035
+      pri=-2
+      key=T1036
+      seen=false
+      groupKey=T1037
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1038
+            deleteIntent=T1039
+            number=0
+            groupAlertBehavior=2
+            when=1792895232374/1792895232374
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1040
+            extras={
+                android.title=null
+                android.reduced.images=Boolean (T1041)
+                android.subText=null
+                android.showChronometer=Boolean (T1042)
+                android.text=null
+                android.progress=Integer (T1043)
+                android.progressMax=Integer (T1044)
+                android.appInfo=ApplicationInfo (T1045)
+                android.showWhen=Boolean (T1046)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1047)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=null
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+            when=1792895232384/1792895232384
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1048
+            extras={
+                android.title=String (T1049)
+                android.reduced.images=Boolean (T1050)
+                android.subText=String (T1051)
+                android.showChronometer=Boolean (T1052)
+                android.text=String (T1053)
+                android.progress=Integer (T1054)
+                android.progressMax=Integer (T1055)
+                android.appInfo=ApplicationInfo (T1056)
+                android.showWhen=Boolean (T1057)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1058)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T1059
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1060
+      mAsstImportance=T1061
+      mImportance=T1062
+      mImportanceExplanation=T1063
+      mProposedImportance=T1064
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1065
+      mGlobalSortKey=T1066
+      mRankingTimeMs=1792895232374
+      mCreationTimeMs=1792882760681
+      mVisibleSinceMs=0
+      mUpdateTimeMs=1792895232400
+      mInterruptionTimeMs=1792895232400
+      mSuppressedVisualEffects= 0
+      mSound=T1067
+      mVibration=T1068
+      mAttributes=T1069
+      mLight=T1070
+      mShowBadge=false
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1071
+      mAdjustments=[]
+      shortcut=T1072
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0912df84: pkg=com.google.android.googlequicksearchbox user=UserHandle{0} id=0 tag=-1955593338::a:snotification:[0x394,wx.f,NOTIFICATION] importance=1 key=0|com.google.android.googlequicksearchbox|0|-1955593338::a:snotification:[0x394,wx.f,NOTIFICATION]|10167: Notification(channel=71 shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=ONLY_ALERT_ONCE color=0x00000000 groupKey=-1955593338::SUMMARY::wx vis=PRIVATE))
+      uid=T1073
+      opPkg=T1074
+      icon=Icon (T1075)
+      flags=T1076
+      originalFlags=T1077
+      pri=-2
+      key=T1078
+      seen=false
+      groupKey=T1079
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1080
+            deleteIntent=T1081
+            number=0
+            groupAlertBehavior=1
+            when=1792895231000/1792895231000
+            tickerText=T1082
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1083
+            extras={
+                android.title=SpannableString (T1084)
+                android.reduced.images=Boolean (T1085)
+                android.subText=null
+                android.template=String (T1086)
+                android.showChronometer=Boolean (T1087)
+                android.text=SpannableString (T1088)
+                android.progress=Integer (T1089)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T1090)
+                android.progressMax=Integer (T1091)
+                chime.account_name_hash=Integer (T1092)
+                android.appInfo=ApplicationInfo (T1093)
+                chime.thread_id=String (T1094)
+                android.showWhen=Boolean (T1095)
+                android.largeIcon=Icon (T1096)
+                android.bigText=SpannableString (T1097)
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1098)
+                android.remoteInputHistory=null
+                android.title.big=SpannableString (T1099)
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            T1100
+      stats=T1101
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1102
+      mAsstImportance=T1103
+      mImportance=T1104
+      mImportanceExplanation=T1105
+      mProposedImportance=T1106
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1107
+      mGlobalSortKey=T1108
+      mRankingTimeMs=1792895231000
+      mCreationTimeMs=1792882760685
+      mVisibleSinceMs=1792894949009
+      mUpdateTimeMs=1792895232408
+      mInterruptionTimeMs=1792895232408
+      mSuppressedVisualEffects= 0
+      mSound=T1109
+      mVibration=T1110
+      mAttributes=T1111
+      mLight=T1112
+      mShowBadge=false
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1113
+      mAdjustments=[]
+      shortcut=T1114
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x02a06ff0: pkg=com.paypal.android.p2pmobile user=UserHandle{0} id=1893653169 tag=null importance=3 key=0|com.paypal.android.p2pmobile|1893653169|null|10313: Notification(channel=DEFAULT shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=AUTO_CANCEL color=0x00000000 vis=PRIVATE))
+      uid=T1115
+      opPkg=T1116
+      icon=Icon (T1117)
+      flags=T1118
+      originalFlags=T1119
+      pri=0
+      key=T1120
+      seen=true
+      groupKey=T1121
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1122
+            deleteIntent=T1123
+            number=0
+            groupAlertBehavior=0
+            when=1792895015607/1792895015607
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1124
+            extras={
+                android.title=String (T1125)
+                android.reduced.images=Boolean (T1126)
+                android.subText=null
+                android.template=String (T1127)
+                android.showChronometer=Boolean (T1128)
+                android.text=String (T1129)
+                android.progress=Integer (T1130)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T1131)
+                android.progressMax=Integer (T1132)
+                android.appInfo=ApplicationInfo (T1133)
+                android.showWhen=Boolean (T1134)
+                android.largeIcon=Icon (T1135)
+                android.bigText=String (T1136)
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1137)
+                android.remoteInputHistory=null
+            }
+      publicNotification=
+            T1138
+      stats=T1139
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1140
+      mAsstImportance=T1141
+      mImportance=T1142
+      mImportanceExplanation=T1143
+      mProposedImportance=T1144
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1145
+      mGlobalSortKey=T1146
+      mRankingTimeMs=1792895015607
+      mCreationTimeMs=1792895015691
+      mVisibleSinceMs=1792895016493
+      mUpdateTimeMs=1792895015691
+      mInterruptionTimeMs=1792895016493
+      mSuppressedVisualEffects= 0
+      mSound=T1147
+      mVibration=T1148
+      mAttributes=T1149
+      mLight=T1150
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1151
+      mAdjustments=[]
+      shortcut=T1152
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0a349b1c: pkg=com.google.android.youtube user=UserHandle{0} id=0 tag=qhDrLkgtAlg::410fcd15-6699-4171-86ce-4779adef5d9f importance=4 key=0|com.google.android.youtube|0|qhDrLkgtAlg::410fcd15-6699-4171-86ce-4779adef5d9f|10184: Notification(channel=2 shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=AUTO_CANCEL color=0xffff0033 groupKey=-1955593338::SUMMARY::687079518817279393 actions=3 vis=PRIVATE))
+      uid=T1153
+      opPkg=T1154
+      icon=Icon (T1155)
+      flags=T1156
+      originalFlags=T1157
+      pri=1
+      key=T1158
+      seen=true
+      groupKey=T1159
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1160
+            deleteIntent=T1161
+            number=0
+            groupAlertBehavior=0
+            when=1792891821659/1792891821659
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffff0033
+            timeout=T1162
+            actions={
+                [0] T1163
+                [1] T1164
+                [2] T1165
+              }
+            extras={
+                android.title=SpannableString (T1166)
+                android.reduced.images=Boolean (T1167)
+                chime.slot_key=String (T1168)
+                android.subText=null
+                android.template=String (T1169)
+                android.showChronometer=Boolean (T1170)
+                android.text=SpannableString (T1171)
+                android.progress=Integer (T1172)
+                android.progressMax=Integer (T1173)
+                chime.account_name_hash=Integer (T1174)
+                android.largeIcon.big=Icon (T1175)
+                android.appInfo=ApplicationInfo (T1176)
+                chime.thread_id=String (T1177)
+                android.picture=Bitmap (T1178)
+                android.showWhen=Boolean (T1179)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1180)
+                android.remoteInputHistory=null
+                android.pictureIcon=null
+                chime.richCollapsedView=Integer (T1181)
+                android.support.v4.app.extra.COMPAT_TEMPLATE=String (T1182)
+                android.title.big=SpannableString (T1183)
+                android.showBigPictureWhenCollapsed=Boolean (T1184)
+            }
+      publicNotification=
+            T1185
+      stats=T1186
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1187
+      mAsstImportance=T1188
+      mImportance=T1189
+      mImportanceExplanation=T1190
+      mProposedImportance=T1191
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1192
+      mGlobalSortKey=T1193
+      mRankingTimeMs=1792891821659
+      mCreationTimeMs=1792891821740
+      mVisibleSinceMs=1792894944107
+      mUpdateTimeMs=1792891821740
+      mInterruptionTimeMs=1792894944107
+      mSuppressedVisualEffects= 0
+      mSound=T1194
+      mVibration=T1195
+      mAttributes=T1196
+      mLight=T1197
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1198
+      mAdjustments=[]
+      shortcut=T1199
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x00ca7e87: pkg=com.android.shell user=UserHandle{0} id=0 tag=0|com.android.shell|g:Aggregate_AlertingSection importance=3 key=0|com.android.shell|0|0|com.android.shell|g:Aggregate_AlertingSection|2000|0|com.android.shell|g:Aggregate_AlertingSection: Notification(channel=shell_cmd shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=LOCAL_ONLY|GROUP_SUMMARY|AUTOGROUP_SUMMARY color=0x00000000 groupKey=0|com.android.shell|g:Aggregate_AlertingSection vis=PRIVATE))
+      uid=T1200
+      opPkg=T1201
+      icon=Icon (T1202)
+      flags=T1203
+      originalFlags=T1204
+      pri=0
+      key=T1205
+      seen=true
+      groupKey=T1206
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=null
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=2
+            when=1792891135409/1792891135409
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1207
+            extras={
+                android.reduced.images=Boolean (T1208)
+                android.appInfo=ApplicationInfo (T1209)
+                android.showWhen=Boolean (T1210)
+            }
+      publicNotification=
+            T1211
+      stats=T1212
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1213
+      mAsstImportance=T1214
+      mImportance=T1215
+      mImportanceExplanation=T1216
+      mProposedImportance=T1217
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1218
+      mGlobalSortKey=T1219
+      mRankingTimeMs=1792891135411
+      mCreationTimeMs=1792891135411
+      mVisibleSinceMs=1792894944105
+      mUpdateTimeMs=1792891135411
+      mInterruptionTimeMs=1792891135411
+      mSuppressedVisualEffects= 0
+      mSound=T1220
+      mVibration=T1221
+      mAttributes=T1222
+      mLight=T1223
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1224
+      mAdjustments=[]
+      shortcut=T1225
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x067531dd: pkg=com.android.shell user=UserHandle{0} id=2020 tag=pixelprobe2 importance=3 key=0|com.android.shell|2020|pixelprobe2|2000: Notification(channel=shell_cmd shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=0 color=0x00000000 vis=PRIVATE))
+      uid=T1226
+      opPkg=T1227
+      icon=Icon (T1228)
+      flags=0
+      originalFlags=0
+      pri=0
+      key=T1229
+      seen=true
+      groupKey=T1230
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=null
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+            when=1792891135183/1792891135183
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1231
+            extras={
+                android.title=String (T1232)
+                android.reduced.images=Boolean (T1233)
+                android.text=String (T1234)
+                android.appInfo=ApplicationInfo (T1235)
+                android.showWhen=Boolean (T1236)
+            }
+      publicNotification=
+            T1237
+      stats=T1238
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1239
+      mAsstImportance=T1240
+      mImportance=T1241
+      mImportanceExplanation=T1242
+      mProposedImportance=T1243
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1244
+      mGlobalSortKey=T1245
+      mRankingTimeMs=1792891135187
+      mCreationTimeMs=1792891135187
+      mVisibleSinceMs=1792894944108
+      mUpdateTimeMs=1792891135187
+      mInterruptionTimeMs=1792894944108
+      mSuppressedVisualEffects= 0
+      mSound=T1246
+      mVibration=T1247
+      mAttributes=T1248
+      mLight=T1249
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1250
+      mAdjustments=[]
+      shortcut=T1251
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x028db365: pkg=com.android.shell user=UserHandle{0} id=2020 tag=Probe importance=3 key=0|com.android.shell|2020|Probe|2000: Notification(channel=shell_cmd shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=0 color=0x00000000 vis=PRIVATE))
+      uid=T1252
+      opPkg=T1253
+      icon=Icon (T1254)
+      flags=0
+      originalFlags=0
+      pri=0
+      key=T1255
+      seen=true
+      groupKey=T1256
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=null
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+            when=1792891016910/1792891016910
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1257
+            extras={
+                android.title=String (T1258)
+                android.reduced.images=Boolean (T1259)
+                android.text=String (T1260)
+                android.appInfo=ApplicationInfo (T1261)
+                android.showWhen=Boolean (T1262)
+            }
+      publicNotification=
+            T1263
+      stats=T1264
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1265
+      mAsstImportance=T1266
+      mImportance=T1267
+      mImportanceExplanation=T1268
+      mProposedImportance=T1269
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1270
+      mGlobalSortKey=T1271
+      mRankingTimeMs=1792891016913
+      mCreationTimeMs=1792891016913
+      mVisibleSinceMs=1792894944103
+      mUpdateTimeMs=1792891016913
+      mInterruptionTimeMs=1792894944103
+      mSuppressedVisualEffects= 0
+      mSound=T1272
+      mVibration=T1273
+      mAttributes=T1274
+      mLight=T1275
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1276
+      mAdjustments=[]
+      shortcut=T1277
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x00a6dfc5: pkg=android user=UserHandle{-1} id=26 tag=null importance=4 key=-1|android|26|null|1000: Notification(channel=DEVELOPER_IMPORTANT shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=ONGOING_EVENT|CAN_COLORIZE color=0x00000000 vis=PUBLIC))
+      uid=T1278
+      opPkg=T1279
+      icon=Icon (T1280)
+      flags=T1281
+      originalFlags=T1282
+      pri=0
+      key=T1283
+      seen=true
+      groupKey=T1284
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1285
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+            when=0/1792890706357
+            tickerText=T1286
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1287
+            extras={
+                android.title=String (T1288)
+                android.reduced.images=Boolean (T1289)
+                android.text=String (T1290)
+                android.appInfo=ApplicationInfo (T1291)
+                android.showWhen=Boolean (T1292)
+                android.tv.EXTENSIONS=Bundle (T1293)
+            }
+      publicNotification=
+            T1294
+      stats=T1295
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1296
+      mAsstImportance=T1297
+      mImportance=T1298
+      mImportanceExplanation=T1299
+      mProposedImportance=T1300
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1301
+      mGlobalSortKey=T1302
+      mRankingTimeMs=1792890706359
+      mCreationTimeMs=1792890706359
+      mVisibleSinceMs=1792894944106
+      mUpdateTimeMs=1792890706359
+      mInterruptionTimeMs=1792894944106
+      mSuppressedVisualEffects= 0
+      mSound=T1303
+      mVibration=T1304
+      mAttributes=T1305
+      mLight=T1306
+      mShowBadge=false
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1307
+      mAdjustments=[]
+      shortcut=T1308
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0c860a28: pkg=android user=UserHandle{-1} id=1 tag=-1|android|g:Aggregate_SilentSection importance=1 key=-1|android|1|-1|android|g:Aggregate_SilentSection|1000|-1|android|g:Aggregate_SilentSection: Notification(channel=NETWORK_STATUS shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|LOCAL_ONLY|GROUP_SUMMARY|AUTOGROUP_SUMMARY|SILENT color=0x00000000 groupKey=-1|android|g:Aggregate_SilentSection vis=PUBLIC))
+      uid=T1309
+      opPkg=T1310
+      icon=Icon (T1311)
+      flags=T1312
+      originalFlags=T1313
+      pri=0
+      key=T1314
+      seen=true
+      groupKey=T1315
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=null
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=2
+            when=1792882671867/1792882671867
+            tickerText=null
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1316
+            extras={
+                android.reduced.images=Boolean (T1317)
+                android.appInfo=ApplicationInfo (T1318)
+                android.showWhen=Boolean (T1319)
+            }
+      publicNotification=
+            T1320
+      stats=T1321
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1322
+      mAsstImportance=T1323
+      mImportance=T1324
+      mImportanceExplanation=T1325
+      mProposedImportance=T1326
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1327
+      mGlobalSortKey=T1328
+      mRankingTimeMs=1792882671867
+      mCreationTimeMs=1792882671867
+      mVisibleSinceMs=1792894949008
+      mUpdateTimeMs=1792882671867
+      mInterruptionTimeMs=1792882671867
+      mSuppressedVisualEffects= 0
+      mSound=T1329
+      mVibration=T1330
+      mAttributes=T1331
+      mLight=T1332
+      mShowBadge=false
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1333
+      mAdjustments=[]
+      shortcut=T1334
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x064250e6: pkg=android user=UserHandle{-1} id=27 tag=null importance=1 key=-1|android|27|null|1000: Notification(channel=USB shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=ONGOING_EVENT|CAN_COLORIZE color=0x00000000 vis=PUBLIC))
+      uid=T1335
+      opPkg=T1336
+      icon=Icon (T1337)
+      flags=T1338
+      originalFlags=T1339
+      pri=0
+      key=T1340
+      seen=true
+      groupKey=T1341
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1342
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+            when=0/1792890706353
+            tickerText=T1343
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1344
+            extras={
+                android.title=String (T1345)
+                android.reduced.images=Boolean (T1346)
+                android.text=String (T1347)
+                android.appInfo=ApplicationInfo (T1348)
+                android.showWhen=Boolean (T1349)
+            }
+      publicNotification=
+            T1350
+      stats=T1351
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1352
+      mAsstImportance=T1353
+      mImportance=T1354
+      mImportanceExplanation=T1355
+      mProposedImportance=T1356
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1357
+      mGlobalSortKey=T1358
+      mRankingTimeMs=1792890706355
+      mCreationTimeMs=1792890706355
+      mVisibleSinceMs=1792894949009
+      mUpdateTimeMs=1792890706355
+      mInterruptionTimeMs=1792894949009
+      mSuppressedVisualEffects= 0
+      mSound=T1359
+      mVibration=T1360
+      mAttributes=T1361
+      mLight=T1362
+      mShowBadge=false
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1363
+      mAdjustments=[]
+      shortcut=T1364
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x079e427d: pkg=android user=UserHandle{-1} id=740 tag=ConnectivityNotification:100 importance=2 key=-1|android|740|ConnectivityNotification:100|1000: Notification(channel=NETWORK_STATUS shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=ONLY_ALERT_ONCE|AUTO_CANCEL|LOCAL_ONLY|CAN_COLORIZE color=0x00000000 vis=PRIVATE))
+      uid=T1365
+      opPkg=T1366
+      icon=Icon (T1367)
+      flags=T1368
+      originalFlags=T1369
+      pri=0
+      key=T1370
+      seen=true
+      groupKey=T1371
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1372
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=0
+            when=1792882671624/1792882671624
+            tickerText=T1373
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1374
+            extras={
+                android.title=String (T1375)
+                android.reduced.images=Boolean (T1376)
+                android.text=String (T1377)
+                android.appInfo=ApplicationInfo (T1378)
+                android.showWhen=Boolean (T1379)
+                android.tv.EXTENSIONS=Bundle (T1380)
+            }
+      publicNotification=
+            T1381
+      stats=T1382
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1383
+      mAsstImportance=T1384
+      mImportance=T1385
+      mImportanceExplanation=T1386
+      mProposedImportance=T1387
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1388
+      mGlobalSortKey=T1389
+      mRankingTimeMs=1792882671632
+      mCreationTimeMs=1792882671632
+      mVisibleSinceMs=1792894949009
+      mUpdateTimeMs=1792882671632
+      mInterruptionTimeMs=1792894949009
+      mSuppressedVisualEffects= 0
+      mSound=T1390
+      mVibration=T1391
+      mAttributes=T1392
+      mLight=T1393
+      mShowBadge=false
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1394
+      mAdjustments=[]
+      shortcut=T1395
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x04de8dc3: pkg=com.ss.android.ugc.trill user=UserHandle{0} id=2059420580 tag=app_notify_ame importance=4 key=0|com.ss.android.ugc.trill|2059420580|app_notify_ame|10231: Notification(channel=recommend_video_push_associated_4 shortcut=null contentView=com.ss.android.ugc.trill/0x7f0e0eb7 vibrate=null sound=null tick defaults=0 flags=SHOW_LIGHTS|AUTO_CANCEL color=0x00000000 groupKey=android_exclusive_group_7692037420589583636 actions=2 vis=PRIVATE))
+      uid=T1396
+      opPkg=T1397
+      icon=Icon (T1398)
+      flags=T1399
+      originalFlags=T1400
+      pri=1
+      key=T1401
+      seen=true
+      groupKey=T1402
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1403
+            deleteIntent=T1404
+            number=0
+            groupAlertBehavior=0
+            when=1792889597500/1792889597500
+            tickerText=T1405
+            vis=0
+            contentView=T1406
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1407
+            actions={
+                [0] T1408
+                [1] T1409
+              }
+            extras={
+                android.title=String (T1410)
+                android.reduced.images=Boolean (T1411)
+                android.subText=null
+                android.template=String (T1412)
+                android.showChronometer=Boolean (T1413)
+                android.text=String (T1414)
+                android.progress=Integer (T1415)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T1416)
+                android.progressMax=Integer (T1417)
+                android.appInfo=ApplicationInfo (T1418)
+                android.contains.customView=Boolean (T1419)
+                android.showWhen=Boolean (T1420)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1421)
+                android.remoteInputHistory=null
+                push_label=String (T1422)
+            }
+      publicNotification=
+            T1423
+      stats=T1424
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1425
+      mAsstImportance=T1426
+      mImportance=T1427
+      mImportanceExplanation=T1428
+      mProposedImportance=T1429
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1430
+      mGlobalSortKey=T1431
+      mRankingTimeMs=1792889597500
+      mCreationTimeMs=1792889597524
+      mVisibleSinceMs=1792894948007
+      mUpdateTimeMs=1792889597524
+      mInterruptionTimeMs=1792894948007
+      mSuppressedVisualEffects= 0
+      mSound=T1432
+      mVibration=T1433
+      mAttributes=T1434
+      mLight=T1435
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1436
+      mAdjustments=[]
+      shortcut=T1437
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x03136290: pkg=com.google.android.gms user=UserHandle{0} id=0 tag=0|com.google.android.gms|g:Aggregate_AlertingSection importance=3 key=0|com.google.android.gms|0|0|com.google.android.gms|g:Aggregate_AlertingSection|10153|0|com.google.android.gms|g:Aggregate_AlertingSection: Notification(channel=com.google.android.gms.auth.base.Notifications.AuthGroup.AccountReauth shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|LOCAL_ONLY|GROUP_SUMMARY|AUTOGROUP_SUMMARY color=0x00000000 groupKey=0|com.google.android.gms|g:Aggregate_AlertingSection vis=PRIVATE))
+      uid=T1438
+      opPkg=T1439
+      icon=Icon (T1440)
+      flags=T1441
+      originalFlags=T1442
+      pri=0
+      key=T1443
+      seen=true
+      groupKey=T1444
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=null
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=2
+            when=1792882710151/1792882710151
+            tickerText=null
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1445
+            extras={
+                android.reduced.images=Boolean (T1446)
+                android.appInfo=ApplicationInfo (T1447)
+                android.showWhen=Boolean (T1448)
+            }
+      publicNotification=
+            T1449
+      stats=T1450
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1451
+      mAsstImportance=T1452
+      mImportance=T1453
+      mImportanceExplanation=T1454
+      mProposedImportance=T1455
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1456
+      mGlobalSortKey=T1457
+      mRankingTimeMs=1792882710154
+      mCreationTimeMs=1792882710154
+      mVisibleSinceMs=1792894948007
+      mUpdateTimeMs=1792882710154
+      mInterruptionTimeMs=1792882710154
+      mSuppressedVisualEffects= 0
+      mSound=T1458
+      mVibration=T1459
+      mAttributes=T1460
+      mLight=T1461
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1462
+      mAdjustments=[]
+      shortcut=T1463
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0f3a238e: pkg=com.google.android.gms user=UserHandle{0} id=0 tag=com.google.android.gms.auth.TokenNotificationManager:c6aa7ee0201d581a3baf3922b6b0bd2f:com.google importance=3 key=0|com.google.android.gms|0|com.google.android.gms.auth.TokenNotificationManager:c6aa7ee0201d581a3baf3922b6b0bd2f:com.google|10153: Notification(channel=com.google.android.gms.auth.base.Notifications.AuthGroup.AccountReauth shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=ONGOING_EVENT|ONLY_ALERT_ONCE color=0x00000000 vis=SECRET))
+      uid=T1464
+      opPkg=T1465
+      icon=Icon (T1466)
+      flags=T1467
+      originalFlags=T1468
+      pri=0
+      key=T1469
+      seen=true
+      groupKey=T1470
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1471
+            deleteIntent=T1472
+            number=0
+            groupAlertBehavior=0
+            when=1792882709841/1792882709841
+            tickerText=T1473
+            vis=-1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1474
+            extras={
+                android.title=String (T1475)
+                android.reduced.images=Boolean (T1476)
+                android.subText=null
+                android.showChronometer=Boolean (T1477)
+                android.text=String (T1478)
+                android.progress=Integer (T1479)
+                android.progressMax=Integer (T1480)
+                android.appInfo=ApplicationInfo (T1481)
+                android.showWhen=Boolean (T1482)
+                android.largeIcon=Icon (T1483)
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1484)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+                android.tv.EXTENSIONS=Bundle (T1485)
+            }
+      publicNotification=
+            T1486
+      stats=T1487
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1488
+      mAsstImportance=T1489
+      mImportance=T1490
+      mImportanceExplanation=T1491
+      mProposedImportance=T1492
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1493
+      mGlobalSortKey=T1494
+      mRankingTimeMs=1792882709946
+      mCreationTimeMs=1792882709946
+      mVisibleSinceMs=1792894948006
+      mUpdateTimeMs=1792882709946
+      mInterruptionTimeMs=1792894948006
+      mSuppressedVisualEffects= 0
+      mSound=T1495
+      mVibration=T1496
+      mAttributes=T1497
+      mLight=T1498
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1499
+      mAdjustments=[]
+      shortcut=T1500
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0ed2ffcb: pkg=com.google.android.gms user=UserHandle{0} id=0 tag=com.google.android.gms.auth.TokenNotificationManager:1df2f833decb1076dc09280ec1b85a3e:com.google importance=3 key=0|com.google.android.gms|0|com.google.android.gms.auth.TokenNotificationManager:1df2f833decb1076dc09280ec1b85a3e:com.google|10153: Notification(channel=com.google.android.gms.auth.base.Notifications.AuthGroup.AccountReauth shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=ONGOING_EVENT|ONLY_ALERT_ONCE color=0x00000000 vis=SECRET))
+      uid=T1501
+      opPkg=T1502
+      icon=Icon (T1503)
+      flags=T1504
+      originalFlags=T1505
+      pri=0
+      key=T1506
+      seen=true
+      groupKey=T1507
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1508
+            deleteIntent=T1509
+            number=0
+            groupAlertBehavior=0
+            when=1792882709405/1792882709405
+            tickerText=T1510
+            vis=-1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0x00000000
+            timeout=T1511
+            extras={
+                android.title=String (T1512)
+                android.reduced.images=Boolean (T1513)
+                android.subText=null
+                android.showChronometer=Boolean (T1514)
+                android.text=String (T1515)
+                android.progress=Integer (T1516)
+                android.progressMax=Integer (T1517)
+                android.appInfo=ApplicationInfo (T1518)
+                android.showWhen=Boolean (T1519)
+                android.largeIcon=Icon (T1520)
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1521)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+                android.tv.EXTENSIONS=Bundle (T1522)
+            }
+      publicNotification=
+            T1523
+      stats=T1524
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1525
+      mAsstImportance=T1526
+      mImportance=T1527
+      mImportanceExplanation=T1528
+      mProposedImportance=T1529
+      mIsAppImportanceLocked=false
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1530
+      mGlobalSortKey=T1531
+      mRankingTimeMs=1792882709405
+      mCreationTimeMs=1792882709467
+      mVisibleSinceMs=1792894948008
+      mUpdateTimeMs=1792882709467
+      mInterruptionTimeMs=1792894948008
+      mSuppressedVisualEffects= 0
+      mSound=T1532
+      mVibration=T1533
+      mAttributes=T1534
+      mLight=T1535
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1536
+      mAdjustments=[]
+      shortcut=T1537
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x05bbe5fd: pkg=com.google.android.gm user=UserHandle{0} id=0 tag=gig:-810226808:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|0|gig:-810226808:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=AUTO_CANCEL|GROUP_SUMMARY color=0xffaecbfa category=email groupKey=gig:-810226808:^sq_ig_i_personal sortKey=92233702440913957470 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T1538
+      opPkg=T1539
+      icon=Icon (T1540)
+      flags=T1541
+      originalFlags=T1542
+      pri=0
+      key=T1543
+      seen=false
+      groupKey=T1544
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1545
+            deleteIntent=T1546
+            number=0
+            groupAlertBehavior=0
+            when=1792763380060/1792763380060
+            tickerText=T1547
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1548
+            actions={
+                [0] T1549
+                [1] T1550
+                [2] T1551
+              }
+            extras={
+                android.title=String (T1552)
+                android.reduced.images=Boolean (T1553)
+                android.subText=String (T1554)
+                android.template=String (T1555)
+                android.showChronometer=Boolean (T1556)
+                argAndroidAccount=Account (T1557)
+                argPriorityScore=Float (T1558)
+                android.people.list=ArrayList (T1559)
+                android.text=SpannableString (T1560)
+                android.progress=Integer (T1561)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T1562)
+                android.progressMax=Integer (T1563)
+                android.appInfo=ApplicationInfo (T1564)
+                android.showWhen=Boolean (T1565)
+                android.largeIcon=Icon (T1566)
+                android.bigText=SpannableString (T1567
+T1568
+͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ 
+T1569
+T1570
+T1571
+T1572
+T1573
+T1574
+T1575
+T1576
+T1577
+T1578
+T1579
+T1580
+T1581
+T1582
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T1583)
+                argMustShow=Boolean (T1584)
+                argNotificationType=String (T1585)
+                android.progressIndeterminate=Boolean (T1586)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T1587
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792882744982/1792882744982
+            tickerText=T1588
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1589
+            extras={
+                android.title=String (T1590)
+                android.reduced.images=Boolean (T1591)
+                android.subText=null
+                android.showChronometer=Boolean (T1592)
+                android.people.list=ArrayList (T1593)
+                android.text=null
+                android.progress=Integer (T1594)
+                android.progressMax=Integer (T1595)
+                android.appInfo=ApplicationInfo (T1596)
+                android.showWhen=Boolean (T1597)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1598)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T1599
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1600
+      mAsstImportance=T1601
+      mImportance=T1602
+      mImportanceExplanation=T1603
+      mProposedImportance=T1604
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1605
+      mGlobalSortKey=T1606
+      mRankingTimeMs=1792763380060
+      mCreationTimeMs=1792882749397
+      mVisibleSinceMs=0
+      mUpdateTimeMs=1792882749397
+      mInterruptionTimeMs=1792882749397
+      mSuppressedVisualEffects= 0
+      mSound=T1607
+      mVibration=T1608
+      mAttributes=T1609
+      mLight=T1610
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1611
+      mAdjustments=[]
+      shortcut=T1612
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0d9be516: pkg=com.google.android.gm user=UserHandle{0} id=1407271989 tag=gig:-810226808:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|1407271989|gig:-810226808:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:-810226808:^sq_ig_i_personal sortKey=92233702440913957471407271989 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T1613
+      opPkg=T1614
+      icon=Icon (T1615)
+      flags=T1616
+      originalFlags=T1617
+      pri=0
+      key=T1618
+      seen=true
+      groupKey=T1619
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1620
+            deleteIntent=T1621
+            number=0
+            groupAlertBehavior=1
+            when=1792763380060/1792763380060
+            tickerText=T1622
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1623
+            actions={
+                [0] T1624
+                [1] T1625
+                [2] T1626
+              }
+            extras={
+                android.title=String (T1627)
+                android.reduced.images=Boolean (T1628)
+                android.subText=String (T1629)
+                android.template=String (T1630)
+                android.showChronometer=Boolean (T1631)
+                argAndroidAccount=Account (T1632)
+                argPriorityScore=Float (T1633)
+                android.people.list=ArrayList (T1634)
+                android.text=SpannableString (T1635)
+                android.progress=Integer (T1636)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T1637)
+                android.progressMax=Integer (T1638)
+                android.appInfo=ApplicationInfo (T1639)
+                android.showWhen=Boolean (T1640)
+                android.largeIcon=Icon (T1641)
+                android.bigText=SpannableString (T1642
+T1643
+͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ ͏‌ 
+T1644
+T1645
+T1646
+T1647
+T1648
+T1649
+T1650
+T1651
+T1652
+T1653
+T1654
+T1655
+T1656
+T1657
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T1658)
+                argMustShow=Boolean (T1659)
+                argNotificationType=String (T1660)
+                android.progressIndeterminate=Boolean (T1661)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T1662
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792882746207/1792882746207
+            tickerText=T1663
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1664
+            extras={
+                android.title=String (T1665)
+                android.reduced.images=Boolean (T1666)
+                android.subText=null
+                android.showChronometer=Boolean (T1667)
+                android.people.list=ArrayList (T1668)
+                android.text=null
+                android.progress=Integer (T1669)
+                android.progressMax=Integer (T1670)
+                android.appInfo=ApplicationInfo (T1671)
+                android.showWhen=Boolean (T1672)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1673)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T1674
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1675
+      mAsstImportance=T1676
+      mImportance=T1677
+      mImportanceExplanation=T1678
+      mProposedImportance=T1679
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1680
+      mGlobalSortKey=T1681
+      mRankingTimeMs=1792763380060
+      mCreationTimeMs=1792882749415
+      mVisibleSinceMs=1792894948007
+      mUpdateTimeMs=1792882749415
+      mInterruptionTimeMs=1792894948007
+      mSuppressedVisualEffects= 0
+      mSound=T1682
+      mVibration=T1683
+      mAttributes=T1684
+      mLight=T1685
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1686
+      mAdjustments=[]
+      shortcut=T1687
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x07f43fab: pkg=com.google.android.gm user=UserHandle{0} id=0 tag=gig:1114166174:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|0|gig:1114166174:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=0 flags=AUTO_CANCEL|GROUP_SUMMARY color=0xffaecbfa category=email groupKey=gig:1114166174:^sq_ig_i_personal sortKey=92233702443132591420 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T1688
+      opPkg=T1689
+      icon=Icon (T1690)
+      flags=T1691
+      originalFlags=T1692
+      pri=0
+      key=T1693
+      seen=false
+      groupKey=T1694
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1695
+            deleteIntent=T1696
+            number=0
+            groupAlertBehavior=0
+            when=1792541516665/1792541516665
+            tickerText=T1697
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1698
+            actions={
+                [0] T1699
+                [1] T1700
+                [2] T1701
+              }
+            extras={
+                android.title=String (T1702)
+                android.reduced.images=Boolean (T1703)
+                android.subText=String (T1704)
+                android.template=String (T1705)
+                android.showChronometer=Boolean (T1706)
+                argAndroidAccount=Account (T1707)
+                argPriorityScore=Float (T1708)
+                android.people.list=ArrayList (T1709)
+                android.text=SpannableString (T1710)
+                android.progress=Integer (T1711)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T1712)
+                android.progressMax=Integer (T1713)
+                android.appInfo=ApplicationInfo (T1714)
+                android.showWhen=Boolean (T1715)
+                android.largeIcon=Icon (T1716)
+                android.bigText=SpannableString (T1717
+T1718
+͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­   ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏)
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T1719)
+                argMustShow=Boolean (T1720)
+                argNotificationType=String (T1721)
+                android.progressIndeterminate=Boolean (T1722)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T1723
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792882749489/1792882749489
+            tickerText=T1724
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1725
+            extras={
+                android.title=String (T1726)
+                android.reduced.images=Boolean (T1727)
+                android.subText=null
+                android.showChronometer=Boolean (T1728)
+                android.people.list=ArrayList (T1729)
+                android.text=null
+                android.progress=Integer (T1730)
+                android.progressMax=Integer (T1731)
+                android.appInfo=ApplicationInfo (T1732)
+                android.showWhen=Boolean (T1733)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1734)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T1735
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1736
+      mAsstImportance=T1737
+      mImportance=T1738
+      mImportanceExplanation=T1739
+      mProposedImportance=T1740
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1741
+      mGlobalSortKey=T1742
+      mRankingTimeMs=1792541516665
+      mCreationTimeMs=1792882752040
+      mVisibleSinceMs=0
+      mUpdateTimeMs=1792882752040
+      mInterruptionTimeMs=1792882752040
+      mSuppressedVisualEffects= 0
+      mSound=T1743
+      mVibration=T1744
+      mAttributes=T1745
+      mLight=T1746
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=false
+      effectiveNotificationChannel=T1747
+      mAdjustments=[]
+      shortcut=T1748
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+    NotificationRecord(0x0770cc4c: pkg=com.google.android.gm user=UserHandle{0} id=2009309261 tag=gig:1114166174:^sq_ig_i_personal importance=3 key=0|com.google.android.gm|2009309261|gig:1114166174:^sq_ig_i_personal|10195: Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=gig:1114166174:^sq_ig_i_personal sortKey=92233702443132591422009309261 actions=3 vis=PRIVATE publicVersion=Notification(channel=^u@example.invalid shortcut=null contentView=null vibrate=null sound=null tick defaults=LIGHTS flags=SHOW_LIGHTS|AUTO_CANCEL color=0xffaecbfa category=email groupKey=silent vis=PUBLIC)))
+      uid=T1749
+      opPkg=T1750
+      icon=Icon (T1751)
+      flags=T1752
+      originalFlags=T1753
+      pri=0
+      key=T1754
+      seen=true
+      groupKey=T1755
+      notification=Redacted()
+            fullscreenIntent=null
+            contentIntent=T1756
+            deleteIntent=T1757
+            number=0
+            groupAlertBehavior=1
+            when=1792541516665/1792541516665
+            tickerText=T1758
+            vis=0
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1759
+            actions={
+                [0] T1760
+                [1] T1761
+                [2] T1762
+              }
+            extras={
+                android.title=String (T1763)
+                android.reduced.images=Boolean (T1764)
+                android.subText=String (T1765)
+                android.template=String (T1766)
+                android.showChronometer=Boolean (T1767)
+                argAndroidAccount=Account (T1768)
+                argPriorityScore=Float (T1769)
+                android.people.list=ArrayList (T1770)
+                android.text=SpannableString (T1771)
+                android.progress=Integer (T1772)
+                androidx.core.app.extra.COMPAT_TEMPLATE=String (T1773)
+                android.progressMax=Integer (T1774)
+                android.appInfo=ApplicationInfo (T1775)
+                android.showWhen=Boolean (T1776)
+                android.largeIcon=Icon (T1777)
+                android.bigText=SpannableString (T1778
+T1779
+͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­ ­   ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏  ͏)
+                android.infoText=null
+                android.wearable.EXTENSIONS=Bundle (T1780)
+                argMustShow=Boolean (T1781)
+                argNotificationType=String (T1782)
+                android.progressIndeterminate=Boolean (T1783)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      publicNotification=
+            fullscreenIntent=null
+            contentIntent=T1784
+            deleteIntent=null
+            number=0
+            groupAlertBehavior=1
+            when=1792882751492/1792882751492
+            tickerText=T1785
+            vis=1
+            contentView=null
+            bigContentView=null
+            headsUpContentView=null
+            color=0xffaecbfa
+            timeout=T1786
+            extras={
+                android.title=String (T1787)
+                android.reduced.images=Boolean (T1788)
+                android.subText=null
+                android.showChronometer=Boolean (T1789)
+                android.people.list=ArrayList (T1790)
+                android.text=null
+                android.progress=Integer (T1791)
+                android.progressMax=Integer (T1792)
+                android.appInfo=ApplicationInfo (T1793)
+                android.showWhen=Boolean (T1794)
+                android.largeIcon=null
+                android.infoText=null
+                android.progressIndeterminate=Boolean (T1795)
+                android.remoteInputHistory=null
+                android.shortCriticalText=null
+            }
+      stats=T1796
+      mContactAffinity=0.0
+      mRecentlyIntrusive=false
+      mPackagePriority=0
+      mPackageVisibility=-1000
+      mSystemImportance=T1797
+      mAsstImportance=T1798
+      mImportance=T1799
+      mImportanceExplanation=T1800
+      mProposedImportance=T1801
+      mIsAppImportanceLocked=true
+      mSensitiveContent=false
+      mCanceledAfterLifetimeExtension=false
+      mIntercept=false
+      mHidden=T1802
+      mGlobalSortKey=T1803
+      mRankingTimeMs=1792541516665
+      mCreationTimeMs=1792882752062
+      mVisibleSinceMs=1792894948008
+      mUpdateTimeMs=1792882752062
+      mInterruptionTimeMs=1792894948008
+      mSuppressedVisualEffects= 0
+      mSound=T1804
+      mVibration=T1805
+      mAttributes=T1806
+      mLight=T1807
+      mShowBadge=true
+      mColorized=false
+      mAllowBubble=false
+      isBubble=false
+      mIsInterruptive=true
+      effectiveNotificationChannel=T1808
+      mAdjustments=[]
+      shortcut=T1809
+      mUserVisOverride=-1000
+      hasSummarization=false
+      bundleType=0
+  
+  mMaxPackageEnqueueRate=5.0
+  hideSilentStatusBar=false
+
+  T1810
+      mSoundNotificationKey=T1811
+      mVibrateNotificationKey=T1812
+      mDisableNotificationEffects=false
+      mCallState=T1813
+      mSystemReady=true
+      mNotificationPulseEnabled=true
+  mArchive=Archive (T1814)
+    T1815
+    T1816
+    T1817
+    T1818
+    T1819
+    ...
+
+  T1820
+
+ T1821
+
+  T1822
+    T1823
+      T1824
+      T1825
+      T1826
+      T1827
+      T1828
+      T1829
+      T1830
+      T1831
+      T1832
+      T1833
+      T1834
+
+ T1835
+    T1836
+T1837
+      T1838
+      T1839
+      T1840
+      T1841
+        T1842
+        T1843
+      T1844
+        T1845
+        T1846
+        T1847
+      T1848
+      T1849
+      T1850
+        T1851
+        T1852
+      T1853
+      T1854
+      T1855
+      T1856
+        T1857
+      T1858
+      T1859
+      T1860
+      T1861
+        T1862
+        T1863
+      T1864
+      T1865
+      T1866
+      T1867
+      T1868
+        T1869
+        T1870
+        T1871
+        T1872
+        T1873
+        T1874
+        T1875
+        T1876
+        T1877
+        T1878
+        T1879
+        T1880
+        T1881
+        T1882
+        T1883
+        T1884
+        T1885
+        T1886
+        T1887
+        T1888
+        T1889
+        T1890
+        T1891
+        T1892
+        T1893
+        T1894
+        T1895
+        T1896
+        T1897
+        T1898
+        T1899
+        T1900
+        T1901
+        T1902
+        T1903
+        T1904
+        T1905
+        T1906
+        T1907
+        T1908
+        T1909
+        T1910
+        T1911
+        T1912
+        T1913
+        T1914
+        T1915
+        T1916
+        T1917
+        T1918
+        T1919
+        T1920
+        T1921
+        T1922
+        T1923
+        T1924
+        T1925
+        T1926
+        T1927
+        T1928
+        T1929
+        T1930
+        T1931
+      T1932
+      T1933
+      T1934
+      T1935
+        T1936
+        T1937
+        T1938
+      T1939
+      T1940
+      T1941
+      T1942
+      T1943
+      T1944
+      T1945
+      T1946
+        T1947
+      T1948
+        T1949
+        T1950
+        T1951
+        T1952
+        T1953
+        T1954
+        T1955
+        T1956
+        T1957
+      T1958
+      T1959
+      T1960
+      T1961
+      T1962
+      T1963
+      T1964
+      T1965
+        T1966
+        T1967
+        T1968
+      T1969
+      T1970
+      T1971
+        T1972
+        T1973
+        T1974
+        T1975
+        T1976
+        T1977
+        T1978
+        T1979
+        T1980
+        T1981
+        T1982
+      T1983
+      T1984
+      T1985
+      T1986
+      T1987
+      T1988
+      T1989
+        T1990
+        T1991
+        T1992
+        T1993
+      T1994
+      T1995
+      T1996
+      T1997
+      T1998
+      T1999
+      T2000
+        T2001
+        T2002
+        T2003
+        T2004
+        T2005
+      T2006
+      T2007
+      T2008
+      T2009
+      T2010
+      T2011
+        T2012
+        T2013
+        T2014
+        T2015
+        T2016
+        T2017
+        T2018
+        T2019
+        T2020
+        T2021
+        T2022
+        T2023
+        T2024
+        T2025
+      T2026
+      T2027
+        T2028
+        T2029
+        T2030
+        T2031
+        T2032
+        T2033
+        T2034
+        T2035
+        T2036
+        T2037
+        T2038
+        T2039
+        T2040
+        T2041
+        T2042
+        T2043
+        T2044
+        T2045
+        T2046
+        T2047
+      T2048
+      T2049
+      T2050
+        T2051
+        T2052
+        T2053
+        T2054
+        T2055
+        T2056
+        T2057
+      T2058
+      T2059
+      T2060
+      T2061
+      T2062
+      T2063
+        T2064
+        T2065
+        T2066
+        T2067
+      T2068
+      T2069
+      T2070
+      T2071
+      T2072
+      T2073
+        T2074
+        T2075
+        T2076
+      T2077
+        T2078
+      T2079
+      T2080
+      T2081
+        T2082
+        T2083
+      T2084
+      T2085
+      T2086
+      T2087
+      T2088
+      T2089
+        T2090
+        T2091
+        T2092
+        T2093
+        T2094
+        T2095
+        T2096
+        T2097
+      T2098
+      T2099
+      T2100
+      T2101
+      T2102
+        T2103
+        T2104
+        T2105
+        T2106
+        T2107
+        T2108
+        T2109
+        T2110
+        T2111
+        T2112
+        T2113
+        T2114
+        T2115
+        T2116
+        T2117
+        T2118
+        T2119
+        T2120
+        T2121
+        T2122
+        T2123
+        T2124
+        T2125
+        T2126
+        T2127
+        T2128
+        T2129
+        T2130
+        T2131
+        T2132
+        T2133
+        T2134
+        T2135
+      T2136
+      T2137
+      T2138
+      T2139
+      T2140
+        T2141
+        T2142
+      T2143
+      T2144
+      T2145
+      T2146
+      T2147
+      T2148
+      T2149
+        T2150
+        T2151
+      T2152
+      T2153
+      T2154
+      T2155
+      T2156
+      T2157
+      T2158
+      T2159
+      T2160
+        T2161
+      T2162
+      T2163
+        T2164
+        T2165
+        T2166
+        T2167
+        T2168
+        T2169
+        T2170
+      T2171
+      T2172
+      T2173
+      T2174
+        T2175
+        T2176
+        T2177
+        T2178
+        T2179
+      T2180
+        T2181
+        T2182
+        T2183
+      T2184
+      T2185
+      T2186
+      T2187
+      T2188
+      T2189
+        T2190
+        T2191
+        T2192
+      T2193
+      T2194
+      T2195
+        T2196
+        T2197
+        T2198
+        T2199
+        T2200
+        T2201
+        T2202
+      T2203
+      T2204
+      T2205
+        T2206
+        T2207
+        T2208
+        T2209
+        T2210
+        T2211
+        T2212
+      T2213
+      T2214
+        T2215
+      T2216
+      T2217
+      T2218
+      T2219
+      T2220
+      T2221
+        T2222
+        T2223
+        T2224
+      T2225
+      T2226
+      T2227
+      T2228
+        T2229
+      T2230
+      T2231
+      T2232
+      T2233
+      T2234
+      T2235
+      T2236
+      T2237
+      T2238
+        T2239
+      T2240
+        T2241
+        T2242
+      T2243
+        T2244
+        T2245
+        T2246
+        T2247
+        T2248
+        T2249
+        T2250
+        T2251
+        T2252
+        T2253
+        T2254
+        T2255
+      T2256
+        T2257
+      T2258
+      T2259
+      T2260
+        T2261
+        T2262
+        T2263
+        T2264
+        T2265
+        T2266
+      T2267
+        T2268
+        T2269
+      T2270
+      T2271
+      T2272
+      T2273
+        T2274
+        T2275
+        T2276
+        T2277
+        T2278
+        T2279
+        T2280
+        T2281
+        T2282
+        T2283
+        T2284
+        T2285
+        T2286
+        T2287
+        T2288
+        T2289
+        T2290
+        T2291
+        T2292
+        T2293
+        T2294
+        T2295
+        T2296
+        T2297
+        T2298
+        T2299
+        T2300
+        T2301
+        T2302
+        T2303
+        T2304
+        T2305
+        T2306
+        T2307
+        T2308
+        T2309
+        T2310
+        T2311
+        T2312
+        T2313
+        T2314
+        T2315
+        T2316
+        T2317
+        T2318
+        T2319
+        T2320
+        T2321
+        T2322
+        T2323
+        T2324
+        T2325
+        T2326
+        T2327
+        T2328
+        T2329
+        T2330
+        T2331
+        T2332
+        T2333
+        T2334
+        T2335
+        T2336
+        T2337
+        T2338
+        T2339
+        T2340
+        T2341
+        T2342
+        T2343
+        T2344
+        T2345
+        T2346
+        T2347
+        T2348
+        T2349
+        T2350
+      T2351
+      T2352
+      T2353
+        T2354
+      T2355
+      T2356
+      T2357
+      T2358
+      T2359
+      T2360
+      T2361
+        T2362
+        T2363
+        T2364
+        T2365
+        T2366
+      T2367
+        T2368
+      T2369
+      T2370
+      T2371
+        T2372
+        T2373
+      T2374
+      T2375
+      T2376
+      T2377
+      T2378
+      T2379
+        T2380
+      T2381
+      T2382
+      T2383
+      T2384
+      T2385
+      T2386
+        T2387
+      T2388
+      T2389
+      T2390
+      T2391
+      T2392
+        T2393
+        T2394
+        T2395
+      T2396
+      T2397
+      T2398
+      T2399
+      T2400
+        T2401
+        T2402
+        T2403
+        T2404
+        T2405
+        T2406
+        T2407
+      T2408
+      T2409
+      T2410
+      T2411
+        T2412
+        T2413
+        T2414
+        T2415
+        T2416
+      T2417
+      T2418
+      T2419
+      T2420
+      T2421
+      T2422
+      T2423
+      T2424
+      T2425
+      T2426
+      T2427
+      T2428
+      T2429
+      T2430
+        T2431
+        T2432
+        T2433
+        T2434
+        T2435
+        T2436
+        T2437
+        T2438
+        T2439
+        T2440
+      T2441
+        T2442
+        T2443
+        T2444
+        T2445
+        T2446
+        T2447
+        T2448
+        T2449
+        T2450
+        T2451
+        T2452
+        T2453
+        T2454
+        T2455
+        T2456
+      T2457
+      T2458
+      T2459
+      T2460
+      T2461
+        T2462
+      T2463
+        T2464
+        T2465
+        T2466
+        T2467
+        T2468
+        T2469
+        T2470
+        T2471
+        T2472
+        T2473
+      T2474
+      T2475
+      T2476
+      T2477
+        T2478
+        T2479
+        T2480
+        T2481
+        T2482
+        T2483
+      T2484
+        T2485
+        T2486
+        T2487
+        T2488
+      T2489
+      T2490
+      T2491
+      T2492
+      T2493
+        T2494
+        T2495
+        T2496
+        T2497
+      T2498
+      T2499
+      T2500
+      T2501
+      T2502
+      T2503
+      T2504
+      T2505
+      T2506
+      T2507
+      T2508
+      T2509
+        T2510
+        T2511
+      T2512
+      T2513
+        T2514
+      T2515
+      T2516
+      T2517
+      T2518
+      T2519
+      T2520
+        T2521
+        T2522
+      T2523
+        T2524
+        T2525
+        T2526
+      T2527
+      T2528
+      T2529
+      T2530
+      T2531
+      T2532
+        T2533
+        T2534
+        T2535
+        T2536
+        T2537
+        T2538
+        T2539
+        T2540
+        T2541
+        T2542
+        T2543
+        T2544
+        T2545
+        T2546
+        T2547
+        T2548
+        T2549
+      T2550
+        T2551
+        T2552
+        T2553
+        T2554
+        T2555
+        T2556
+        T2557
+        T2558
+      T2559
+      T2560
+      T2561
+        T2562
+      T2563
+        T2564
+        T2565
+        T2566
+        T2567
+        T2568
+        T2569
+        T2570
+        T2571
+        T2572
+        T2573
+        T2574
+        T2575
+        T2576
+        T2577
+        T2578
+        T2579
+        T2580
+        T2581
+      T2582
+      T2583
+        T2584
+      T2585
+        T2586
+        T2587
+      T2588
+      T2589
+      T2590
+      T2591
+      T2592
+      T2593
+      T2594
+      T2595
+      T2596
+        T2597
+      T2598
+      T2599
+      T2600
+        T2601
+        T2602
+      T2603
+      T2604
+        T2605
+        T2606
+        T2607
+        T2608
+        T2609
+        T2610
+        T2611
+        T2612
+      T2613
+      T2614
+      T2615
+        T2616
+        T2617
+        T2618
+      T2619
+        T2620
+        T2621
+        T2622
+        T2623
+        T2624
+      T2625
+      T2626
+        T2627
+        T2628
+        T2629
+        T2630
+        T2631
+      T2632
+        T2633
+      T2634
+      T2635
+      T2636
+      T2637
+      T2638
+      T2639
+      T2640
+      T2641
+        T2642
+        T2643
+        T2644
+        T2645
+        T2646
+        T2647
+        T2648
+        T2649
+      T2650
+      T2651
+      T2652
+      T2653
+        T2654
+      T2655
+      T2656
+        T2657
+        T2658
+        T2659
+        T2660
+        T2661
+        T2662
+        T2663
+        T2664
+        T2665
+        T2666
+        T2667
+        T2668
+        T2669
+        T2670
+        T2671
+        T2672
+        T2673
+        T2674
+        T2675
+        T2676
+        T2677
+        T2678
+        T2679
+        T2680
+        T2681
+        T2682
+        T2683
+        T2684
+        T2685
+        T2686
+        T2687
+        T2688
+        T2689
+        T2690
+        T2691
+        T2692
+        T2693
+        T2694
+        T2695
+        T2696
+        T2697
+      T2698
+      T2699
+      T2700
+        T2701
+      T2702
+      T2703
+        T2704
+        T2705
+        T2706
+        T2707
+      T2708
+      T2709
+        T2710
+        T2711
+        T2712
+        T2713
+      T2714
+      T2715
+        T2716
+        T2717
+        T2718
+        T2719
+        T2720
+        T2721
+        T2722
+        T2723
+        T2724
+        T2725
+      T2726
+      T2727
+        T2728
+        T2729
+      T2730
+        T2731
+        T2732
+        T2733
+        T2734
+        T2735
+        T2736
+        T2737
+        T2738
+        T2739
+        T2740
+        T2741
+        T2742
+        T2743
+        T2744
+        T2745
+        T2746
+        T2747
+        T2748
+        T2749
+        T2750
+        T2751
+        T2752
+        T2753
+        T2754
+        T2755
+        T2756
+        T2757
+        T2758
+        T2759
+        T2760
+        T2761
+        T2762
+        T2763
+        T2764
+        T2765
+        T2766
+        T2767
+      T2768
+      T2769
+      T2770
+        T2771
+        T2772
+        T2773
+        T2774
+        T2775
+        T2776
+        T2777
+        T2778
+        T2779
+        T2780
+        T2781
+        T2782
+        T2783
+      T2784
+      T2785
+      T2786
+        T2787
+        T2788
+        T2789
+        T2790
+        T2791
+        T2792
+        T2793
+        T2794
+        T2795
+        T2796
+        T2797
+        T2798
+        T2799
+        T2800
+        T2801
+        T2802
+        T2803
+        T2804
+        T2805
+        T2806
+        T2807
+        T2808
+        T2809
+        T2810
+        T2811
+        T2812
+        T2813
+        T2814
+      T2815
+      T2816
+      T2817
+      T2818
+      T2819
+      T2820
+      T2821
+      T2822
+        T2823
+        T2824
+        T2825
+        T2826
+        T2827
+        T2828
+        T2829
+        T2830
+        T2831
+        T2832
+        T2833
+        T2834
+        T2835
+        T2836
+        T2837
+        T2838
+        T2839
+        T2840
+        T2841
+        T2842
+        T2843
+        T2844
+        T2845
+        T2846
+        T2847
+        T2848
+        T2849
+      T2850
+      T2851
+      T2852
+        T2853
+      T2854
+      T2855
+      T2856
+      T2857
+        T2858
+        T2859
+        T2860
+        T2861
+        T2862
+        T2863
+        T2864
+        T2865
+        T2866
+        T2867
+        T2868
+        T2869
+        T2870
+        T2871
+        T2872
+        T2873
+        T2874
+      T2875
+        T2876
+        T2877
+        T2878
+      T2879
+      T2880
+      T2881
+      T2882
+      T2883
+        T2884
+        T2885
+      T2886
+      T2887
+      T2888
+      T2889
+      T2890
+        T2891
+      T2892
+      T2893
+      T2894
+      T2895
+        T2896
+        T2897
+        T2898
+      T2899
+      T2900
+      T2901
+      T2902
+      T2903
+      T2904
+      T2905
+      T2906
+      T2907
+      T2908
+      T2909
+      T2910
+        T2911
+        T2912
+        T2913
+        T2914
+        T2915
+        T2916
+        T2917
+        T2918
+        T2919
+      T2920
+      T2921
+        T2922
+        T2923
+      T2924
+      T2925
+      T2926
+      T2927
+      T2928
+        T2929
+        T2930
+        T2931
+        T2932
+        T2933
+        T2934
+        T2935
+        T2936
+        T2937
+        T2938
+        T2939
+        T2940
+        T2941
+        T2942
+        T2943
+        T2944
+        T2945
+        T2946
+        T2947
+        T2948
+        T2949
+        T2950
+      T2951
+      T2952
+      T2953
+        T2954
+      T2955
+      T2956
+      T2957
+      T2958
+      T2959
+      T2960
+      T2961
+      T2962
+        T2963
+      T2964
+        T2965
+        T2966
+        T2967
+        T2968
+        T2969
+        T2970
+        T2971
+        T2972
+        T2973
+        T2974
+        T2975
+        T2976
+        T2977
+        T2978
+        T2979
+        T2980
+        T2981
+        T2982
+        T2983
+        T2984
+        T2985
+        T2986
+        T2987
+        T2988
+      T2989
+      T2990
+        T2991
+        T2992
+        T2993
+      T2994
+        T2995
+        T2996
+      T2997
+      T2998
+      T2999
+T3000
+
+  T3001
+    T3002
+      T3003
+    T3004
+    T3005
+      userId=T3006
+    T3007
+      T3008
+      T3009
+      T3010
+      T3011
+      T3012
+      T3013
+      T3014
+      T3015
+    T3016
+      T3017
+      T3018
+      T3019
+      T3020
+      T3021
+      T3022
+      T3023
+      T3024
+      T3025
+      T3026
+      T3027
+      T3028
+    T3029
+      T3030
+        T3031
+        T3032
+        T3033
+    T3034
+    T3035
+
+  T3036
+    T3037
+      T3038
+    T3039
+    T3040
+    T3041
+      T3042
+    T3043
+      T3044
+    T3045
+    T3046
+      T3047
+    T3048
+    T3049
+    T3050
+
+  T3051
+    mInterruptionFilter=1
+    mZenMode=T3052
+    mConsolidatedPolicy=T3053
+    mConsolidatedDeviceEffects=[]
+    T3054
+hasPriorityChannels=T3055
+automaticRules={
+T3056
+T3057
+T3058
+T3059
+manualRule=T3060
+deletedRules={}]
+    mUser=0
+    mConfig=T3061
+hasPriorityChannels=T3062
+automaticRules={
+T3063
+T3064
+T3065
+T3066
+manualRule=T3067
+deletedRules={}]
+    mSuppressedEffects=0
+    mDefaultPhoneApp=T3068
+    RepeatCallers.mThresholdMinutes=0
+    mSubscriptions={}
+
+  T3069
+    T3070
+    T3071
+    T3072
+    T3073
+    T3074
+    T3075
+    T3076
+    T3077
+    T3078
+    T3079
+    T3080
+    T3081
+    T3082
+    T3083
+    T3084
+    T3085
+    T3086
+    T3087
+    T3088
+    T3089
+    T3090
+    T3091
+    T3092
+    T3093
+    T3094
+    T3095
+    T3096
+    T3097
+    T3098
+    T3099
+    T3100
+    T3101
+    T3102
+    T3103
+    T3104
+    T3105
+    T3106
+    T3107
+    T3108
+    T3109
+    T3110
+    T3111
+    T3112
+    T3113
+    T3114
+    T3115
+    T3116
+    T3117
+    T3118
+    T3119
+    T3120
+    T3121
+    T3122
+    T3123
+    T3124
+    T3125
+    T3126
+    T3127
+    T3128
+    T3129
+    T3130
+    T3131
+    T3132
+    T3133
+    T3134
+    T3135
+    T3136
+    T3137
+    T3138
+    T3139
+    T3140
+    T3141
+    T3142
+    T3143
+    T3144
+    T3145
+    T3146
+    T3147
+    T3148
+    T3149
+    T3150
+    T3151
+    T3152
+    T3153
+    T3154
+    T3155
+    T3156
+    T3157
+    T3158
+    T3159
+    T3160
+    T3161
+    T3162
+    T3163
+    T3164
+    T3165
+    T3166
+    T3167
+    T3168
+    T3169
+    T3170
+    T3171
+    T3172
+    T3173
+    T3174
+    T3175
+    T3176
+    T3177
+    T3178
+    T3179
+    T3180
+    T3181
+    T3182
+    T3183
+    T3184
+    T3185
+    T3186
+    T3187
+    T3188
+    T3189
+    T3190
+    T3191
+    T3192
+    T3193
+
+  T3194
+    T3195
+      T3196
+      T3197
+    T3198
+    T3199
+      userId=T3200
+    T3201
+      T3202
+    T3203
+      T3204
+      T3205
+      T3206
+      T3207
+    T3208
+      T3209
+        T3210
+    T3211
+    T3212
+    T3213
+      mConnected=true
+      mTime=0
+    T3214
+    T3215
+      mConnected=true
+      mRegistered=false
+      mBootComplete=true
+      mNextAlarmTime=0
+      mSubscriptions=
+      mTrackers=
+        user=0
+          mCallback=null
+          mRegistered=false
+          u=0
+    T3216
+      mConnected=true
+      mRegistered=false
+      mSubscriptions=
+      T3217
+      mNextAlarmTime=0
+
+  T3218
+    T3219
+    T3220
+    T3221
+    T3222
+    T3223
+    T3224
+    T3225
+
+  T3226
+    T3227
+      key=T3228
+      numEnqueuedByApp=1,
+      numPostedByApp=0,
+      numUpdatedByApp=0,
+      numRemovedByApp=1,
+      numPeopleCacheHit=0,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=0,
+      numPrivate=0,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=0
+      numWithLargeIcon=0
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=0
+      numWithText=0
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3229
+      T3230
+      T3231
+      numUndecorateRVs=0
+    }
+    T3232
+      key=T3233
+      numEnqueuedByApp=6,
+      numPostedByApp=7,
+      numUpdatedByApp=2,
+      numRemovedByApp=3,
+      numPeopleCacheHit=0,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=0,
+      numPrivate=2,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=7
+      numAutoCancel=2
+      numWithLargeIcon=0
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=6
+      numWithText=6
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3234
+      T3235
+      T3236
+      numUndecorateRVs=0
+    }
+    T3237
+      key=T3238
+      numEnqueuedByApp=27,
+      numPostedByApp=1,
+      numUpdatedByApp=26,
+      numRemovedByApp=1,
+      numPeopleCacheHit=27,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=26,
+      numPrivate=0,
+      numSecret=27,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=26
+      numUserInitiatedJob=0
+      numOngoing=27
+      numAutoCancel=0
+      numWithLargeIcon=27
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=27
+      numWithText=3
+      numWithSubText=27
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3239
+      T3240
+      T3241
+      numUndecorateRVs=0
+    }
+    T3242
+      key=T3243
+      numEnqueuedByApp=157,
+      numPostedByApp=39,
+      numUpdatedByApp=116,
+      numRemovedByApp=7,
+      numPeopleCacheHit=208,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=32,
+      numBlocked=6,
+      numSuspendedByAdmin=0,
+      numWithActions=114,
+      numPrivate=119,
+      numSecret=29,
+      numInterrupt=0,
+      numWithBigText=94,
+      numWithBigPicture=1
+      numForegroundService=26
+      numUserInitiatedJob=0
+      numOngoing=37
+      numAutoCancel=99
+      numWithLargeIcon=142
+      numWithInbox=9
+      numWithMediaSession=0
+      numWithTitle=142
+      numWithText=109
+      numWithSubText=121
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3244
+      T3245
+      T3246
+      numUndecorateRVs=0
+    }
+    T3247
+      key=T3248
+      numEnqueuedByApp=2,
+      numPostedByApp=3,
+      numUpdatedByApp=0,
+      numRemovedByApp=0,
+      numPeopleCacheHit=20,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=0,
+      numPrivate=1,
+      numSecret=2,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=3
+      numAutoCancel=0
+      numWithLargeIcon=2
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=2
+      numWithText=2
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=1
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3249
+      T3250
+      T3251
+      numUndecorateRVs=0
+    }
+    T3252
+      key=T3253
+      numEnqueuedByApp=16,
+      numPostedByApp=4,
+      numUpdatedByApp=12,
+      numRemovedByApp=2,
+      numPeopleCacheHit=26,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=1,
+      numPrivate=16,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=8,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=0
+      numWithLargeIcon=16
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=8
+      numWithText=8
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3254
+      T3255
+      T3256
+      numUndecorateRVs=0
+    }
+    T3257
+      key=T3258
+      numEnqueuedByApp=2,
+      numPostedByApp=3,
+      numUpdatedByApp=0,
+      numRemovedByApp=0,
+      numPeopleCacheHit=5,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=0,
+      numPrivate=3,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=0
+      numWithLargeIcon=0
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=2
+      numWithText=2
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3259
+      T3260
+      T3261
+      numUndecorateRVs=0
+    }
+    T3262
+      key=T3263
+      numEnqueuedByApp=94,
+      numPostedByApp=18,
+      numUpdatedByApp=76,
+      numRemovedByApp=0,
+      numPeopleCacheHit=122,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=32,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=85,
+      numPrivate=94,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=85,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=94
+      numWithLargeIcon=94
+      numWithInbox=9
+      numWithMediaSession=0
+      numWithTitle=94
+      numWithText=85
+      numWithSubText=94
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3264
+      T3265
+      T3266
+      numUndecorateRVs=0
+    }
+    T3267
+      key=T3268
+      numEnqueuedByApp=3,
+      numPostedByApp=0,
+      numUpdatedByApp=0,
+      numRemovedByApp=0,
+      numPeopleCacheHit=0,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=3,
+      numSuspendedByAdmin=0,
+      numWithActions=0,
+      numPrivate=0,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=0
+      numWithLargeIcon=0
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=0
+      numWithText=0
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3269
+      T3270
+      T3271
+      numUndecorateRVs=0
+    }
+    T3272
+      key=T3273
+      numEnqueuedByApp=1,
+      numPostedByApp=1,
+      numUpdatedByApp=0,
+      numRemovedByApp=0,
+      numPeopleCacheHit=6,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=1,
+      numPrivate=1,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=1
+      numWithLargeIcon=1
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=1
+      numWithText=1
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3274
+      T3275
+      T3276
+      numUndecorateRVs=0
+    }
+    T3277
+      key=T3278
+      numEnqueuedByApp=3,
+      numPostedByApp=0,
+      numUpdatedByApp=0,
+      numRemovedByApp=0,
+      numPeopleCacheHit=0,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=3,
+      numSuspendedByAdmin=0,
+      numWithActions=0,
+      numPrivate=0,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=0
+      numWithLargeIcon=0
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=0
+      numWithText=0
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3279
+      T3280
+      T3281
+      numUndecorateRVs=0
+    }
+    T3282
+      key=T3283
+      numEnqueuedByApp=1,
+      numPostedByApp=1,
+      numUpdatedByApp=0,
+      numRemovedByApp=0,
+      numPeopleCacheHit=1,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=1,
+      numPrivate=1,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=0,
+      numWithBigPicture=1
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=1
+      numWithLargeIcon=1
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=1
+      numWithText=1
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3284
+      T3285
+      T3286
+      numUndecorateRVs=0
+    }
+    T3287
+      key=T3288
+      numEnqueuedByApp=1,
+      numPostedByApp=1,
+      numUpdatedByApp=0,
+      numRemovedByApp=0,
+      numPeopleCacheHit=1,
+      numWithStaredPeople=0,
+      numWithValidPeople=0,
+      numPeopleCacheMiss=0,
+      numBlocked=0,
+      numSuspendedByAdmin=0,
+      numWithActions=0,
+      numPrivate=1,
+      numSecret=0,
+      numInterrupt=0,
+      numWithBigText=1,
+      numWithBigPicture=0
+      numForegroundService=0
+      numUserInitiatedJob=0
+      numOngoing=0
+      numAutoCancel=1
+      numWithLargeIcon=1
+      numWithInbox=0
+      numWithMediaSession=0
+      numWithTitle=1
+      numWithText=1
+      numWithSubText=0
+      numWithInfoText=0
+      numRateViolations=0
+      numAlertViolations=0
+      numQuotaViolations=0
+      numImagesRemoved=0
+      numTooOld=0
+      T3289
+      T3290
+      T3291
+      numUndecorateRVs=0
+    }
+    T3292
+    T3293
+
+  T3294
+    T3295
+
+  T3296
+    T3297
+        T3298
+            T3299
+        T3300
+            T3301
+        T3302
+            T3303
+        T3304
+            T3305
+
+    T3306
+        T3307
+            T3308
+            T3309
+        T3310
+            T3311
+            T3312
+        T3313
+            T3314
+            T3315
+

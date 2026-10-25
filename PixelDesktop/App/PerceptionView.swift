@@ -66,6 +66,10 @@ struct PerceptionView: View {
                 Divider()
                 logcatSection
                 Divider()
+                // A5 — the notification stream (Phase 3.2). Group A, so it lives here rather than in
+                // an eleventh tab; see `NotificationsSection`'s header for the reasoning.
+                NotificationsSection()
+                Divider()
                 forwardSection
                 Divider()
                 scrcpySection

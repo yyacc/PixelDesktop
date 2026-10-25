@@ -686,3 +686,75 @@ instrument is worth more than re-running the test.** This is the third instance 
 **Notable positive:** this is the **first phase in which no Android platform assumption was
 falsified.** The plausible reason is T-017 — the highest-risk assumption was probed *before* the
 design was committed to, rather than discovered after the code compiled and the tests passed.
+
+---
+
+## Event: Phase 3.2 — A5, the notification stream
+
+### Agent
+Ciel (Hermes Agent)
+
+### Model
+deepseek-flash
+
+### Task
+Implement 3.2 of the Phase 3 proposal: the two-tier notification reader, the five-field parser, the
+consent-gated audit, and the Perception view showing it.
+
+### Context
+- Phase 3 gate opened by rnz; 3.1 (consent + audit + dry run) already committed at `c370b52`.
+- `NotificationParser.swift`, `NotificationStream.swift`, `Notifications.swift` had been authored in an
+  earlier turn of the same session and had **never been compiled**.
+- P4 data class: package, title, body, sender. Q3 (content may be shown in the app) was approved.
+
+### Tools Used
+- `xcodebuild build-for-testing` / `test-without-building`
+- `xcodegen generate`
+- `swiftc -enable-bare-slash-regex -swift-version 5` (evidence harness, per ADR-006)
+- `adb shell 'cmd notification list'`, `dumpsys notification --noredact`
+- Python for measuring the captured dump (record counts, field presence, type mix)
+
+### Process
+1. Measured the dump before writing any assertion: 33 records, 29 with content, 4 without; key shapes
+   30×5-part + 3×10-part; `android.text` typed `SpannableString` 19× / `String` 9× / absent 5×.
+2. Compiled — the parser failed (4 × `Regex.firstMatch` need `try?`), then the view failed (ternary
+   between `HierarchicalShapeStyle` and `Color`), then the tests failed to compile (`await` inside
+   `XCTAssert*` autoclosures, a redeclared `AuditProbeTransport`, a multi-line literal that cannot hold
+   column-0 continuation lines).
+3. Ran the tests — four logical failures, each one an assertion I had invented rather than measured:
+   aggregate key length, multi-line indentation, "text-only finds fewer than half", and the
+   in-flight audit probe (which needed the *existing* `AuditProbeTransport`, not a new one).
+4. Replaced every invented number with the measured one and re-ran: 26/26 green, then 776/776.
+5. Ran the device harness: 4/4 checks pass; discovered my own assertion expected 2 executed audit
+   records where the correct count was 3 (poll 2 issues one command), fixed, re-ran, all PASS.
+
+### Errors and fixes
+1. **A file that looked finished and had never been compiled.** The parser's doc comments were detailed
+   and its logic defensible; the target did not build. Lesson recorded below.
+2. **Four assertions that encoded remembered numbers instead of measured ones.** The most instructive:
+   `XCTAssertLessThan(textOnly, parsed/2)` passed the *shape* of the prototype's claim (30% coverage)
+   but the capture measures 28 of 33 records with `android.text` present. The real cause of the
+   prototype's 30% is the `SpannableString` type — 19 of 28 — so the test now asserts `9/28 = 32%`
+   from the fixture and says why.
+3. **A criterion that cannot be met as written.** Success criterion 2 wants ≥90% of records; the
+   capture yields 87.9% because 4 records carry nothing, and the same criterion forbids dropping them.
+   Reported as a measured miss with a recommended restatement (phase record §4) rather than redefined
+   quietly.
+
+### Quality
+- Correctly gated both tiers inside the reader, and asserted **zero shell invocations** rather than a
+  thrown error.
+- Correctly kept content out of the audit detail and proved it two ways (hermetic: distinctive tokens;
+  hardware: 12 real values compared against the trail, 0 leaked).
+- Correctly distinguished empty tier-1 output (no notifications) from empty tier-2 output (failed read).
+- Incorrectly shipped three files uncompiled into the sub-phase.
+- Incorrectly wrote four tests against remembered numbers.
+
+### Lesson
+**"The file is written" and "the target builds" are different facts, and the gap is where a whole
+sub-phase can sit looking complete.** The check is cheap (`build-for-testing`) and the cost of not
+running it was four files' worth of unverified assumptions. The same discipline applies to numbers:
+an assertion that quotes a prototype's measurement is a memory, not evidence — measure the fixture,
+then assert what it actually says, even when that contradicts the plan.
+
+**Human intervention:** none during implementation. rnz opened the gate and set the direction.

@@ -1,0 +1,8 @@
+0|com.example.mail|26|redacted-tag-a|10153
+-1|com.example.chat|27|redacted-tag-b|1000
+0|com.example.system|0|0|com.example.system|g:Aggregate_SilentSection|10153|0|redacted-tag-c|android
+-1|com.example.news|1|-1|com.example.news|g:Aggregate_AlertingSection|1000|-1|redacted-tag-d|com.example.news
+Warning: the notification service is not running
+0|com.example.maps|12||10153
+notakey|missing|the|numeric|positions
+0|com.example.calendar|notanumber|redacted-tag-e|10153
