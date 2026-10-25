@@ -12,7 +12,12 @@ import java.security.MessageDigest;
  * The Phase 6 local-language-model workload: {@code LOCAL-LLM-1}.
  *
  * <p>Bounded by construction. One prompt in, a bounded number of tokens out, one result file.
- * No conversation, no tools, no memory, no RAG, no network, no agent loop (ADR-012 §P8).
+ * No conversation, no tools, no memory, no RAG, no agent loop (ADR-012 §P8).
+ *
+ * <p>Two backends produce that generation, selected per job by the {@code backend} field. The
+ * default ({@link #BACKEND_IN_PROCESS}) is the original in-process llama.cpp path with a fixed
+ * Qwen model. {@link HttpInferenceBackend} delegates generation to the on-device llama-server over
+ * a fixed loopback URL, which is the only outbound connection this app can make.
  *
  * <p>This class is the only place that knows the job shape for inference. It delegates the
  * actual computation to {@link LlamaBridge}, which knows nothing about jobs or files.
@@ -23,9 +28,20 @@ final class LlmWorkload {
 
     static final String WORKLOAD_NAME = "LOCAL-LLM-1";
 
-    /** The single fixed model filename. No caller may influence this. */
+    /** The single fixed model filename for the in-process backend. No caller may influence this. */
     static final String MODEL_DIR_NAME = "model";
     static final String MODEL_FILE_NAME = "qwen2.5-1.5b-instruct-q4_k_m.gguf";
+
+    /**
+     * Backend ids a job may name. Absent means {@link #BACKEND_IN_PROCESS}, so every job written
+     * before this field existed keeps its exact previous behaviour.
+     *
+     * <p>{@code BACKEND_IN_PROCESS} loads {@link #MODEL_FILE_NAME} from this app's files directory
+     * and samples in-process. {@link HttpInferenceBackend#BACKEND_ID} delegates generation to the
+     * already-running on-device llama-server, which chooses its own model — see that class for why
+     * the split is drawn there.
+     */
+    static final String BACKEND_IN_PROCESS = "llama-jni";
 
     private static final int MAX_PROMPT_CHARS = 4096;
     private static final int MAX_TOKENS_CEILING = 256;
@@ -102,6 +118,21 @@ final class LlmWorkload {
         if (temperature != 0.0) {
             throw new Failure("INVALID_INPUT",
                     "Phase 6 requires greedy decoding (temperature 0), got " + temperature);
+        }
+
+        // ---- which backend? ----
+        // Read after validation so an invalid request is refused for the reason that matters, and
+        // before the native probe so the server-backed path never reports a missing .so as its
+        // failure on a build where that library is irrelevant.
+        String backend = job.optString("backend", BACKEND_IN_PROCESS);
+        if (!BACKEND_IN_PROCESS.equals(backend)
+                && !HttpInferenceBackend.BACKEND_ID.equals(backend)) {
+            // Refused rather than defaulted: a typo must not silently run on a different model.
+            throw new Failure("INVALID_INPUT", "unknown backend \"" + backend + "\", expected \""
+                    + BACKEND_IN_PROCESS + "\" or \"" + HttpInferenceBackend.BACKEND_ID + "\"");
+        }
+        if (HttpInferenceBackend.BACKEND_ID.equals(backend)) {
+            return HttpInferenceBackend.execute(jobId, prompt, maxTokens, seed);
         }
 
         // ---- native runtime present? ----

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cleartext is permitted to exactly two peers: 127.0.0.1 and localhost.
+
+  WHY THIS FILE EXISTS
+    The first end-to-end run with the http backend failed with:
+
+      WORKER_FAILED type=BACKEND_ERROR Cleartext HTTP traffic to 127.0.0.1 not permitted
+
+    Since targetSdk 28, Android blocks cleartext HTTP by default, and the block applies to
+    loopback too. INTERNET is necessary but not sufficient: the permission grants the socket,
+    this policy decides whether the platform lets the request be written.
+
+  WHY NOT android:usesCleartextTraffic="true"
+    That flag would permit cleartext to EVERY host, which would quietly widen the containment
+    that makes adding INTERNET defensible. This config is the narrow form: base-config denies
+    cleartext everywhere, and only the two loopback names are exempted. The app therefore still
+    cannot speak cleartext to a remote host even if HttpInferenceBackend were edited carelessly;
+    it would have to be edited to use https, or this file would have to be edited too.
+
+  NOTE (build lesson)
+    XML comments may not contain a double hyphen. The first version of this file quoted the CLI
+    flag name inside the comment and aapt rejected it at mergeDebugResources, so flag names are
+    written plainly here.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>

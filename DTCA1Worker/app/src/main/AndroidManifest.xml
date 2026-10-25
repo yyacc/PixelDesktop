@@ -2,13 +2,30 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-      ZERO PERMISSIONS. Deliberate, per D5.
+      ONE PERMISSION, and only because a measured capability needs it.
 
-      The worker reads one file from, and writes one file to, its own app-specific external
-      files directory. Android requires no permission for that on API 19+.
+      INTERNET - REQUIRED by HttpInferenceBackend, which POSTs to the on-device llama-server at
+                 the literal http://127.0.0.1:8080. Android gates AF_INET sockets on the AID_INET
+                 group, which is granted by this permission, so loopback is NOT exempt: without it
+                 the connection fails with EACCES. Verified on this device, not assumed.
 
-      Explicitly NOT declared, each rejected for a concrete reason:
-        INTERNET                    - the channel is file-based over ADB; no network is used
+                 CONTAINMENT: the endpoint is a private constant in HttpInferenceBackend, never a
+                 job field, so a job document cannot point this app at any other host. The only
+                 reachable peer is the local server the project already runs and trusts.
+
+                 INTERNET alone is NOT sufficient, and this was also discovered by real-device
+                 failure: the first run died with "Cleartext HTTP traffic to 127.0.0.1 not
+                 permitted", because Android blocks cleartext by default since targetSdk 28 and
+                 does not exempt loopback. res/xml/network_security_config.xml therefore permits
+                 cleartext for 127.0.0.1 and localhost ONLY, with everything else still denied.
+
+                 This is a deliberate, reversible departure from the earlier "zero permissions"
+                 posture (D5). It is recorded here rather than in a commit message because the
+                 manifest is where the next reader looks. Removing the single line below disables
+                 the http backend and restores the previous posture; the default backend
+                 (llama-jni) never opens a socket at all.
+
+      Still explicitly NOT declared:
         POST_NOTIFICATIONS          - there is no Service and no notification
         FOREGROUND_SERVICE          - there is no Service
         READ/WRITE_EXTERNAL_STORAGE - not needed for the app's OWN external directory
@@ -19,11 +36,14 @@
       No <service>, no <receiver>, no <provider>. One Activity.
     -->
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:label="PixelDesktop DTCA-1 Worker"
         android:allowBackup="false"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:networkSecurityConfig="@xml/network_security_config">
 
         <!--
           exported="true" IS REQUIRED, and was discovered by real-device failure, not assumed.
