@@ -187,6 +187,11 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 
 ## 5. Next task
 
+> **Superseded in part, 2026-10-25 13:44.** B4 is shipped (`2e013cb`); B5 is next and is **not
+> approved**. The "both are authorized" line below predates rnz's narrower approval and is corrected
+> by `engineering/phases/phase-03-3-preflight-device-probes.md` §7. Current session handoff:
+> `docs/handoffs/handoff-pixeldesktop-phase3-3-b5.md`.
+
 **B4 acceptance already passed on hardware** (rnz approval 2026-10-25, B4 only; B5 not approved):
 `com.pixeldesktop.worker` v2.0 was uninstalled and reinstalled from the sha256-pinned backup, ADB
 never dropped, and the reinstalled app passed `Phase7StreamingDeviceHarness/testLiveSmokeTest`.
