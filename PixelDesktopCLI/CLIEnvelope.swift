@@ -23,7 +23,7 @@ import Foundation
 
 // Compiled into both the `pixel-desktop` tool (same module as the shared sources) and the test
 // bundle (separate module), from one file.
-#if canImport(PixelDesktop)
+#if canImport(PixelDesktop) && !PIXELDESKTOP_CLI_TOOL
 @testable import PixelDesktop
 #endif
 
@@ -55,6 +55,14 @@ struct CLIEnvelope {
     /// key means "not applicable" or "something went wrong".
     let result: CLIRunResult?
 
+    /// The structured result of one `schedule run` invocation.
+    ///
+    /// Present only for the `schedule` command, and always emitted for it (`null` otherwise), for
+    /// the same reason as `result`: a missing key and a null key must not look alike. The outcome
+    /// here is the scheduler's own vocabulary — see `CLIScheduledRunReport` for why it is not
+    /// mapped onto `PixelDesktopError`.
+    let scheduledRun: CLIScheduledRunReport?
+
     /// Fields deliberately not read, with the reason.
     ///
     /// Present so an omission is *stated* rather than left for the consumer to infer from a
@@ -71,6 +79,7 @@ struct CLIEnvelope {
         contract: PixelCapabilityContract? = nil,
         observation: PixelStateObservation? = nil,
         result: CLIRunResult? = nil,
+        scheduledRun: CLIScheduledRunReport? = nil,
         notRead: [CLINotRead] = [],
         error: CLIErrorPayload? = nil
     ) {
@@ -81,6 +90,7 @@ struct CLIEnvelope {
         self.contract = contract
         self.observation = observation
         self.result = result
+        self.scheduledRun = scheduledRun
         self.notRead = notRead
         self.error = error
     }
@@ -104,6 +114,7 @@ extension CLIEnvelope: Encodable {
         case contract
         case observation
         case result
+        case scheduledRun = "scheduled_run"
         case notRead = "not_read"
         case error
     }
@@ -124,6 +135,7 @@ extension CLIEnvelope: Encodable {
         try container.encode(contract, forKey: .contract)
         try container.encode(observation, forKey: .observation)
         try container.encode(result, forKey: .result)
+        try container.encode(scheduledRun, forKey: .scheduledRun)
         try container.encode(notRead, forKey: .notRead)
         try container.encode(error, forKey: .error)
     }
@@ -143,6 +155,13 @@ struct CLIErrorPayload: Encodable, Equatable {
     let isRecoverable: Bool
     let category: String?
 
+    /// The routing decision, when the failure *is* a routing decision.
+    ///
+    /// Present only for `routing_blocked`, and carried whole rather than summarised: the reason
+    /// lines, the measurements and the `deferred`/`rejected` distinction are the actionable part
+    /// of the refusal, and a consumer that gets only prose cannot tell whether to retry.
+    let routing: RoutingDecision?
+
     /// snake_case to match the rest of the envelope (`interface_version`, `produced_at`,
     /// `not_read`). The keys inside `contract` and `observation` are the shared types' own and
     /// are deliberately left alone.
@@ -151,6 +170,7 @@ struct CLIErrorPayload: Encodable, Equatable {
         case message
         case isRecoverable = "is_recoverable"
         case category
+        case routing
     }
 
     init(_ error: PixelDesktopError) {
@@ -162,6 +182,12 @@ struct CLIErrorPayload: Encodable, Equatable {
             self.category = category
         } else {
             self.category = nil
+        }
+
+        if case .routingBlocked(let decision) = error {
+            self.routing = decision
+        } else {
+            self.routing = nil
         }
     }
 
@@ -183,6 +209,9 @@ struct CLIErrorPayload: Encodable, Equatable {
         case .verificationFailed: return "verification_failed"
         case .workerError: return "worker_error"
         case .workerRefused: return "worker_refused"
+        // Distinct from `worker_refused`: nothing was asked of the worker. The gate stopped the
+        // run before submission, and the decision travels alongside in `routing`.
+        case .routingBlocked: return "routing_blocked"
         case .unknown: return "unknown"
         }
     }

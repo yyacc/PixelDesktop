@@ -294,7 +294,7 @@ struct MeasurementConditions: Codable, Equatable, Sendable {
 /// Reads through `TransportProtocol` and the existing worker types — it does not add a monitoring
 /// layer, a cache, or a background loop. Every method performs its reads at call time and returns
 /// an immutable value.
-struct PixelEvidenceReader: Sendable {
+struct PixelEvidenceReader: Sendable, PixelStateObserving {
 
     private let transport: TransportProtocol
 
@@ -304,6 +304,9 @@ struct PixelEvidenceReader: Sendable {
 
     /// The fixed model path, derived from the contract rather than supplied.
     static var remoteModelPath: String { ModelContract.remoteModelPath }
+
+    /// Default timeout for the single ADB round trip `observeState` performs.
+    static let defaultObservationTimeout: TimeInterval = 20
 
     // MARK: State observation
 
@@ -317,7 +320,10 @@ struct PixelEvidenceReader: Sendable {
     /// unavailable rather than fabricated. A device that is entirely unreachable produces an
     /// observation whose every field says so, which is more useful to a consumer than an error
     /// that discards what *was* readable.
-    func observeState(deviceSerial: String, timeout: TimeInterval = 20) async throws -> PixelStateObservation {
+    func observeState(
+        deviceSerial: String,
+        timeout: TimeInterval = PixelEvidenceReader.defaultObservationTimeout
+    ) async throws -> PixelStateObservation {
         let now = Date()
 
         // One round trip. Each line is `KEY=value`; a missing key means the read failed.

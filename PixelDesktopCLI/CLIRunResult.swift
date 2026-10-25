@@ -26,7 +26,7 @@ import Foundation
 // PixelDesktop sources are in the *same* module, so no import is needed) and the test bundle
 // (where they are a separate module). The conditional keeps both compiling from one source file
 // rather than forking a test-only copy that could drift.
-#if canImport(PixelDesktop)
+#if canImport(PixelDesktop) && !PIXELDESKTOP_CLI_TOOL
 // `@testable` rather than a plain import: the shared types are `internal`, so a plain import
 // would find the module but not the types. In the tool target this branch is not compiled at all
 // (the shared sources are in the same module there).
@@ -63,6 +63,14 @@ struct CLIRunResult: Encodable, Equatable {
     /// What the execution machinery observed while running the job.
     let evidence: CLIRunEvidence
 
+    /// The routing decision this run was submitted under.
+    ///
+    /// Present on every submitted run — `.eligible` when the device was suitable, `.overridden`
+    /// when a soft condition failed and the caller accepted it. Its presence is what lets a
+    /// consumer see *why* a run was allowed, not only that it happened. Absent only on results
+    /// constructed before routing existed.
+    let routing: RoutingDecision?
+
     init(
         workload: String,
         jobId: String,
@@ -70,7 +78,8 @@ struct CLIRunResult: Encodable, Equatable {
         run: WorkerStreamRunner.Run,
         output: DTCA1Result?,
         inferenceOutput: InferenceResult? = nil,
-        workerRefusal: PixelDesktopError? = nil
+        workerRefusal: PixelDesktopError? = nil,
+        routing: RoutingDecision? = nil
     ) {
         self.workload = workload
         self.jobId = jobId
@@ -82,6 +91,7 @@ struct CLIRunResult: Encodable, Equatable {
         self.output = output
         self.inferenceOutput = inferenceOutput
         self.evidence = CLIRunEvidence(run)
+        self.routing = routing
     }
 
     /// A stable, machine-readable name for each `WorkerStreamOutcome` case.

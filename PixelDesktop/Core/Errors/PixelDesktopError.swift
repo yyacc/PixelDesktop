@@ -109,6 +109,14 @@ enum PixelDesktopError: Error, Equatable, CustomStringConvertible {
     /// drop any category a newer worker introduced.
     case workerRefused(category: String, message: String)
 
+    /// The routing gate refused to submit this work, and the decision travels with the refusal.
+    ///
+    /// **Reachable (Phase 11).** Distinct from `workerRefused`: the worker never saw a job. The
+    /// decision is carried whole — not flattened into prose — because the two reasons work is
+    /// withheld call for opposite responses: a `.deferred` decision is worth retrying once the
+    /// device has settled, a `.rejected` one is not worth retrying until something changes.
+    case routingBlocked(RoutingDecision)
+
     /// An error that fits none of the above.
     /// **Reachable** as a last-resort fallback.
     case unknown(String)
@@ -139,6 +147,9 @@ enum PixelDesktopError: Error, Equatable, CustomStringConvertible {
             return "Worker error: \(message)"
         case .workerRefused(let category, let message):
             return "Worker refused the job [\(category)]: \(message)"
+        case .routingBlocked(let decision):
+            let reasons = decision.reasonLines.joined(separator: "; ")
+            return "\(decision.summary)\(reasons.isEmpty ? "" : " \(reasons)")"
         case .unknown(let message):
             return "Unknown error: \(message)"
         }
@@ -169,6 +180,9 @@ enum PixelDesktopError: Error, Equatable, CustomStringConvertible {
             return true
         case .invalidInput, .verificationFailed, .workerError, .workerRefused:
             return false
+        case .routingBlocked(let decision):
+            // The decision already knows: a deferral clears on its own, a rejection does not.
+            return decision.isRetryable
         case .unknown:
             return false
         }

@@ -105,6 +105,42 @@ struct InferenceRequest: Equatable, Codable, Sendable {
     let temperature: Double
     let seed: Int
 
+    /// Which backend the worker must use to produce the generation.
+    ///
+    /// `LOCAL-LLM-1` is one workload with two ways to compute it: the worker's in-process
+    /// llama.cpp with its fixed Qwen artifact, or the on-device llama-server, which serves whatever
+    /// model it was started with. The choice is a *request* property rather than a worker build
+    /// property, so a caller can ask for a specific model without a second APK.
+    ///
+    /// Defaults to `.inProcess`, and the default is omitted from the wire, so a request written
+    /// before this field existed is byte-identical to one written after. The worker's own default
+    /// is the same value, which is what makes that safe rather than merely convenient.
+    let backend: InferenceBackend
+
+    /// Backend ids as the worker spells them. Raw values are the wire values.
+    enum InferenceBackend: String, Codable, Sendable, Equatable, CaseIterable {
+        /// In-process llama.cpp in the worker APK; model is the fixed Qwen artifact.
+        case inProcess = "llama-jni"
+        /// Delegates generation to the already-running on-device llama-server over loopback.
+        case onDeviceServer = "llama-server-http"
+    }
+
+    init(
+        jobId: String,
+        prompt: String,
+        maxTokens: Int,
+        temperature: Double,
+        seed: Int,
+        backend: InferenceBackend = .inProcess
+    ) {
+        self.jobId = jobId
+        self.prompt = prompt
+        self.maxTokens = maxTokens
+        self.temperature = temperature
+        self.seed = seed
+        self.backend = backend
+    }
+
     /// Explicit wire keys. **Not** decorative — the synthesized encoding would emit `jobId` and
     /// `maxTokens`, and the Android worker reads `job_id` and `max_tokens`
     /// (`LlmWorkload.execute`). A missing `max_tokens` is not an error on the device: the worker
@@ -120,6 +156,35 @@ struct InferenceRequest: Equatable, Codable, Sendable {
         case maxTokens = "max_tokens"
         case temperature
         case seed
+        case backend
+    }
+
+    /// Decoded with the default when the key is absent. This is what lets a job document written
+    /// before the backend field existed decode to the same request it always meant.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        jobId = try container.decode(String.self, forKey: .jobId)
+        prompt = try container.decode(String.self, forKey: .prompt)
+        maxTokens = try container.decode(Int.self, forKey: .maxTokens)
+        temperature = try container.decode(Double.self, forKey: .temperature)
+        seed = try container.decode(Int.self, forKey: .seed)
+        backend = try container.decodeIfPresent(InferenceBackend.self, forKey: .backend)
+            ?? .inProcess
+    }
+
+    /// Encoded with `backend` omitted while it is the default, so the wire form of an
+    /// in-process request does not change. A non-default backend is always stated explicitly —
+    /// an omitted key must never be able to mean "the other one".
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(jobId, forKey: .jobId)
+        try container.encode(prompt, forKey: .prompt)
+        try container.encode(maxTokens, forKey: .maxTokens)
+        try container.encode(temperature, forKey: .temperature)
+        try container.encode(seed, forKey: .seed)
+        if backend != .inProcess {
+            try container.encode(backend, forKey: .backend)
+        }
     }
 
     static let maximumPromptCharacters = 4096
@@ -273,6 +338,24 @@ protocol InferenceRuntime: Sendable {
 
     /// Validates a request without touching the device.
     func validate(_ request: InferenceRequest) throws
+
+    /// The device-local loopback port the on-device `llama-server` listens on.
+    ///
+    /// A protocol requirement (rather than an extension-only member) so it is reachable as
+    /// `InferenceRuntime.onDeviceServerPort` from the CLI, which names the protocol rather than
+    /// a concrete runtime.
+    static var onDeviceServerPort: Int { get }
+}
+
+extension InferenceRuntime {
+    /// The device-local loopback port the on-device `llama-server` listens on.
+    ///
+    /// Named once here so the routing gate's backend-health probe and the CLI wiring agree with
+    /// the worker's own endpoint (`HttpInferenceBackend.ENDPOINT`,
+    /// `http://127.0.0.1:8080/v1/chat/completions`). The literal must not be scattered through
+    /// code that has to match it. `AppState.llamaServerPort` keeps its own name for the app's
+    /// server lifecycle and is deliberately not referenced here.
+    static var onDeviceServerPort: Int { 8080 }
 }
 
 /// llama.cpp, pinned. The version string is part of the evidence chain: a result is only

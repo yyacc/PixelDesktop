@@ -57,6 +57,12 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.pixeldesktop.cli
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "5.0"
+        # The guarded `@testable import PixelDesktop` in PixelDesktopCLI exists for the TEST
+        # BUNDLE, which links the app target. The tool compiles the same `PixelDesktop/` sources
+        # natively, so importing the app module there is redundant and makes the tool appear to
+        # depend on the app (Xcode's dependency scanner warns about exactly that). This flag makes
+        # the distinction explicit instead of relying on whether the app happens to be built.
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: PIXELDESKTOP_CLI_TOOL
 
   PixelDesktopTests:
     type: bundle.unit-test
@@ -77,6 +83,12 @@ targets:
       - path: PixelDesktopCLI/CLIDeviceSelection.swift
       - path: PixelDesktopCLI/CLIEnvelope.swift
       - path: PixelDesktopCLI/CLIInvocation.swift
+      # The `scheduled_run` payload the envelope carries. Compiled in so the envelope's encoding
+      # can be asserted — a field a consumer parses must be covered by a test that reads it back.
+      - path: PixelDesktopCLI/CLIScheduledRunReport.swift
+      # The renderer is Foundation-only too, and asserting the published JSON means running the
+      # same serialiser the tool runs rather than a parallel one in the test.
+      - path: PixelDesktopCLI/CLIEnvelopeRenderer.swift
     dependencies:
       - target: PixelDesktop
     settings:

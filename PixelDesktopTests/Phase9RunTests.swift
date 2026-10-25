@@ -158,7 +158,7 @@ final class Phase9RunCommandTests: XCTestCase {
         let path = try temporaryInput("hello world")
 
         do {
-            _ = try await CLIRunCommand.run(workload: "UNSUPPORTED-WORKLOAD", inputPath: path, transport: transport)
+            _ = try await CLIRunCommand.run(workload: "UNSUPPORTED-WORKLOAD", inputPath: path, transport: transport, eligibility: AlwaysEligibleEligibility())
             XCTFail("expected a refusal")
         } catch {
             guard case PixelDesktopError.invalidInput(let message) = error else {
@@ -278,7 +278,7 @@ final class Phase9RunCommandTests: XCTestCase {
 
         let path = try temporaryInput("hello world")
         let (result, error) = try await CLIRunCommand.run(
-            workload: "DTCA-1", inputPath: path, transport: transport)
+            workload: "DTCA-1", inputPath: path, transport: transport, eligibility: AlwaysEligibleEligibility())
 
         XCTAssertEqual(result.workload, "DTCA-1")
         XCTAssertEqual(result.jobId, result.jobId, "a job id is always reported")
@@ -304,7 +304,7 @@ final class Phase9RunCommandTests: XCTestCase {
         ])
 
         let path = try temporaryInput("hello")
-        _ = try? await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport)
+        _ = try? await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport, eligibility: AlwaysEligibleEligibility())
 
         let sessions = await transport.streamingSessionCount
         let pushes = await transport.pushCount
@@ -320,7 +320,7 @@ final class Phase9RunCommandTests: XCTestCase {
 
         let path = try temporaryInput("hello")
         do {
-            _ = try await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport)
+            _ = try await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport, eligibility: AlwaysEligibleEligibility())
             XCTFail("expected deviceNotFound")
         } catch {
             XCTAssertEqual(error as? PixelDesktopError, .deviceNotFound)
@@ -337,7 +337,7 @@ final class Phase9RunCommandTests: XCTestCase {
 
         let path = try temporaryInput("hello")
         do {
-            _ = try await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport)
+            _ = try await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport, eligibility: AlwaysEligibleEligibility())
             XCTFail("expected a worker error")
         } catch {
             guard case PixelDesktopError.workerError(let message) = error else {
@@ -357,7 +357,7 @@ final class Phase9RunCommandTests: XCTestCase {
 
         let path = try temporaryInput("hello")
         do {
-            _ = try await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport)
+            _ = try await CLIRunCommand.run(workload: "DTCA-1", inputPath: path, transport: transport, eligibility: AlwaysEligibleEligibility())
             XCTFail("expected a worker error")
         } catch {
             guard case PixelDesktopError.workerError(let message) = error else {
@@ -386,7 +386,7 @@ final class Phase9RunCommandTests: XCTestCase {
 
         let path = try temporaryInput("hello")
         let (result, error) = try await CLIRunCommand.run(
-            workload: "DTCA-1", inputPath: path, transport: transport)
+            workload: "DTCA-1", inputPath: path, transport: transport, eligibility: AlwaysEligibleEligibility())
 
         XCTAssertEqual(result.outcome, "failed")
         XCTAssertNil(result.output, "a refusal carries no result payload")

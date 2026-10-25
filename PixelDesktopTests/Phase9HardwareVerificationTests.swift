@@ -56,7 +56,8 @@ final class Phase9HardwareVerificationTests: XCTestCase {
         let (result, failure) = try await CLIRunCommand.run(
             workload: "DTCA-1",
             inputPath: try writeInput(Self.verificationInput),
-            transport: ADBTransport()
+            transport: ADBTransport(),
+            eligibility: AlwaysEligibleEligibility()
         )
 
         print("=== PHASE 9 STEP 4 — REAL-DEVICE `run` ===")
@@ -95,7 +96,8 @@ final class Phase9HardwareVerificationTests: XCTestCase {
         let (result, _) = try await CLIRunCommand.run(
             workload: "DTCA-1",
             inputPath: try writeInput(Self.verificationInput),
-            transport: ADBTransport()
+            transport: ADBTransport(),
+            eligibility: AlwaysEligibleEligibility()
         )
 
         let pixelResult = try XCTUnwrap(result.output, "no result to verify")
@@ -134,7 +136,8 @@ final class Phase9HardwareVerificationTests: XCTestCase {
         let (result, _) = try await CLIRunCommand.run(
             workload: "DTCA-1",
             inputPath: try writeInput(Self.verificationInput),
-            transport: ADBTransport()
+            transport: ADBTransport(),
+            eligibility: AlwaysEligibleEligibility()
         )
 
         // The device echoes the job id it was given. A result whose echo did not match would have
@@ -162,7 +165,8 @@ final class Phase9HardwareVerificationTests: XCTestCase {
         let (result, failure) = try await CLIRunCommand.run(
             workload: "DTCA-1",
             inputPath: try writeInput(Self.verificationInput),
-            transport: ADBTransport()
+            transport: ADBTransport(),
+            eligibility: AlwaysEligibleEligibility()
         )
 
         XCTAssertEqual(result.outcome, "completed")
@@ -189,7 +193,8 @@ final class Phase9HardwareVerificationTests: XCTestCase {
         let (result, failure) = try await CLIRunCommand.run(
             workload: "DTCA-1",
             inputPath: try writeInput(String(repeating: "a ", count: bound / 2)),
-            transport: ADBTransport()
+            transport: ADBTransport(),
+            eligibility: AlwaysEligibleEligibility()
         )
 
         XCTAssertNil(failure, "input at the published bound must be accepted by the device")

@@ -20,7 +20,7 @@ import Foundation
 // PixelDesktop sources are in the *same* module, so no import is needed) and the test bundle
 // (where they are a separate module). The conditional keeps both compiling from one source file
 // rather than forking a test-only copy that could drift.
-#if canImport(PixelDesktop)
+#if canImport(PixelDesktop) && !PIXELDESKTOP_CLI_TOOL
 // `@testable` rather than a plain import: the shared types are `internal`, so a plain import
 // would find the module but not the types. In the tool target this branch is not compiled at all
 // (the shared sources are in the same module there).

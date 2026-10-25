@@ -27,7 +27,7 @@ import Foundation
 // PixelDesktop sources are in the *same* module, so no import is needed) and the test bundle
 // (where they are a separate module). The conditional keeps both compiling from one source file
 // rather than forking a test-only copy that could drift.
-#if canImport(PixelDesktop)
+#if canImport(PixelDesktop) && !PIXELDESKTOP_CLI_TOOL
 // `@testable` rather than a plain import: the shared types are `internal`, so a plain import
 // would find the module but not the types. In the tool target this branch is not compiled at all
 // (the shared sources are in the same module there).
@@ -109,7 +109,10 @@ enum CLIRunCommand {
     static func run(
         workload: String,
         inputPath: String,
-        transport: TransportProtocol
+        transport: TransportProtocol,
+        eligibility: any ExecutionEligibilityEvaluating,
+        overrideRequested: Bool = false,
+        backend: InferenceRequest.InferenceBackend = .inProcess
     ) async throws -> (result: CLIRunResult, error: PixelDesktopError?) {
 
         guard supportedWorkloads.contains(workload) else {
@@ -147,6 +150,30 @@ enum CLIRunCommand {
                 + "the worker must be launched once to create it")
         }
 
+        // The routing gate. It runs after device selection and preflight — a "worker not
+        // installed" is more actionable than a routing verdict — and before any job id is minted
+        // or any file is staged: a blocked run never reaches the worker.
+        let requirement: ExecutionRequirement =
+            workload == LlmJob.workloadName ? .inference : .deviceRead
+        let decision = await eligibility.decide(
+            deviceSerial: serial,
+            requirement: requirement,
+            context: .interactive
+        )
+
+        let routingDecision: RoutingDecision
+        if decision.isPermitted {
+            routingDecision = decision
+        } else if decision.outcome == .requiresOverride, overrideRequested,
+                  let overridden = decision.overridden(by: .interactive) {
+            routingDecision = overridden
+        } else {
+            // `.rejected` and `.deferred` are never overridable — hard failures and an unhealthy
+            // backend block even when an override is requested. A `.requiresOverride` without an
+            // explicit request blocks too.
+            throw PixelDesktopError.routingBlocked(decision)
+        }
+
         // The existing job representation and the existing id rules. No second format.
         let jobId: String
         let payload: String
@@ -164,7 +191,8 @@ enum CLIRunCommand {
                 prompt: input,
                 maxTokens: 32,
                 temperature: 0.0,
-                seed: 0
+                seed: 0,
+                backend: backend
             )
             let job = LlmJob(request: request)
             payload = try job.encoded()
@@ -188,7 +216,8 @@ enum CLIRunCommand {
             run: run,
             output: decoded.output,
             inferenceOutput: decoded.inferenceOutput,
-            workerRefusal: decoded.refusal
+            workerRefusal: decoded.refusal,
+            routing: routingDecision
         )
 
         // A worker-reported refusal takes precedence over the stream outcome: the stream may have

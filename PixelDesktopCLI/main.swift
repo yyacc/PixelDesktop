@@ -13,8 +13,14 @@
 //
 //  WHAT IT IS NOT
 //  Not a second capability implementation, not a service, not an orchestration layer.
-//  There is no HTTP, no socket, no daemon, no queue, no scheduler, no router, no resource
-//  manager, no retry policy, and no cancellation. It is a process that runs, prints, and exits.
+//  There is no HTTP, no socket, no daemon, no queue, no router, no resource manager, no retry
+//  policy, and no cancellation. It is a process that runs, prints, and exits.
+//
+//  ONE AMENDMENT (Phase 3.4 / C4): `schedule run <job-id>` exists, and the clock still does not.
+//  launchd owns the schedule and decides when to fire; it invokes this process with a job id that
+//  was stored by the app. The command cannot choose a cadence, describe an action, or ask to be
+//  re-run later — a caller that could do any of those would be the scheduler, which this process
+//  is not. `--scheduler` stays in `forbiddenFlags` for exactly that reason.
 //
 //  AUTHORITY
 //  PixelDesktop remains the authority on what the Pixel can do and on how work reaches it. This
@@ -46,10 +52,28 @@ func run(_ invocation: CLIInvocation) async -> Int32 {
 
         case .run:
             // `workload` and `inputFile` are guaranteed non-nil by the parser for `run`.
+            let transport = ADBTransport()
+            // Absent means the in-process backend, which is what an omitted wire key means on
+            // the device too. The eligibility gate is wired to the same backend so the probe and
+            // the model-presence policy cannot disagree with the request: the on-device server
+            // probes its loopback port and skips the contract-model check; the in-process backend
+            // has no endpoint to probe and must find the contract model present.
+            let backend = invocation.backend ?? .inProcess
             let (result, failure) = try await CLIRunCommand.run(
                 workload: invocation.workload ?? "",
                 inputPath: invocation.inputFile ?? "",
-                transport: ADBTransport()
+                transport: transport,
+                eligibility: DeviceExecutionEligibility(
+                    transport: transport,
+                    // Swift cannot address a static member on a protocol metatype, so the port
+                    // constant — declared on `InferenceRuntime` — is reached via its concrete
+                    // conformer rather than `InferenceRuntime.onDeviceServerPort`.
+                    backendPort: backend == .onDeviceServer
+                        ? LlamaCppInferenceRuntime.onDeviceServerPort : nil,
+                    contractModelRequired: backend == .inProcess
+                ),
+                overrideRequested: invocation.overrideRouting,
+                backend: backend
             )
 
             // A worker refusal is a *result*, not an exception: the execution machinery ran and
@@ -60,6 +84,22 @@ func run(_ invocation: CLIInvocation) async -> Int32 {
                 ok: failure == nil,
                 result: result,
                 error: failure.map(CLIErrorPayload.init)
+            )
+
+        case .schedule:
+            // `jobID` is guaranteed non-nil by the parser for `schedule`.
+            let report = try await CLIScheduleCommand.run(
+                jobID: invocation.jobID ?? UUID(),
+                transport: ADBTransport()
+            )
+
+            // A refused or failed attempt is a *result*, not an exception: the runner reached a
+            // decision and recorded it. It is published with `ok: false` and the report's own exit
+            // status, so launchd's log carries the reason instead of a bare non-zero code.
+            envelope = CLIEnvelope(
+                command: CLICommand.schedule.rawValue,
+                ok: report.isSuccess,
+                scheduledRun: report
             )
         }
 

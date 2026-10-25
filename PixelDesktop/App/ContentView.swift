@@ -98,65 +98,108 @@ struct ContentView: View {
 
     // MARK: - Detail
 
+    /// Every tab, in one place, so the two presentations below can never drift apart.
+    @ViewBuilder
+    private var tabChoices: some View {
+        ForEach(DeviceTab.allCases) { tab in
+            Text(tab.title).tag(tab)
+        }
+    }
+
+    /// The segmented bar is only honest when it fits: a segmented picker does not scroll or
+    /// ellipsise, it clips, and the tab that falls off the right edge is unreachable rather than
+    /// merely off-screen. At 900 pt eleven segments overflow, so asking for the bar at its ideal
+    /// width makes ViewThatFits reject it and fall through to the pop-up button below.
+    private var segmentedTabBar: some View {
+        Picker("", selection: $selection) { tabChoices }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+    }
+
+    /// Carries the same eleven choices in a menu, with the current tab named in the button. No tab
+    /// can hide off the edge, and the chevron makes the control's purpose visible without a scroll
+    /// indicator that this design has nowhere to put.
+    private var compactTabBar: some View {
+        Picker("Tab", selection: $selection) { tabChoices }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     @ViewBuilder
     private var detailView: some View {
-        if let device = appState.devices.first(where: { $0.state == .device }) {
-            VStack(spacing: 0) {
-                Picker("", selection: $selection) {
-                    ForEach(DeviceTab.allCases) { tab in
-                        Text(tab.title).tag(tab)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .padding()
-
-                Divider()
-
-                switch selection {
-                case .device:
-                    DeviceDetailView(device: device)
-                case .state:
-                    DeviceStateView()
-                case .applications:
-                    ApplicationsView()
-                case .log:
-                    LogView()
-                case .storage:
-                    StorageBrowserView()
-                case .perception:
-                    PerceptionView()
-                case .inference:
-                    InferenceView()
-                case .telemetry:
-                    TelemetryView()
-                case .input:
-                    InputView()
-                case .trust:
-                    TrustView()
-                }
+        VStack(spacing: 0) {
+            ViewThatFits(in: .horizontal) {
+                segmentedTabBar
+                compactTabBar
             }
-        } else if appState.devices.isEmpty {
-            ContentUnavailableView(
-                "No Device Connected",
-                systemImage: "iphone.slash",
-                description: Text("Connect an Android device via USB and enable USB debugging.")
-            )
-        } else {
-            // A device is attached but not usable. Naming the actual state is the point: an
-            // unauthorized device needs a tap on its screen, an offline one needs a cable check,
-            // and collapsing both into "no device" hides the one action the user can take.
-            ContentUnavailableView(
-                "Device Not Ready",
-                systemImage: "exclamationmark.triangle",
-                description: Text(appState.devices.first?.state.description ?? "Unknown state")
-            )
+            .padding()
+
+            Divider()
+
+            // Schedules is deliberately outside the "a device is attached" gate the other tabs sit
+            // behind: a job matters most while the phone is unplugged, and a tab that only opens with
+            // the phone in hand would hide the feature exactly when the operator wants to check it.
+            if selection == .schedules {
+                SchedulesView()
+            } else if let device = appState.devices.first(where: { $0.state == .device }) {
+                deviceTab(for: device)
+            } else if appState.devices.isEmpty {
+                ContentUnavailableView(
+                    "No Device Connected",
+                    systemImage: "iphone.slash",
+                    description: Text("Connect an Android device via USB and enable USB debugging.")
+                )
+            } else {
+                // A device is attached but not usable. Naming the actual state is the point: an
+                // unauthorized device needs a tap on its screen, an offline one needs a cable check,
+                // and collapsing both into "no device" hides the one action the user can take.
+                ContentUnavailableView(
+                    "Device Not Ready",
+                    systemImage: "exclamationmark.triangle",
+                    description: Text(appState.devices.first?.state.description ?? "Unknown state")
+                )
+            }
+        }
+        // Without this the detail column centres the whole stack vertically, which parks the tab
+        // picker in the middle of an empty window whenever no device is attached.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    @ViewBuilder
+    private func deviceTab(for device: AndroidDevice) -> some View {
+        switch selection {
+        case .device:
+            DeviceDetailView(device: device)
+        case .state:
+            DeviceStateView()
+        case .applications:
+            ApplicationsView()
+        case .log:
+            LogView()
+        case .storage:
+            StorageBrowserView()
+        case .perception:
+            PerceptionView()
+        case .inference:
+            InferenceView()
+        case .telemetry:
+            TelemetryView()
+        case .input:
+            InputView()
+        case .trust:
+            TrustView()
+        case .schedules:
+            // Unreachable: `detailView` renders the Schedules tab before it reaches here.
+            EmptyView()
         }
     }
 }
 
 enum DeviceTab: String, CaseIterable, Identifiable {
     case device, state, applications, log, storage, perception, inference, telemetry, input, trust
+    case schedules
 
     var id: String { rawValue }
 
@@ -172,6 +215,7 @@ enum DeviceTab: String, CaseIterable, Identifiable {
         case .telemetry: return "Telemetry"
         case .input: return "Input"
         case .trust: return "Trust"
+        case .schedules: return "Schedules"
         }
     }
 }

@@ -244,6 +244,7 @@ struct InputView: View {
         case .refused: return .orange
         case .pending: return .secondary
         case .failed: return .red
+        case .deferred: return .yellow
         }
     }
 

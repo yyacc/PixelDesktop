@@ -43,6 +43,7 @@ enum DeviceAuditOutcome: String, Codable, Sendable, CaseIterable {
     case executed
     case refused
     case failed
+    case deferred
 }
 
 /// The input-specific context ADR-019 requires, carried inside a general device record.
@@ -140,6 +141,7 @@ struct DeviceAuditRecord: Equatable, Sendable, Codable, Identifiable {
     static let refused = DeviceAuditOutcome.refused
     static let failed = DeviceAuditOutcome.failed
     static let pending = DeviceAuditOutcome.pending
+    static let deferred = DeviceAuditOutcome.deferred
 }
 
 // MARK: - Input records
