@@ -158,3 +158,34 @@ PIXELDESKTOP_DISPOSABLE_APK="$PWD/engineering/evidence/b4-b5-probes/disposable/o
 `xcodebuild test` still cannot run these: it does not forward `PIXELDESKTOP_DEVICE_SERIAL` to the
 test host (ADR-006, re-confirmed), and `DYLD_LIBRARY_PATH` is stripped because `xctest` is
 SIP-protected — hence the dylib staging above.
+
+## Addendum — one non-reproducible test-build failure (2026-10-25 12:31)
+
+A `xcodebuild build-for-testing` run against this same source failed once:
+
+```
+Phase3PackageDeviceHarness.swift:225:13: error: failed to produce diagnostic for expression
+```
+
+Line 225 is the `installedThirdPartyPackages(deviceSerial:timeout:)` call — structurally identical to
+the two calls at lines 101 and 166 that compiled in the same invocation, so this is the Swift
+type-checker failing to diagnose, not a signature error. The build log (`22BC558F`, 12:31:29) records
+it as a compile error with no preceding diagnostic.
+
+Root cause not established. It overlapped the device-acceptance work in the same `.build`
+derived-data directory, and this session also rewrote the project (`xcodegen generate`) and staged
+`PixelDesktop.debug.dylib` into the already-built `.xctest` bundle around that time; concurrent
+builds, a project rewrite mid-build, and mutation of build products are all consistent with it.
+
+Non-reproducible at the committed tree, four independent attempts:
+
+| Attempt | Result |
+|---|---|
+| same command, project unchanged | `TEST BUILD SUCCEEDED` |
+| committed tree at `2e013cb` (`git status` empty), `test-without-building` | 797 tests, 32 skipped, 0 failures |
+| after `xcodegen generate` + touched source | `TEST BUILD SUCCEEDED` |
+| forced recompile of this exact file (object removed) | `TEST BUILD SUCCEEDED` |
+
+Conclusion: no source defect, and the acceptance result above stands. Operational rule: do not run
+`xcodegen generate`, or a second `xcodebuild`, against the same `-derivedDataPath` while a build is in
+flight — that is the only condition this failure ever appeared under.
