@@ -402,17 +402,19 @@ confirmation gate.
 
 1. **A5 reads the notification feed with no grant → throws, issues zero commands.** Measured
    against a real dump, not a fixture.
-2. **The A5 parser extracts content from ≥ 90% of records *that carry content*** on a captured real
-   dump — the prototype achieved 21/23 (91%) reading title/text/textLines/subText/tickerText, vs
-   7/23 (30%) for a text-only parser.
+2. **The A5 parser extracts content from ≥ 90% of records** on a captured real dump — the prototype
+   achieved 21/23 (91%) reading title/text/textLines/subText/tickerText, vs 7/23 (30%) for a text-only
+   parser.
 
-   *Restated 2026-10-25 (rnz, item 1 of the Phase-3.2 decision checklist).* As originally written
-   — "≥ 90% of records" — the criterion is unachievable by construction: some records carry no
-   content at all (system aggregates, section headers), and the same criterion requires them to be
-   surfaced rather than dropped. On the phase-3.2 captured dump (33 records) the implementation
-   extracts **29/29 = 100% of content-bearing records**; **29/33 = 87.9% of all records** is
-   reported as a diagnostic, not a pass/fail line. Evidence:
-   `engineering/phases/phase-03-2-notification-stream.md` §4.
+   **Status: MISSED — 87.9% (29/33) on the phase-3.2 captured dump — and the wording stands.** rnz ruled
+   on 2026-10-25 that the criterion is **not** restated, because the design's own measurement shows its
+   denominator is *all* records: §3.2 derived the 90% bar from 21/23 = 91%, and that dump contained
+   **2 records with no extractable content**, so "21 of 23" *is* the all-records ratio (21 extracted +
+   2 contentless = 23). The bar sits just below it. On the 33-record dump the contentless share rose
+   from 8.7% to 4/33 = 12.1%, so an unchanged parser reads 87.9%: the shortfall is a property of the
+   notification mix, not of the parser's reach. Records that carry content: **29/29 = 100%**, reported
+   as a diagnostic. Evidence: `engineering/phases/phase-03-2-notification-stream.md` §4.
+   *Proposed and rejected, kept for the record:* "≥ 90% of records that carry content".
 3. **Every destructive operation refuses without a confirmed dry-run**, verified by asserting
    zero transport invocations.
 4. **B4 installs and uninstalls the worker APK on the real device** and leaves it healthy.

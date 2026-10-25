@@ -182,9 +182,10 @@ defaults to 0.50 with no `DEEPSEEK_BALANCE_THRESHOLD` override anywhere in `.env
 or `config.yaml`, so the 2026-10-26 09:00 run will be silent at the current balance. Delivery was
 always the part that mattered and it works; the threshold quoted in that one message was stale.
 
-A $0.50 floor leaves roughly one long phase of headroom, not two. If 3.3's B4/B5 work could cost more
-than about $1, raise the floor — `DEEPSEEK_BALANCE_THRESHOLD` in the job environment is enough, the
-script needs no edit.
+**Decision (rnz, 2026-10-25): the threshold stays at $0.50 and the watchdog is frozen as it is.** Spend
+is monitored manually through the DeepSeek provider console, with manual top-ups. The script and the
+cron job are not to be refactored, "improved", or debugged further, and no time is to be spent on the
+silent-failure question. The version-skew note above is history, not a work item.
 
 ---
 

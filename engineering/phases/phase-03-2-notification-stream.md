@@ -24,7 +24,7 @@ consent gate and the audit trail precisely so this could ship; 3.2 is the reader
 | One audit record per command issued, content-free | **Implemented** |
 | Perception view with poll cadence and payload visibility | **Implemented** |
 | Real-device evidence harness (committed, reproducible) | **Implemented** |
-| **Criterion 2 (≥90% of records) as literally written** | **Missed — 87.9%. Correction recorded below.** |
+| **Criterion 2 (≥90% of records) as literally written** | **Missed — 87.9%. Explained below; wording preserved as written (rnz, 2026-10-25).** |
 
 ---
 
@@ -122,9 +122,16 @@ in the dump at all, and the same criterion requires them to be **surfaced rather
 the live device the same effect is larger — 6 records, 2 contentless, 4/6 = 67% — while the parser
 extracted content from 4 of 4.
 
-**Recommendation for the proposal:** restate criterion 2 as *"≥ 90% of records that carry content"*
-(measured 100% on both dumps) and keep the raw ratio as a reported diagnostic. This is a correction to
-the wording, not to the parser. rnz's call; recorded here rather than silently satisfied.
+**Decision (rnz, 2026-10-25): the criterion is preserved as written, and stands MISSED.** The paragraph
+above settles the intent question in favour of *all records*: the 90% bar was derived from 21/23 = 91%
+over a dump that already contained 2 contentless records, so 21 extracted of 23 total is the
+all-records ratio. Restating the criterion would have redefined the pass line to match the result.
+Criterion 2 therefore remains unmet at 87.9%, with the analysis above as the explanation and the 100%
+content-bearing figure as a reported diagnostic — not as a substitute pass line. The restatement below
+was proposed and **rejected**; it is not applied to the proposal.
+
+*Rejected proposal, kept for the record:* "≥ 90% of records that carry content", raw ratio as a
+diagnostic.
 
 ### The claim the parser is actually built on, re-measured
 
@@ -199,8 +206,9 @@ Secret records are exactly why the gate exists.
 
 ## 6. Deviations and corrections
 
-1. **Criterion 2 as written is not met** (87.9% vs ≥90%). Cause and evidence in §4. Recommended
-   restatement there; not silently redefined.
+1. **Criterion 2 as written is not met** (87.9% vs ≥90%). Cause and evidence in §4. The restatement
+   recommended there was **rejected by rnz on 2026-10-25**; the criterion stands as written and the
+   miss is carried openly rather than redefined.
 2. **`NotificationParser` had never been compiled.** It was authored in an earlier turn of this
    session; the first build of this sub-phase failed on four `Regex.firstMatch` calls that need `try?`.
    Fixed in place; no behaviour change. Recorded because "it looked finished" was true of the file and

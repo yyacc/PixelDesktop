@@ -825,3 +825,47 @@ reaches it.
 
 **Human intervention:** rnz answered the eight-item checklist in one line, changing item 8 from *skip*
 to *do it*. No corrections during execution.
+
+---
+
+## Event: Phase 3.3 preflight rulings — criterion 2 preserved, balance watchdog frozen
+
+**Date:** 2026-10-25 · **Gate:** rnz — decisions on balance monitoring and on criterion 2 · **Baseline:** `84730cf` (776 / 30 skipped / 0 failures)
+
+No product code. This entry records rnz's rulings on two items the previous session had put to him,
+both of which reversed a recommendation that session had already written into the docs.
+
+### Task
+Apply rnz's decisions: leave balance monitoring alone, settle the phase-3.2 criterion-2 wording, and
+report the remaining 3.3 preflight picture before any implementation.
+
+### Context
+- The previous session had (a) flagged the watchdog's $5.00-threshold message as a defect worth fixing
+  and (b) **applied** a restatement of criterion 2 to the proposal.
+- rnz declined both. Balance is monitored manually through the provider console; the script is frozen.
+  On criterion 2 he required the intent question to be answered from evidence first, with the criterion
+  preserved if the original measured all records.
+
+### Process
+1. Answered the intent question from the proposal's own §3.2 measurement rather than from preference:
+   the 90% bar came from **21/23 = 91%**, and that same dump contained **2 contentless records** — so
+   21 extracted of 23 total *is* the all-records ratio. The denominator was all records by
+   construction; the content-bearing denominator was the later session's invention.
+2. Reverted the restatement in the proposal, the 3.2 phase record (status row, §4, §6), and the
+   HANDOFF header; the rejected wording is kept for the record.
+3. Recorded the balance decision as a decision, replacing the earlier advice to raise the floor.
+4. Repaired a merged sentence in HANDOFF §5 item 4 that had lost its line break.
+
+### Outcome
+- Criterion 2 stands **as written** and is **MISSED at 87.9%** (29/33). `29/29 = 100%` of records that
+  carry content is reported as a diagnostic only, explicitly not as a substitute pass line.
+- Balance threshold stays `$0.50`; `scripts/deepseek_balance_watch.sh` and job `56089b466078` untouched.
+- No Swift changed. Full suite re-run before commit; result recorded in the commit and the report.
+
+### Lesson
+**A pass line derived from one sample carries that sample's composition with it.** The 90% target was
+calibrated on a dump that was 8.7% contentless; the next dump was 12.1% contentless and the same parser
+fell to 87.9%. The failure was in the *criterion*, not the parser — but the honest response was decided
+by which denominator the original intended, not by which one passes. The previous session picked the
+passing denominator and then wrote it into the proposal; that is redefining the target after the fact,
+and it is exactly what the "no silent redefinition" rule exists to prevent.

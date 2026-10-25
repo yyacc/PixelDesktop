@@ -5,9 +5,11 @@
 audit · D3 universal dry run) and A5, the notification stream, are implemented and green at
 **776 tests / 30 skipped / 0 failures**, with real-device evidence for A5 (§5 of the 3.2 phase record).
 **Next: Phase 3.3 (B4 app install + B5 power actions).** 3.3–3.5 not started.
-**Open item for rnz:** phase-3.2 §4 — success criterion 2 (≥90% of records) measures 87.9% on the
-captured dump because 4 of 33 records carry no content at all; 100% of the records that carry content
-are extracted. Recommended restatement, not yet applied to the proposal.
+**Settled (rnz, 2026-10-25):** success criterion 2 (≥90% of records) **stays as written and stands
+MISSED at 87.9%.** The 90% bar was derived from 21/23 over a dump that already held 2 contentless
+records, so the denominator is all records by construction; 100% of records that carry content are
+extracted — a diagnostic, not the pass line. The restatement is rejected, not pending. Likewise the
+balance watchdog: threshold stays $0.50, spend managed manually, script frozen.
 **Supersedes:** the Phase 0 handoff, archived to `docs/handoffs/handoff-pixeldesktop-phase0-control-plane.md`.
 
 > This file is the entry point. It carries **the goal of the project** and the minimum context to
@@ -198,8 +200,9 @@ are authorized, and both primitives are already measured on the device — see
    hold `com.termux.permission.RUN_COMMAND`, so `RunCommandService` still refuses an ADB caller.
    Candidate fix (needs an ADR + an APK change): declare the permission in `com.pixeldesktop.worker`
    and grant it to that package. **Nothing in 3.3 or 3.4 may plan on `RunCommandService` until that is
-   decided and built.**re-test `am startservice … RunCommandService`. It is no longer on the critical path (Q3a moved the
-   scheduler to the Mac), so this is now optional reconnaissance.
+   decided and built.** It is off the critical path (Q3a moved the scheduler to the Mac), so this is
+   optional reconnaissance: build the permission-declaring path, then re-test
+   `am startservice … RunCommandService`.
 
 ---
 
