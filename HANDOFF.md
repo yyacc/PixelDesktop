@@ -256,4 +256,4 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 - Agent: Ciel (Hermes)
 - Session id: `20261024_213642_77b4ea`
 - Model: `meituan/longcat-2.5-preview:free` via nous
-- Last commit: `23f0bb5` — Phase 3 proposal, docs only, suite unchanged at 715 / 0 / 26
+- Last commit: `1f3994b` — Phase 3.1 (D1+D2+D3), suite **746 / 0 / 26** (baseline 715 / 0 / 26)
