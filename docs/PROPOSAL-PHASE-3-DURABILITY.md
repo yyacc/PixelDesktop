@@ -274,6 +274,16 @@ recommendation; the alternative is available if rnz wants push.
 installs and uninstalls the worker APK — reversible, and the APK is on the Mac
 (`DTCA1Worker/app/build/outputs/apk/debug/app-debug.apk`).
 
+> **Open question — recorded 2026-10-25, after the round-trip was actually executed.** The table above
+> and this verification line contradict each other: the API must **refuse** to uninstall
+> `com.pixeldesktop.worker`, yet the test is specified to uninstall that exact package. A test driving
+> the guarded API can therefore never produce the required present→absent→present transition.
+> The round-trip was executed at the **device/transport level** (raw `adb uninstall` / `adb install`);
+> see `engineering/evidence/b4-b5-probes/B4-ACCEPTANCE-REPORT.md`. When B4's Swift surface is written,
+> its acceptance test must either drive the raw transport or perform the round-trip on a **disposable
+> side-loaded package** — the guarded API's refusal is unit-testable, but it cannot be its own
+> acceptance evidence. Needs one ruling from rnz before B4 code starts.
+
 ### 5.6 B5 — Reboot control
 
 **P5-gated.** `reboot(mode:)` where mode ∈ {`normal`, `recovery`, `bootloader`}.

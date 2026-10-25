@@ -197,4 +197,46 @@ silent-failure question. The version-skew note above is history, not a work item
   alone; it must not assume the phone's screen state, and it must re-establish perception itself.
 - Termux remains closed to the ADB shell (C). **Nothing in 3.3 or 3.4 may plan on `RunCommandService`**
   until §4.4 is decided and built.
-- The criterion-2 restatement is in the proposal, so 3.2 no longer carries a rubric it cannot meet.
+- Criterion 2 of 3.2 stands **as written** (≥ 90% of records) and is **MISSED** at 87.9% (29/33).
+  The restatement was rejected by rnz on 2026-10-25 and reverted; 3.2 carries an openly reported miss,
+  not a redefined rubric.
+
+---
+
+## 7. B4 acceptance — executed on the device (approved 2026-10-25)
+
+rnz approved **B4 only**, with seven conditions; **B5 (reboot / power-cycle) remains NOT approved**.
+Full command-level record: `engineering/evidence/b4-b5-probes/B4-ACCEPTANCE-REPORT.md`.
+
+Result: **PASS**, present → absent → present on `3C261JEHN25632`.
+
+- Integrity first: backup sha256 `b3318d6d…005f` = build artifact = **the then-installed** `base.apk`.
+  All three are the same binary, so the thing removed is the thing restored.
+- Package identity unambiguous: `com.pixeldesktop.worker` (v2.0/2), distinct from
+  `com.pixeldesktop.metadata` (v1.0) — the latter untouched, install time still 2026-09-22.
+- `adb uninstall` → `Success`; absence proven three ways (`pm list` 0 hits, empty `pm path`,
+  `am start` "Activity class … does not exist"); app data dir removed by the platform.
+- `adb install -r worker-backup.apk` → `Success`; reinstalled APK hashes to the same sha256, fresh
+  `firstInstallTime`.
+- Function verified twice: identical deterministic result at the contract level, and
+  `Phase7StreamingDeviceHarness/testLiveSmokeTest` **passed** (6 events, launch ack 0.161 s, result
+  401 B, 0 stderr) through the shipped `WorkerStreamRunner`/`ADBTransport`/`WorkerLifecycle`.
+- ADB link never dropped (same `transport_id`), nothing else on the device was modified, no reboot.
+
+### Two findings this run produced
+
+1. **The install path is not an identity.** `apkpath.txt`'s recorded path was already stale (the package
+   had relocated); the sha256 was not. Any future restore must key on the hash. Recorded in the report.
+2. **The proposal contradicts itself on B4's verification.** §5.5 asks for a real-device test that
+   "installs and uninstalls the worker APK", while the same table requires the API to **refuse**
+   uninstalling `com.pixeldesktop.worker`. A test through the guarded API can never produce that
+   transition. Resolution before B4 code is written: the acceptance test drives the **raw
+   transport** (as measured here), or performs the round-trip on a **disposable side-loaded package**.
+   Needs one clarifying line in the proposal, not a silent workaround.
+
+### Tooling gap confirmed
+
+`xcodebuild test` still does not forward `PIXELDESKTOP_DEVICE_SERIAL` (ADR-006), so live-device tests
+cannot run through it. Working invocation — stage `PixelDesktop.debug.dylib` into the test bundle's
+`Contents/Frameworks` (build products only; `DYLD_LIBRARY_PATH` is stripped because `xctest` is
+SIP-protected), then `xcrun xctest -XCTest <bundle>` with the serial set. Exact commands in the report.

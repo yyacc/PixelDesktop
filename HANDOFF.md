@@ -137,7 +137,7 @@ notification stream → **3.3** B4 install/uninstall + B5 reboot → **3.4** C4 
 |---|---|---|
 | 3.1 Trust foundation | ✅ done 2026-10-25 | `Trust/ConsentRegistry.swift`, `Trust/DryRun.swift`, `Audit/DeviceAuditLog.swift`, `App/TrustView.swift` (new **Trust** tab), ADR-020, 31 tests |
 | 3.2 A5 notifications | ✅ done 2026-10-25 | `Perception/Notifications*` (parser, reader, stream), two-tier read gated **inside** the reader, **Perception** panel, ADR-021, 30 tests (26 hermetic + 4 device-gated) |
-| 3.3 B4/B5 | 🟨 next | `DestructiveActionPlan` ready; install/uninstall and reboot measured on hardware (preflight record) |
+| 3.3 B4/B5 | 🟨 next | B4 acceptance **PASS** on `3C261JEHN25632` 2026-10-25 (round-trip report in `engineering/evidence/b4-b5-probes/`); B5 **not approved**, not run |
 | 3.4 C4 Mac scheduler | ⬜ | — |
 | 3.5 D4 kill switch | ⬜ | — |
 
@@ -177,6 +177,13 @@ why the design is two-tier — poll the cheap list for change, fetch the full du
 ---
 
 ## 5. Next task
+
+**B4 acceptance already passed on hardware** (rnz approval 2026-10-25, B4 only; B5 not approved):
+`com.pixeldesktop.worker` v2.0 was uninstalled and reinstalled from the sha256-pinned backup, ADB
+never dropped, and the reinstalled app passed `Phase7StreamingDeviceHarness/testLiveSmokeTest`.
+Command-level record: `engineering/evidence/b4-b5-probes/B4-ACCEPTANCE-REPORT.md`. One ruling is
+outstanding before B4 code: the proposal contradicts itself on how the guarded API can be its own
+acceptance evidence (§5.5 open question).
 
 **3.3 is next, shipped as two commits** (rnz, 2026-10-25 — decision 4): **B4 first, then B5**. Both
 are authorized, and both primitives are already measured on the device — see
