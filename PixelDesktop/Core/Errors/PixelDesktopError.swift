@@ -111,7 +111,7 @@ enum PixelDesktopError: Error, Equatable, CustomStringConvertible {
 
     /// The routing gate refused to submit this work, and the decision travels with the refusal.
     ///
-    /// **Reachable (Phase 11).** Distinct from `workerRefused`: the worker never saw a job. The
+    /// **Reachable (Phase 3.4).** Distinct from `workerRefused`: the worker never saw a job. The
     /// decision is carried whole — not flattened into prose — because the two reasons work is
     /// withheld call for opposite responses: a `.deferred` decision is worth retrying once the
     /// device has settled, a `.rejected` one is not worth retrying until something changes.
