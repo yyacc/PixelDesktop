@@ -130,7 +130,7 @@ false negative in the one place a user would not question it.
 
 - **Suite:** 776 tests, 30 skipped, 0 failures (baseline 746/26/0). 26 hermetic A5 tests + 4
   device-gated.
-- **Hardware** (`3C261JEHN25632`, Android 16): 4 harness checks pass — refusal with 0 commands, the
+- **Hardware** (`DEADBEEF000000`, Android 16): 4 harness checks pass — refusal with 0 commands, the
   539 B / 627,757 B / 539 B poll sequence, 0 of 12 content values in the trail, immediate refusal after
   revocation.
 - **Evidence:** `engineering/harnesses/a5-notification-evidence.swift` (committed, reproducible per

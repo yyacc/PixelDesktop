@@ -34,7 +34,7 @@ discarded**:
 | Zeno model server running | `flashmoe` on `127.0.0.1:55823`, `/v1/models` returns one model |
 | Zeno runtime unreachable | `127.0.0.1:55811` answers **401** |
 | Zeno's runtime credential is not obtainable | Password is `randomUUID()` at launch, passed over Electron IPC, never written to disk (confirmed by reading the app's `sidecar.js`) |
-| Pixel 7a attached and authorized | `3C261JEHN25632`, Android 16 / SDK 36 / arm64-v8a |
+| Pixel 7a attached and authorized | `DEADBEEF000000`, Android 16 / SDK 36 / arm64-v8a |
 
 The historical ports quoted in the mission brief (`57946`, `57961`) were **stale** — the live
 runtime is on `55811`/`55823`. The audit is what caught that.

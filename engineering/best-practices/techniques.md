@@ -543,8 +543,8 @@ have produced a clean PASS: six command patterns returned byte-identical results
 transports, including a write.
 
 But `adb devices` showed:
-    3C261JEHN25632                                      device usb:...    <- USB
-    adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp     device            <- WIRELESS
+    DEADBEEF000000                                      device usb:...    <- USB
+    adb-DEADBEEF000000-laKyZz._adb-tls-connect._tcp     device            <- WIRELESS
 **Two independent entries, two different serials, one physical phone.** The operation works; the
 identity model does not. A discovery pass would see a duplicate device, and code keying on
 `serialNumber` would treat one phone as two.
@@ -694,7 +694,7 @@ The design depended on macOS delivering USB attach/detach events to an ordinary 
 citing documentation, a ~90-line Swift probe was compiled and run on the target machine
 (macOS 27.0, Swift 6.4). It returned `KERN_SUCCESS` for both attach and detach notifications,
 matched `IOUSBHostDevice`, required no root or entitlement, and — the part that mattered most —
-read `kUSBSerialNumberString` as `3C261JEHN25632`, **the same serial ADB uses**, which closed the
+read `kUSBSerialNumberString` as `DEADBEEF000000`, **the same serial ADB uses**, which closed the
 trust boundary without any further work.
 
 The same probe also **disproved a tempting alternative**: `IOUSBHost` callbacks would require

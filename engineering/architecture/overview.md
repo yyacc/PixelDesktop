@@ -379,7 +379,7 @@ Recorded in ADR-006.
 
 ## 8. Verified Device Facts
 
-Pixel 7a, serial `3C261JEHN25632`:
+Pixel 7a, serial `DEADBEEF000000`:
 
 | Property | `getprop` key | Value |
 |---|---|---|

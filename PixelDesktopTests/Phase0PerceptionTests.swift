@@ -361,8 +361,8 @@ final class Phase0PerceptionTests: XCTestCase {
 
     func testForwardListParses() {
         let output = """
-        3C261JEHN25632 tcp:8080 tcp:8080
-        3C261JEHN25632 tcp:9000 localabstract:scrcpy
+        DEADBEEF000000 tcp:8080 tcp:8080
+        DEADBEEF000000 tcp:9000 localabstract:scrcpy
         garbage line
         """
         let forwards = PortForward.parseList(output)

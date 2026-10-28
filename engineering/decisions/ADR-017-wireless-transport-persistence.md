@@ -45,20 +45,20 @@ that gap.
 
 ```
 $ adb devices -l
-3C261JEHN25632                                  device usb:17825792X product:lynx model:Pixel_7a device:lynx transport_id:4
+DEADBEEF000000                                  device usb:17825792X product:lynx model:Pixel_7a device:lynx transport_id:4
 192.168.1.7:5555                                device product:lynx model:Pixel_7a device:lynx transport_id:5
-adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp device product:lynx model:Pixel_7a device:lynx transport_id:3
+adb-DEADBEEF000000-laKyZz._adb-tls-connect._tcp device product:lynx model:Pixel_7a device:lynx transport_id:3
 
 $ adb -s 192.168.1.7:5555 shell getprop ro.product.model
 Pixel 7a
 $ adb -s 192.168.1.7:5555 shell getprop ro.product.cpu.abi
 arm64-v8a
 
-$ adb -s 3C261JEHN25632 shell getprop service.adb.tcp.port
+$ adb -s DEADBEEF000000 shell getprop service.adb.tcp.port
 5555
-$ adb -s 3C261JEHN25632 shell settings get global adb_wifi_enabled
+$ adb -s DEADBEEF000000 shell settings get global adb_wifi_enabled
 1
-$ adb -s 3C261JEHN25632 shell settings get global development_settings_enabled
+$ adb -s DEADBEEF000000 shell settings get global development_settings_enabled
 1
 ```
 
@@ -344,7 +344,7 @@ blocked-on-capability.
 | `-only-testing:PixelDesktopTests/TransportDiagnosisTests` | **16 tests, 0 failures** |
 | `xcodebuild build -scheme pixel-desktop` (compiles `Device/`) | **BUILD SUCCEEDED** |
 | CLI run: `pixel-desktop capability --json` | contract v3 emitted, with limitation annotations |
-| CLI run: `pixel-desktop observe --json` | live observation — `deviceReachable: true`, `deviceSerial: 3C261JEHN25632` |
+| CLI run: `pixel-desktop observe --json` | live observation — `deviceReachable: true`, `deviceSerial: DEADBEEF000000` |
 
 The CLI target is the one that links `Device/` (46-file sources phase, including
 `TransportDiagnosis.swift`), so building and running it proves the new file **links into a

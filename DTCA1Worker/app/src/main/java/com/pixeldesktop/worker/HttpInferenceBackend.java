@@ -241,7 +241,15 @@ final class HttpInferenceBackend {
             // The server exposes no build id over HTTP (/props carries none), so this is stated as
             // unknown rather than copied from a source pin that may not match the running binary.
             runtime.put("version", "unknown");
-            runtime.put("backend", "cpu");
+            // Compute backend. llama-server's HTTP surface (/props, /slots, /health) carries no
+            // device attribution, and this worker is a different process in a different SELinux
+            // domain, so it cannot read the server's argv or its ggml init log. The previous
+            // hardcoded "cpu" asserted something the request cannot observe: which device runs the
+            // tokens is decided when the *server* starts (-ngl), not by which side of the socket
+            // sent the request. Unknown until an observer that can see the server attests it —
+            // scripts/pixel-gpu/serve.sh greps the ggml Vulkan lines out of the server log.
+            runtime.put("backend", "unknown");
+            runtime.put("backend_source", "not_observable_over_http");
 
             JSONObject result = new JSONObject();
             result.put("status", "OK");

@@ -1115,11 +1115,11 @@ transport recovery around it. **No production code modified.**
 **VERIFIED BY RUNNING CODE — IOKit USB notifications work on macOS 27.0.**
 A throwaway Swift probe compiled and ran, then was deleted:
   attach notification registered (result=0)
-  PRESENT-AT-START: Pixel 7a  0x18d1/0x4ee2  serial=3C261JEHN25632
+  PRESENT-AT-START: Pixel 7a  0x18d1/0x4ee2  serial=DEADBEEF000000
   detach notification registered (result=0)
 `IOServiceAddMatchingNotification` returned KERN_SUCCESS for BOTH `kIOFirstMatchNotification` and
 `kIOTerminatedNotification`, matched `IOUSBHostDevice`, required **no root and no entitlement**, and
-— critically — **`kUSBSerialNumberString` returns `3C261JEHN25632`, the SAME serial ADB uses.**
+— critically — **`kUSBSerialNumberString` returns `DEADBEEF000000`, the SAME serial ADB uses.**
 That closes the trust boundary cheaply: a USB attach carries the identity needed to decide "is this
 my Pixel?" WITHOUT first trusting ADB.
 
@@ -1253,8 +1253,8 @@ the Pixel?", not "where should a workload run?".
 **Result: YES — but the architectural conclusion is NOT "the abstraction works unchanged".**
 
 **THE CRITICAL FINDING — the wireless serial is NOT the USB serial**
-    3C261JEHN25632                                      device usb:...    <- USB
-    adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp     device            <- WIRELESS
+    DEADBEEF000000                                      device usb:...    <- USB
+    adb-DEADBEEF000000-laKyZz._adb-tls-connect._tcp     device            <- WIRELESS
 Two INDEPENDENT device entries with DIFFERENT serials. Confirmed by `adb disconnect`: the wireless
 entry vanished while the USB entry survived. Format is
 `adb-<hardware-serial>-<random6>._adb-tls-connect._tcp`.
@@ -2093,7 +2093,7 @@ a job id the code never sent — and the ownership check caught it, which is exa
 
 ### Device
 
-`3C261JEHN25632`, authorized, **USB** (determined from the `usb:` token; `adb mdns services` empty,
+`DEADBEEF000000`, authorized, **USB** (determined from the `usb:` token; `adb mdns services` empty,
 so not wireless). Serial read from `adb devices -l` and passed through the CLI's own selection —
 never hardcoded into the interface.
 
@@ -2302,7 +2302,7 @@ offline, replacing the single word "Offline" with a cause and an actionable next
 -destination 'platform=macOS'` → **609 tests, 22 skipped, 0 failures**; the CLI target
 (`scheme pixel-desktop`) **builds and runs** — `capability --json` emits contract v3 and
 `observe --json` returns a live observation (`deviceReachable: true`,
-`deviceSerial: 3C261JEHN25632`).
+`deviceSerial: DEADBEEF000000`).
 
 **Correction to that verification claim (same day).** The journal previously said running
 `observe` "proves the new types link and the binary executes rather than merely type-checking",

@@ -11,7 +11,7 @@
 
 ### 1.1 Existing PixelDesktop Project
 
-**Location:** `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/`
+**Location:** `<home>/Documents/PixelDesktop/`
 
 **Critical Finding: All 20 Swift source files are 0 bytes (empty).**
 
@@ -58,7 +58,7 @@
 
 ### 1.3 AndroidMetadataHelper
 
-**Location:** `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/AndroidMetadataHelper/`
+**Location:** `<home>/Documents/PixelDesktop/AndroidMetadataHelper/`
 
 A working Java Android app that:
 - Queries all launchable apps via PackageManager
@@ -71,7 +71,7 @@ A working Java Android app that:
 
 ### 1.4 Xcode Project
 
-**Location:** `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/PixelDesktop.xcodeproj/`
+**Location:** `<home>/Documents/PixelDesktop/PixelDesktop.xcodeproj/`
 
 - Uses `PBXFileSystemSynchronizedRootGroup` (Xcode 16+ feature)
 - Two targets: `PixelDesktop` (app) and `PixelDesktopTests` (unit tests)
@@ -482,23 +482,23 @@ PixelDesktop/
 
 | Path | Type | Owner |
 |---|---|---|
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/` | Directory | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/PixelDesktop.xcodeproj/` | Xcode project | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/PixelDesktop/` | 20 empty Swift files | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/PixelDesktopTests/` | 1 empty Swift file | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/AndroidMetadataHelper/` | Working Java APK | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/AutomationBuild/` | Build artifacts | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/AutomationReports/` | Build reports | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/*.md` | 9 documentation files | rnz |
-| `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/opencode-*/` | Benchmark repos | rnz |
+| `<home>/Documents/PixelDesktop/` | Directory | rnz |
+| `<home>/Documents/PixelDesktop/PixelDesktop.xcodeproj/` | Xcode project | rnz |
+| `<home>/Documents/PixelDesktop/PixelDesktop/` | 20 empty Swift files | rnz |
+| `<home>/Documents/PixelDesktop/PixelDesktopTests/` | 1 empty Swift file | rnz |
+| `<home>/Documents/PixelDesktop/AndroidMetadataHelper/` | Working Java APK | rnz |
+| `<home>/Documents/PixelDesktop/AutomationBuild/` | Build artifacts | rnz |
+| `<home>/Documents/PixelDesktop/AutomationReports/` | Build reports | rnz |
+| `<home>/Documents/PixelDesktop/*.md` | 9 documentation files | rnz |
+| `<home>/Documents/PixelDesktop/opencode-*/` | Benchmark repos | rnz |
 
 ### 10.2 Agent-Created Resources (NEW)
 
 | Path | Type | Purpose |
 |---|---|---|
-| `/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/` | Directory | Clean rebuild location |
-| `/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/` | Directory | Engineering documentation |
-| `/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-00-clean-start-audit.md` | File | This audit |
+| `<home>/AICompany/PixelDesktop/` | Directory | Clean rebuild location |
+| `<home>/AICompany/PixelDesktop/engineering/` | Directory | Engineering documentation |
+| `<home>/AICompany/PixelDesktop/engineering/phases/phase-00-clean-start-audit.md` | File | This audit |
 
 ---
 
@@ -506,7 +506,7 @@ PixelDesktop/
 
 ### 11.1 Immediate Next Steps
 
-1. **Create clean Xcode project** at `/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/` with real source files
+1. **Create clean Xcode project** at `<home>/AICompany/PixelDesktop/` with real source files
 2. **Initialize git** repository
 3. **Create Multica issues** for Phase 0-8
 4. **Write engineering README** and created-resources.json

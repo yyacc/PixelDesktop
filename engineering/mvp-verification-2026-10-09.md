@@ -3,7 +3,7 @@
 **Date:** 2026-10-09
 **HEAD:** 6fb99a9 (`docs: engineering journal — Phase 10 Step 6 completion`)
 **Verifier:** Ciel (independent)
-**Device:** Pixel 7a, serial `3C261JEHN25632`, attached via USB (adb state: `device`)
+**Device:** Pixel 7a, serial `DEADBEEF000000`, attached via USB (adb state: `device`)
 
 ---
 
@@ -45,7 +45,7 @@ The 22 skips are environment-gated, not failures:
 - `pixel-desktop tool not built` — CLI-binary-gated tests
 - one `expected a refusal` guard
 
-Attempting to enable them by exporting `PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632`
+Attempting to enable them by exporting `PIXELDESKTOP_DEVICE_SERIAL=DEADBEEF000000`
 before `xcodebuild test` did **not** change the count (still 22 skipped): xcodebuild
 does not forward the parent shell environment to the macOS test host. Enabling them
 requires a scheme/test-plan environment entry, which is a project-config change and
@@ -65,7 +65,7 @@ pixel-desktop observe --json      → exit 0, live device observation
 `observe --json` returned real, device-reported values (source `deviceReported`,
 `observedAt 2026-10-09T09:16:03Z`):
 
-- `deviceSerial`: `3C261JEHN25632`
+- `deviceSerial`: `DEADBEEF000000`
 - `deviceReachable`: true
 - `availableMemoryBytes`: 2,574,376,960
 - `freeStorageBytes`: 54,894,559,232

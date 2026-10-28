@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01
 **Phase:** 2 — Device Discovery and ADB Transport
-**Device:** Pixel 7a, serial `3C261JEHN25632`
+**Device:** Pixel 7a, serial `DEADBEEF000000`
 
 ---
 
@@ -73,7 +73,7 @@ All 31 pass unchanged, including `testADBTransportParseDeviceList`,
 
 ### 3.1 Tooling limitation encountered
 
-`xcodebuild ... test TEST_RUNNER_PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632` did **not**
+`xcodebuild ... test TEST_RUNNER_PIXELDESKTOP_DEVICE_SERIAL=DEADBEEF000000` did **not**
 forward the variable into the test process — the integration tests still reported
 "skipped". Recorded in ADR-006. No real-device claim is made on the basis of those tests.
 
@@ -90,27 +90,27 @@ $ swiftc -swift-version 5 -o verify \
     PixelDesktop/Device/DeviceEnricher.swift \
     main.swift
 
-$ ./verify 3C261JEHN25632
+$ ./verify DEADBEEF000000
 ```
 
 Output (verbatim, exit code 0):
 
 ```
 DISCOVERY: 1 device(s)
-  serial=3C261JEHN25632 state=device model=Pixel_7a device=lynx
+  serial=DEADBEEF000000 state=device model=Pixel_7a device=lynx
   pre-enrichment -> android='' api=0 abi=''
 ENRICHMENT (real values returned by the device):
   androidVersion = 16
   apiLevel       = 36
   architecture   = arm64-v8a
   model preserved= Pixel_7a
-  serial preserved=3C261JEHN25632
+  serial preserved=DEADBEEF000000
 INDEPENDENT CROSS-CHECK (raw adb, no project code):
   androidVersion = 16
   apiLevel       = 36
   architecture   = arm64-v8a
 CROSS-CHECK MATCH: true
-UNSET PROPERTY: correctly rejected -> Invalid input: Property 'ro.pixeldesktop.not.real' is unset on device 3C261JEHN25632
+UNSET PROPERTY: correctly rejected -> Invalid input: Property 'ro.pixeldesktop.not.real' is unset on device DEADBEEF000000
 UNKNOWN SERIAL: correctly failed -> ADB command failed: getprop ro.build.version.release (exit code 1): adb: device 'NOSUCHSERIAL0000' not found
 RESULT: PASS
 ```
@@ -130,7 +130,7 @@ The values were read from the device, not assumed, and independently confirmed b
 
 | Scenario | Expected | Observed |
 |---|---|---|
-| Unset property (`ro.pixeldesktop.not.real`) | Rejected, not silently empty | `invalidInput: Property '...' is unset on device 3C261JEHN25632` |
+| Unset property (`ro.pixeldesktop.not.real`) | Rejected, not silently empty | `invalidInput: Property '...' is unset on device DEADBEEF000000` |
 | Unknown serial (`NOSUCHSERIAL0000`) | Command failure | `adbCommandFailed: getprop ro.build.version.release (exit code 1): adb: device 'NOSUCHSERIAL0000' not found` |
 
 Both negative paths confirmed against the real device, not only against mocks.

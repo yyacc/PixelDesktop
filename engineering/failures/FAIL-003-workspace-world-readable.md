@@ -30,13 +30,13 @@ The first real-device verification run reported:
 ## Evidence
 
 ```
-$ adb -s 3C261JEHN25632 shell 'mkdir -p /data/local/tmp/pixeldesktop && ls -ld /data/local/tmp/pixeldesktop'
+$ adb -s DEADBEEF000000 shell 'mkdir -p /data/local/tmp/pixeldesktop && ls -ld /data/local/tmp/pixeldesktop'
 drwxrwxrwx 2 shell shell 3452 2026-10-01 23:15 /data/local/tmp/pixeldesktop
 
-$ adb -s 3C261JEHN25632 shell stat -c %a /data/local/tmp/pixeldesktop
+$ adb -s DEADBEEF000000 shell stat -c %a /data/local/tmp/pixeldesktop
 777
 
-$ adb -s 3C261JEHN25632 shell ls -ld /data/local/tmp
+$ adb -s DEADBEEF000000 shell ls -ld /data/local/tmp
 drwxrwx--x 2 shell shell 3452 ... /data/local/tmp
 ```
 

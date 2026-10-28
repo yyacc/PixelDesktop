@@ -39,9 +39,9 @@
 
 | Check | Result |
 |---|---|
-| `adb devices -l` | Pixel serial `3C261JEHN25632` present as authorized `device` |
-| `adb -s 3C261JEHN25632 get-state` | `device` |
-| `adb -s 3C261JEHN25632 shell echo ADB_TEST` | `ADB_TEST` |
+| `adb devices -l` | Pixel serial `DEADBEEF000000` present as authorized `device` |
+| `adb -s DEADBEEF000000 get-state` | `device` |
+| `adb -s DEADBEEF000000 shell echo ADB_TEST` | `ADB_TEST` |
 | `pixel-desktop observe --json` | Succeeded |
 | Worker version | 2 |
 | Worker PID/state | 22552, state S |

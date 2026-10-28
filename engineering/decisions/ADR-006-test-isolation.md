@@ -16,7 +16,7 @@ Android device. Two conflicting requirements apply:
 - The Phase 2 task explicitly requires mock-based unit tests for `getprop` success,
   `getprop` failure, property parsing, and device enrichment.
 - The engineering workflow requires real-device verification against the Pixel 7a
-  (serial `3C261JEHN25632`), including verification of the *actual* returned values.
+  (serial `DEADBEEF000000`), including verification of the *actual* returned values.
 
 A suite that always requires a device cannot run on a machine without one. A suite
 that never touches the device cannot satisfy the verification requirement. A suite
@@ -68,7 +68,7 @@ Observed output:
 
 ```
 DISCOVERY: 1 device(s)
-  serial=3C261JEHN25632 state=device model=Pixel_7a device=lynx
+  serial=DEADBEEF000000 state=device model=Pixel_7a device=lynx
   pre-enrichment -> android='' api=0 abi=''
 ENRICHMENT (real values returned by the device):
   androidVersion = 16
@@ -79,7 +79,7 @@ INDEPENDENT CROSS-CHECK (raw adb, no project code):
   apiLevel       = 36
   architecture   = arm64-v8a
 CROSS-CHECK MATCH: true
-UNSET PROPERTY: correctly rejected -> Invalid input: Property 'ro.pixeldesktop.not.real' is unset on device 3C261JEHN25632
+UNSET PROPERTY: correctly rejected -> Invalid input: Property 'ro.pixeldesktop.not.real' is unset on device DEADBEEF000000
 UNKNOWN SERIAL: correctly failed -> ADB command failed: getprop ro.build.version.release (exit code 1): adb: device 'NOSUCHSERIAL0000' not found
 RESULT: PASS
 ```

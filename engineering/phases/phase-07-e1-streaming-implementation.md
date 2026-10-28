@@ -739,7 +739,7 @@ Small workload (DTCA-1), no long LLM run, hard-capped at 300 s.
 
 ```
 === LIVE SMOKE TEST (DTCA-1, no LLM) ===
-transport             : 3C261JEHN25632
+transport             : DEADBEEF000000
 outcome               : completed(... job_id C67641EB-..., resultBytes: 401)
 events received       : 6
 heartbeats            : 1

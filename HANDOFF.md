@@ -92,7 +92,7 @@ AI-company stack (Ciel = CEO/orchestrator, Qwen = worker, LongCat = escalation/f
 
 **Repo:** `~/AICompany/PixelDesktop` · working tree clean at the Phase 3.1 commit
 **Suite:** **776 tests, 30 skipped, 0 failures** (full suite, `xcodebuild test -scheme PixelDesktop`)
-**Device:** Pixel 7a (`lynx`), Android 16 / SDK 36, serial `3C261JEHN25632`, **USB only**
+**Device:** Pixel 7a (`lynx`), Android 16 / SDK 36, serial `DEADBEEF000000`, **USB only**
 
 **The phone's OLED is dead. It does not display. Do not probe to re-establish this.** The
 framebuffer is alive, which is why `screencap` and scrcpy both work. scrcpy is an **external tool**,
@@ -146,7 +146,7 @@ notification stream → **3.3** B4 install/uninstall + B5 reboot → **3.4** C4 
 |---|---|---|
 | 3.1 Trust foundation | ✅ done 2026-10-25 | `Trust/ConsentRegistry.swift`, `Trust/DryRun.swift`, `Audit/DeviceAuditLog.swift`, `App/TrustView.swift` (new **Trust** tab), ADR-020, 31 tests |
 | 3.2 A5 notifications | ✅ done 2026-10-25 | `Perception/Notifications*` (parser, reader, stream), two-tier read gated **inside** the reader, **Perception** panel, ADR-021, 30 tests (26 hermetic + 4 device-gated) |
-| 3.3 B4/B5 | 🟨 next | B4 acceptance **PASS** on `3C261JEHN25632` 2026-10-25 (round-trip report in `engineering/evidence/b4-b5-probes/`); B5 **not approved**, not run |
+| 3.3 B4/B5 | 🟨 next | B4 acceptance **PASS** on `DEADBEEF000000` 2026-10-25 (round-trip report in `engineering/evidence/b4-b5-probes/`); B5 **not approved**, not run |
 | 3.4 C4 Mac scheduler | ⬜ | — |
 | 3.5 D4 kill switch | ⬜ | — |
 

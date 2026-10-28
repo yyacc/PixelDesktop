@@ -632,7 +632,7 @@ final class PixelDesktopTests: XCTestCase {
     }
 
     /// End-to-end enrichment against the exact `getprop` output captured from the
-    /// Pixel 7a (serial 3C261JEHN25632) while it was attached. This exercises the
+    /// Pixel 7a (serial DEADBEEF000000) while it was attached. This exercises the
     /// parser, DeviceProperties.make and DeviceEnricher on real device data without
     /// needing the device, so it runs in the hermetic suite.
     func testEnrichmentAgainstRealPixel7aOutput() async throws {
@@ -648,13 +648,13 @@ final class PixelDesktopTests: XCTestCase {
         """
 
         // The real `adb devices -l` line for this device.
-        let realDevices = "List of devices attached\n3C261JEHN25632         device usb:1048576X product:lynx model:Pixel_7a device:lynx transport_id:276\n"
+        let realDevices = "List of devices attached\nDEADBEEF000000         device usb:1048576X product:lynx model:Pixel_7a device:lynx transport_id:276\n"
 
         let parsed = ADBTransport().parseDeviceList(realDevices)
         XCTAssertEqual(parsed.count, 1)
         guard let discovered = parsed.first else { return }
 
-        XCTAssertEqual(discovered.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(discovered.serialNumber, "DEADBEEF000000")
         XCTAssertEqual(discovered.deviceCodename, "lynx")
         // Discovery must not claim to know these.
         XCTAssertEqual(discovered.marketingName, "")
@@ -802,8 +802,8 @@ final class PixelDesktopTests: XCTestCase {
         ])
 
         let discovered = AndroidDevice(
-            id: "3C261JEHN25632",
-            serialNumber: "3C261JEHN25632",
+            id: "DEADBEEF000000",
+            serialNumber: "DEADBEEF000000",
             deviceCodename: "lynx",
             marketingName: "",
             manufacturer: "",
@@ -825,13 +825,13 @@ final class PixelDesktopTests: XCTestCase {
 
         // Identity from discovery is preserved untouched.
         XCTAssertEqual(enriched.deviceCodename, "lynx")
-        XCTAssertEqual(enriched.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(enriched.serialNumber, "DEADBEEF000000")
         XCTAssertEqual(enriched.state, .device)
 
         // One batched read, not one process spawn per property.
         let invocations = await transport.invocations
         XCTAssertEqual(invocations.count, 1)
-        XCTAssertEqual(invocations[0].arguments, ["3C261JEHN25632", "shell", "getprop"])
+        XCTAssertEqual(invocations[0].arguments, ["DEADBEEF000000", "shell", "getprop"])
     }
 
     func testEnrichDeviceDoesNotSubstituteCodenameForManufacturer() async throws {
@@ -1034,13 +1034,13 @@ final class PixelDesktopTests: XCTestCase {
     /// populated, and the S3-4 fix would have nothing to report.
     func testParserRecognisesTheUnauthorizedStateFromAdbOutput() {
         let unauthorizedLine =
-            "List of devices attached\n3C261JEHN25632         unauthorized usb:1048576X product:lynx model:Pixel_7a device:lynx transport_id:276\n"
+            "List of devices attached\nDEADBEEF000000         unauthorized usb:1048576X product:lynx model:Pixel_7a device:lynx transport_id:276\n"
 
         let parsed = ADBTransport().parseDeviceList(unauthorizedLine)
 
         XCTAssertEqual(parsed.count, 1, "an unauthorized device is still a discovered device")
         guard let device = parsed.first else { return }
-        XCTAssertEqual(device.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(device.serialNumber, "DEADBEEF000000")
         XCTAssertEqual(device.state, .unauthorized, "the state token must be honoured, not skipped")
         // Discovery must still not claim marketing name or manufacturer — those come from getprop.
         XCTAssertEqual(device.marketingName, "")
@@ -1053,7 +1053,7 @@ final class PixelDesktopTests: XCTestCase {
     /// prompt. The selection helper must pick the connected one and not be confused by the other.
     func testParserHandlesConnectedAndUnauthorizedTogether() {
         let mixed = "List of devices attached\n"
-            + "3C261JEHN25632         device usb:1 product:lynx model:Pixel_7a device:lynx transport_id:1\n"
+            + "DEADBEEF000000         device usb:1 product:lynx model:Pixel_7a device:lynx transport_id:1\n"
             + "9ZZ999ZZZZ99         unauthorized usb:2 product:lynx model:Pixel_7a device:lynx transport_id:2\n"
 
         let parsed = ADBTransport().parseDeviceList(mixed)
@@ -1064,7 +1064,7 @@ final class PixelDesktopTests: XCTestCase {
 
         // The connected device still wins — S3-4's precedence rule, at the data level.
         let selected = parsed.first(where: { $0.state == .device })
-        XCTAssertEqual(selected?.serialNumber, "3C261JEHN25632")
+        XCTAssertEqual(selected?.serialNumber, "DEADBEEF000000")
     }
 
     // MARK: - Step 3 end
@@ -1119,8 +1119,8 @@ final class PixelDesktopTests: XCTestCase {
         ])
         await transport.setDeviceList([
             AndroidDevice(
-                id: "3C261JEHN25632",
-                serialNumber: "3C261JEHN25632",
+                id: "DEADBEEF000000",
+                serialNumber: "DEADBEEF000000",
                 deviceCodename: "lynx",
                 marketingName: "",
                 manufacturer: "",
@@ -1139,7 +1139,7 @@ final class PixelDesktopTests: XCTestCase {
         XCTAssertEqual(discovered.count, 1)
         XCTAssertEqual(discovered[0].androidVersion, "")
 
-        let enriched = try await manager.enrichDevice(serial: "3C261JEHN25632")
+        let enriched = try await manager.enrichDevice(serial: "DEADBEEF000000")
 
         XCTAssertEqual(enriched?.androidVersion, "16")
         XCTAssertEqual(enriched?.apiLevel, 36)
@@ -2559,7 +2559,7 @@ actor MockTransport: TransportProtocol {
 ///
 ///     xcodebuild -project PixelDesktop.xcodeproj -scheme PixelDesktop \
 ///       -configuration Debug test \
-///       TEST_RUNNER_PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632
+///       TEST_RUNNER_PIXELDESKTOP_DEVICE_SERIAL=DEADBEEF000000
 ///
 /// Assertions check only that values are present and well-formed. They
 /// deliberately do not pin an expected Android version or API level: the point

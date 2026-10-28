@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-25
 **Phase:** 3.4 (C4), Mac-side scheduler
-**Verdict:** verified by direct observation on the physical Pixel 7a (`3C261JEHN25632`, USB). No reboot, no
+**Verdict:** verified by direct observation on the physical Pixel 7a (`DEADBEEF000000`, USB). No reboot, no
 device-side change, no consent bypass.
 
 ## What was exercised

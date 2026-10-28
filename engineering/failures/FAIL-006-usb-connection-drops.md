@@ -98,7 +98,7 @@ ioreg -p IOUSB:  +-o Pixel 7a@00100000  <class IOUSBHostDevice>
                  "idVendor"  = 6353   (0x18D1, Google)
                  "idProduct" = 20194  (0x4EE2, MTP+ADB)
                  "UsbLinkSpeed" = 480000000  (480 Mbps, USB 2.0 High Speed)
-                 "USB Serial Number" = "3C261JEHN25632"
+                 "USB Serial Number" = "DEADBEEF000000"
 ```
 
 **Topology: direct.** `Pixel 7a@00100000` is attached directly to

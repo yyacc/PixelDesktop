@@ -34,7 +34,7 @@ Deliverables for this phase:
 6. Mock-based tests for: `getprop` success, `getprop` failure, property
    parsing/conversion, device enrichment, and unchanged discovery behaviour.
 7. The complete test suite builds and passes.
-8. Real-device verification against serial `3C261JEHN25632`, confirming the **actual**
+8. Real-device verification against serial `DEADBEEF000000`, confirming the **actual**
    returned values rather than assumed ones.
 
 ---
@@ -93,7 +93,7 @@ code, so the design would be based on observed behaviour rather than assumption:
 
 | Probe | Result |
 |---|---|
-| `adb devices -l` | `3C261JEHN25632 device usb:1048576X product:lynx model:Pixel_7a device:lynx` |
+| `adb devices -l` | `DEADBEEF000000 device usb:1048576X product:lynx model:Pixel_7a device:lynx` |
 | `getprop ro.build.version.release` | `16` (exit 0) |
 | `getprop ro.build.version.sdk` | `36` (exit 0) |
 | `getprop ro.product.cpu.abi` | `arm64-v8a` (exit 0) |
@@ -228,7 +228,7 @@ property fails loudly instead of masquerading as an un-enriched device.
 1. **Real-device property probe** (before coding) — established the actual values and
    the exit-0-on-unset behaviour. Changed the design.
 2. **`TEST_RUNNER_` env-var forwarding** — passed
-   `TEST_RUNNER_PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632` to `xcodebuild`. The
+   `TEST_RUNNER_PIXELDESKTOP_DEVICE_SERIAL=DEADBEEF000000` to `xcodebuild`. The
    integration tests still reported "skipped", so the variable did not reach the test
    process. Recorded as a tooling gap; not worked around with an unverified claim.
 3. **Standalone CLI harness** — compiled the actual production sources
@@ -308,7 +308,7 @@ unknown serial fails.
 | `xcodegen generate` | PASS |
 | `xcodebuild ... build` | **BUILD SUCCEEDED** |
 | `xcodebuild ... test` (default) | **49 executed, 0 failures, 3 skipped** |
-| Real-device discovery | PASS — 1 device, `3C261JEHN25632`, state `device` |
+| Real-device discovery | PASS — 1 device, `DEADBEEF000000`, state `device` |
 | Real-device enrichment | PASS — Android `16`, API `36`, ABI `arm64-v8a` |
 | Independent cross-check vs raw adb | **MATCH: true** |
 | Unset property rejected | PASS |

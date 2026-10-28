@@ -58,6 +58,21 @@ enum CLIRunCommand {
     ///
     /// - Throws: `invalidInput` when the file cannot be read or the workload rejects its contents.
     static func loadInput(from path: String, workload: String) throws -> String {
+        let text = try readText(from: path)
+
+        // The workload owns its own limits. Nothing is duplicated here.
+        if workload == DTCA1Job.workloadName {
+            try DTCA1Worker.validateInput(text)
+        }
+        // LOCAL-LLM-1 is not resolved here: its input may be a request envelope rather than a bare
+        // prompt, so `run` goes through `loadInferenceInput`, which applies the InferenceRequest's
+        // own validator to the prompt it resolves.
+        return text
+    }
+
+    /// Reads a UTF-8 input file verbatim. Shared by both workloads so the failure modes are
+    /// described in exactly one place.
+    static func readText(from path: String) throws -> String {
         let url = URL(fileURLWithPath: (path as NSString).expandingTildeInPath)
 
         let data: Data
@@ -72,23 +87,87 @@ enum CLIRunCommand {
             throw PixelDesktopError.invalidInput(
                 "Input file '\(path)' is not valid UTF-8 text")
         }
+        return text
+    }
 
-        // The workload owns its own limits. Nothing is duplicated here.
-        if workload == DTCA1Job.workloadName {
-            try DTCA1Worker.validateInput(text)
-        } else if workload == LlmJob.workloadName {
-            // LOCAL-LLM-1: the InferenceRequest owns its own validation. We validate the
-            // prompt here so that invalid input is rejected before any device I/O.
-            let request = InferenceRequest(
+    // MARK: - LOCAL-LLM-1 input
+
+    /// The generated-token budget used when a caller does not ask for one.
+    ///
+    /// 128, not the 32 this boundary used to hardcode: 32 cut ordinary answers off mid-sentence,
+    /// which is indistinguishable from a broken model. It is a *generation* budget and nothing
+    /// else — it never touches the server's `-c` context size — and
+    /// `InferenceRequest.maximumTokensCeiling` still caps what any caller may request.
+    static let defaultMaxTokens = 128
+
+    /// A resolved LOCAL-LLM-1 input: the text the model receives and the budget it may spend.
+    struct ResolvedInferenceInput: Equatable {
+        let prompt: String
+        let maxTokens: Int
+    }
+
+    /// Reads a LOCAL-LLM-1 input file and resolves it into a prompt plus an output-length budget.
+    ///
+    /// Two accepted forms, one field location — the envelope is the **top level** of the file:
+    ///
+    ///   - `{"prompt": "...", "max_tokens": 256}` — a request envelope. `prompt` must be a string
+    ///     for the file to be treated as one; `max_tokens` is optional and defaults to
+    ///     `defaultMaxTokens`.
+    ///   - anything else — the file is the prompt, verbatim, exactly as before. A file that is
+    ///     JSON but has no string `prompt` key stays a prompt, so existing inputs, and prompts
+    ///     that happen to be JSON, are unaffected.
+    ///
+    /// Bounds are the request's own (`InferenceRequest.validate()`), never a second copy, and they
+    /// run here so an invalid value is rejected before any device I/O or job id is minted.
+    static func loadInferenceInput(from path: String) throws -> ResolvedInferenceInput {
+        let text = try readText(from: path)
+        let resolved = try resolveInferenceInput(text: text, path: path)
+        do {
+            try InferenceRequest(
                 jobId: LlmJob.newJobId(),
-                prompt: text,
-                maxTokens: 32,
+                prompt: resolved.prompt,
+                maxTokens: resolved.maxTokens,
                 temperature: 0.0,
                 seed: 0
-            )
-            try request.validate()
+            ).validate()
+        } catch let rejection as InferenceRequestError {
+            throw PixelDesktopError.invalidInput("Input file '\(path)': \(rejection.description)")
         }
-        return text
+        return resolved
+    }
+
+    /// The envelope rules, separated from file I/O so they are testable without a temporary file.
+    static func resolveInferenceInput(text: String, path: String) throws -> ResolvedInferenceInput {
+        guard text.drop(while: { $0.isWhitespace }).first == "{" else {
+            return ResolvedInferenceInput(prompt: text, maxTokens: defaultMaxTokens)
+        }
+
+        do {
+            let envelope = try JSONDecoder().decode(RequestEnvelope.self, from: Data(text.utf8))
+            return ResolvedInferenceInput(
+                prompt: envelope.prompt,
+                maxTokens: envelope.max_tokens ?? defaultMaxTokens)
+        } catch DecodingError.keyNotFound {
+            // A JSON object with no `prompt` key is a prompt that happens to be JSON, not a
+            // malformed envelope: keep the pre-existing behaviour rather than rejecting it.
+            return ResolvedInferenceInput(prompt: text, maxTokens: defaultMaxTokens)
+        } catch let DecodingError.typeMismatch(_, context) {
+            let field = context.codingPath.last?.stringValue ?? "prompt"
+            throw PixelDesktopError.invalidInput(
+                "Input file '\(path)': '\(field)' has the wrong type — 'prompt' must be a string "
+                + "and 'max_tokens' a whole number")
+        } catch {
+            throw PixelDesktopError.invalidInput(
+                "Input file '\(path)': could not read the request envelope "
+                + "(\(error.localizedDescription))")
+        }
+    }
+
+    /// The envelope's shape. Typed decoding is what rejects `"max_tokens": true` and `64.5`
+    /// instead of letting them coerce.
+    private struct RequestEnvelope: Decodable {
+        let prompt: String
+        let max_tokens: Int?
     }
 
     // MARK: - Execution
@@ -120,7 +199,19 @@ enum CLIRunCommand {
                 "Unsupported workload '\(workload)'. This interface exposes: \(supportedWorkloads.sorted().joined(separator: ", ")).")
         }
 
-        let input = try loadInput(from: inputPath, workload: workload)
+        // The prompt and the output-length budget, resolved once and used by every path below.
+        // LOCAL-LLM-1's input may be a request envelope; every other workload's input is the
+        // document itself.
+        let input: String
+        let maxTokens: Int
+        if workload == LlmJob.workloadName {
+            let resolved = try loadInferenceInput(from: inputPath)
+            input = resolved.prompt
+            maxTokens = resolved.maxTokens
+        } else {
+            input = try loadInput(from: inputPath, workload: workload)
+            maxTokens = defaultMaxTokens  // not part of this workload's contract; unused below
+        }
 
         // Device selection is PixelDesktop's, not the caller's. This reuses the same rule the
         // application applies (device → unauthorized → offline → not found).
@@ -189,7 +280,7 @@ enum CLIRunCommand {
             let request = InferenceRequest(
                 jobId: jobId,
                 prompt: input,
-                maxTokens: 32,
+                maxTokens: maxTokens,
                 temperature: 0.0,
                 seed: 0,
                 backend: backend

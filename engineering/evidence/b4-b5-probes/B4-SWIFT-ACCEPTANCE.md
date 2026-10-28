@@ -1,6 +1,6 @@
 # B4 — Swift acceptance with a disposable package
 
-Executed **2026-10-25 12:32** on Pixel 7a `3C261JEHN25632`.
+Executed **2026-10-25 12:32** on Pixel 7a `DEADBEEF000000`.
 
 Owner ruling (rnz, 2026-10-25): the B4 Swift acceptance test uses a **disposable side-loaded
 package**; the guarded API's refusal to uninstall `com.pixeldesktop.worker` stays intact and
@@ -72,12 +72,12 @@ Harness output:
 
 ```
 === B4 SWIFT ACCEPTANCE — disposable package ===
-device serial         : 3C261JEHN25632
+device serial         : DEADBEEF000000
 disposable package    : com.pixeldesktop.disposable.probe
 apk                   : …/disposable/out/com.pixeldesktop.disposable.probe.apk
 third-party baseline  : 43 packages
 worker present        : package:/data/app/~~ORcxPBEftaBhMwObgvAr0g==/com.pixeldesktop.worker-fWuIzj1j-G2jEe59CXNb3Q==/base.apk
-install preview       : adb -s 3C261JEHN25632 install -r …/com.pixeldesktop.disposable.probe.apk
+install preview       : adb -s DEADBEEF000000 install -r …/com.pixeldesktop.disposable.probe.apk
 preview notes         : 3
 install stdout        : Serving...
                         Performing Incremental Install
@@ -85,7 +85,7 @@ install stdout        : Serving...
                         Install command complete in 237 ms
 installed at          : package:/data/app/~~S0P1bVFu254Y7ZC2_3gW0A==/com.pixeldesktop.disposable.probe-nz8PwHcPrgVnhvujR1hvHA==/base.apk
 worker refusal        : Refusing to uninstall 'com.pixeldesktop.worker': it is the PixelDesktop worker package
-uninstall preview     : adb -s 3C261JEHN25632 uninstall com.pixeldesktop.disposable.probe
+uninstall preview     : adb -s DEADBEEF000000 uninstall com.pixeldesktop.disposable.probe
 uninstall stdout      : Success
 audit records         : ["appInstall/refused", "appInstall/executed", "appUninstall/executed"]
 outcome               : PASS (install + uninstall performed by the guarded API)
@@ -150,7 +150,7 @@ A=.build/Build/Products/Debug/PixelDesktop.app; B=$A/Contents/PlugIns/PixelDeskt
 mkdir -p "$B/Contents/Frameworks" && cp "$A/Contents/MacOS/PixelDesktop.debug.dylib" "$B/Contents/Frameworks/"
 
 # 3. run the acceptance tests (both skipped when the serial is unset)
-PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632 \
+PIXELDESKTOP_DEVICE_SERIAL=DEADBEEF000000 \
 PIXELDESKTOP_DISPOSABLE_APK="$PWD/engineering/evidence/b4-b5-probes/disposable/out/com.pixeldesktop.disposable.probe.apk" \
   xcrun xctest -XCTest PixelDesktopTests.Phase3PackageDeviceHarness/testDisposablePackageInstallUninstallRoundTrip "$B"
 ```

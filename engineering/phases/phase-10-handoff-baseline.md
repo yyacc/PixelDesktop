@@ -127,7 +127,7 @@ Returns: device serial, reachability, available memory, free storage, worker ins
 ### Device
 
 - **Model:** Pixel 7a
-- **Serial:** `3C261JEHN25632`
+- **Serial:** `DEADBEEF000000`
 - **Codename:** `lynx`
 - **Manufacturer:** Google
 - **Android:** 16 (API 36)

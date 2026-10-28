@@ -348,7 +348,7 @@ da720a6 feat: Phase 9 Step 7 — LOCAL-LLM-1 execution through the CLI boundary
 
 ```
 List of devices attached
-3C261JEHN25632	device
+DEADBEEF000000	device
 ```
 
 The Pixel 7a is connected and ready for runtime verification if needed.

@@ -514,3 +514,130 @@ actor RunTransport: TransportProtocol {
         TransportResult(exitCode: 0, stdout: "", stderr: "")
     }
 }
+
+// MARK: - Configurable output length (LOCAL-LLM-1)
+
+/// The `run` boundary hardcoded `maxTokens: 32` in two places, so no caller could ask for more
+/// than 32 generated tokens however the request was phrased, and the value never reached the job
+/// document. These tests pin the replacement: one resolved value, read from the input file's
+/// `max_tokens`, defaulted when absent, and bounded by the request's own validator rather than a
+/// second copy of the limits.
+final class Phase9RunOutputLengthTests: XCTestCase {
+
+    private var directory: URL!
+
+    override func setUpWithError() throws {
+        directory = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("p9-output-length-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    }
+
+    override func tearDownWithError() throws {
+        try? FileManager.default.removeItem(at: directory)
+    }
+
+    private func write(_ body: String) throws -> String {
+        let url = directory.appendingPathComponent("in-\(UUID().uuidString).txt")
+        try body.write(to: url, atomically: true, encoding: .utf8)
+        return url.path
+    }
+
+    private func assertInvalidInput(_ body: String,
+                                   _ message: String,
+                                   file: StaticString = #filePath,
+                                   line: UInt = #line) throws {
+        let path = try write(body)
+        XCTAssertThrowsError(try CLIRunCommand.loadInferenceInput(from: path),
+                             message, file: file, line: line) { error in
+            guard case PixelDesktopError.invalidInput = error else {
+                return XCTFail("expected invalidInput, got \(error)", file: file, line: line)
+            }
+        }
+    }
+
+    // MARK: - Backward compatibility
+
+    func testABarePromptIsThePromptVerbatimAndGetsTheDefaultBudget() throws {
+        let body = "Explain what a KV cache is in two sentences."
+        let path = try write(body)
+
+        let resolved = try CLIRunCommand.loadInferenceInput(from: path)
+
+        XCTAssertEqual(resolved.prompt, body)
+        XCTAssertEqual(resolved.maxTokens, CLIRunCommand.defaultMaxTokens)
+        XCTAssertEqual(CLIRunCommand.defaultMaxTokens, 128, "the documented default")
+    }
+
+    func testAPromptThatHappensToBeJSONWithoutAPromptKeyStaysAPrompt() throws {
+        let body = "{\"note\":\"this is prompt text, not an envelope\"}"
+        let path = try write(body)
+
+        let resolved = try CLIRunCommand.loadInferenceInput(from: path)
+
+        XCTAssertEqual(resolved.prompt, body, "must not be reinterpreted or rejected")
+        XCTAssertEqual(resolved.maxTokens, CLIRunCommand.defaultMaxTokens)
+    }
+
+    // MARK: - The requested value
+
+    func testAnEnvelopePromptIsUsedAsThePrompt() throws {
+        let path = try write("{\"prompt\":\"Say PIXEL and stop.\"}")
+
+        let resolved = try CLIRunCommand.loadInferenceInput(from: path)
+
+        XCTAssertEqual(resolved.prompt, "Say PIXEL and stop.")
+        XCTAssertEqual(resolved.maxTokens, CLIRunCommand.defaultMaxTokens)
+    }
+
+    func testACustomOutputLengthAboveTheOldHardcodedValueIsHonoured() throws {
+        let path = try write("{\"prompt\":\"Count to twenty.\",\"max_tokens\":64}")
+
+        let resolved = try CLIRunCommand.loadInferenceInput(from: path)
+
+        XCTAssertEqual(resolved.prompt, "Count to twenty.")
+        XCTAssertEqual(resolved.maxTokens, 64)
+    }
+
+    func testTheCeilingItselfIsAccepted() throws {
+        let ceiling = InferenceRequest.maximumTokensCeiling
+        let path = try write("{\"prompt\":\"Count.\",\"max_tokens\":\(ceiling)}")
+
+        XCTAssertEqual(try CLIRunCommand.loadInferenceInput(from: path).maxTokens, ceiling)
+    }
+
+    // MARK: - Invalid values
+
+    func testZeroIsRejected() throws {
+        try assertInvalidInput("{\"prompt\":\"hi\",\"max_tokens\":0}", "zero is not a budget")
+    }
+
+    func testANegativeValueIsRejected() throws {
+        try assertInvalidInput("{\"prompt\":\"hi\",\"max_tokens\":-5}", "negative is not a budget")
+    }
+
+    func testAValueAboveTheCeilingIsRejected() throws {
+        let over = InferenceRequest.maximumTokensCeiling + 1
+        try assertInvalidInput("{\"prompt\":\"hi\",\"max_tokens\":\(over)}",
+                               "an uncontrolled output length must not reach the device")
+    }
+
+    func testAnExcessiveValueCannotBecomeAnUnboundedWorkload() throws {
+        try assertInvalidInput("{\"prompt\":\"hi\",\"max_tokens\":1000000}", "no unbounded output")
+    }
+
+    func testANonIntegerValueIsRejected() throws {
+        try assertInvalidInput("{\"prompt\":\"hi\",\"max_tokens\":64.5}", "fractional budget")
+    }
+
+    func testABooleanValueIsRejected() throws {
+        try assertInvalidInput("{\"prompt\":\"hi\",\"max_tokens\":true}", "booleans are not budgets")
+    }
+
+    func testAnEmptyEnvelopePromptIsRejected() throws {
+        try assertInvalidInput("{\"prompt\":\"\"}", "an empty prompt is not a request")
+    }
+
+    func testAMalformedEnvelopeIsRejected() throws {
+        try assertInvalidInput("{\"prompt\":123}", "prompt must be a string")
+    }
+}

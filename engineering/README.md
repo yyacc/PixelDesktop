@@ -109,11 +109,11 @@ This directory contains all engineering documentation for the PixelDesktop proje
 
 ## Device
 
-**Pixel 7a** — serial `3C261JEHN25632`, codename `lynx`, manufacturer `Google`
+**Pixel 7a** — serial `DEADBEEF000000`, codename `lynx`, manufacturer `Google`
 Verified: Android `16`, API level `36`, ABI `arm64-v8a`, supported ABIs `["arm64-v8a"]`
 
 ## External References
 
-- Legacy documentation: `/Users/rhenzrobertbumanglag/Documents/PixelDesktop/*.md`
+- Legacy documentation: `<home>/Documents/PixelDesktop/*.md`
 - DTCA-1 workload spec: `phase-0-first-workload-specification.md` (legacy)
 - Architecture re-evaluation: `architecture-re-evaluation-report.md` (legacy)

@@ -134,6 +134,15 @@ struct RoutingThresholds: Equatable, Sendable {
     /// low-memory killer, which is a device-stability event, not a workload failure.
     var minimumAvailableMemoryBytes: Int
 
+    /// Minimum `MemAvailable` before a run against the on-device `llama-server`.
+    ///
+    /// The server loaded its model when it started and holds it resident, so those bytes are
+    /// already committed — charging them again would refuse every run on a device that is in fact
+    /// serving. What a request still needs is headroom for the KV cache growth of the next
+    /// generation plus the worker's own footprint, which is orders of magnitude smaller than a
+    /// model load.
+    var minimumAvailableMemoryBytesOnDeviceServer: Int
+
     /// Minimum free bytes on the volume holding the worker's exchange directory.
     var minimumFreeStorageBytes: Int
 
@@ -153,6 +162,7 @@ struct RoutingThresholds: Equatable, Sendable {
     static let `default` = RoutingThresholds(
         maxObservationAge: 180,
         minimumAvailableMemoryBytes: ModelContract.expectedByteCount + (512 * 1024 * 1024),
+        minimumAvailableMemoryBytesOnDeviceServer: 256 * 1024 * 1024,
         minimumFreeStorageBytes: 256 * 1024 * 1024,
         maximumThermalStatus: 2,
         minimumGenerationTokensPerSecond: 0.5,
@@ -373,13 +383,24 @@ struct ExecutionRoutingEvaluator: Sendable {
             }
 
             // Memory. Read as MemAvailable, which is what predicts whether the allocation lands.
+            //
+            // Which allocation depends on the backend. The in-process path loads the model, so it
+            // must find room for the model plus the copy ggml makes. The on-device server loaded
+            // its model at startup: charging for a load that already happened would defer every
+            // run against a device that is demonstrably serving, so that path is measured against
+            // headroom instead. The floor that applied is stated in the check, never left implicit.
+            let memoryMinimum = contractModelRequired
+                ? thresholds.minimumAvailableMemoryBytes
+                : thresholds.minimumAvailableMemoryBytesOnDeviceServer
             checks.append(Self.intCheck(
                 id: "available-memory",
                 title: "Available memory",
                 value: observation.availableMemoryBytes,
-                minimum: thresholds.minimumAvailableMemoryBytes,
+                minimum: memoryMinimum,
                 severity: .hard,
-                explanation: "Starting an inference run that does not fit risks the low-memory killer, which is a device-stability event.",
+                explanation: contractModelRequired
+                    ? "Starting an inference run that does not fit risks the low-memory killer, which is a device-stability event."
+                    : "The on-device server already holds its model resident, so this run needs only headroom for KV growth and the worker's own footprint; below it the low-memory killer is a device-stability event.",
                 isTransient: true
             ))
 

@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01
 **Phase:** 3 — Android Device Model
-**Device:** Pixel 7a, serial `3C261JEHN25632`
+**Device:** Pixel 7a, serial `DEADBEEF000000`
 
 ---
 
@@ -81,10 +81,10 @@ DTCA-1 worker/verifier tests.
 ## 3. Real-device property probe (before implementation)
 
 ```
-$ adb -s 3C261JEHN25632 shell getprop ro.product.model          -> 'Pixel 7a'   (exit 0)
-$ adb -s 3C261JEHN25632 shell getprop ro.product.manufacturer   -> 'Google'     (exit 0)
-$ adb -s 3C261JEHN25632 shell getprop ro.product.cpu.abilist    -> 'arm64-v8a'  (exit 0)
-$ adb -s 3C261JEHN25632 shell getprop ro.product.device         -> 'lynx'       (exit 0)
+$ adb -s DEADBEEF000000 shell getprop ro.product.model          -> 'Pixel 7a'   (exit 0)
+$ adb -s DEADBEEF000000 shell getprop ro.product.manufacturer   -> 'Google'     (exit 0)
+$ adb -s DEADBEEF000000 shell getprop ro.product.cpu.abilist    -> 'arm64-v8a'  (exit 0)
+$ adb -s DEADBEEF000000 shell getprop ro.product.device         -> 'lynx'       (exit 0)
 ```
 
 All three proposed properties present and suitable. `abilist` is **single-entry** on this
@@ -98,7 +98,7 @@ Production sources compiled with `swiftc` and run against the attached Pixel 7a:
 
 ```
 DISCOVERY (identity only, no properties):
-  serial=3C261JEHN25632 state=device
+  serial=DEADBEEF000000 state=device
   deviceCodename=lynx
   marketingName='' manufacturer=''
   displayName=lynx
@@ -108,7 +108,7 @@ BATCHED vs SINGLE (all 6 keys):
   speedup: 3.7x
   batched agrees with single-key reads: true
 ENRICHED ANDROID DEVICE (real values from the device):
-  serial        = 3C261JEHN25632
+  serial        = DEADBEEF000000
   deviceCodename= lynx
   marketingName = Pixel 7a
   manufacturer  = Google
@@ -131,7 +131,7 @@ INDEPENDENT CROSS-CHECK (raw adb, no project code):
 DEFECT REGRESSION (manufacturer/marketingName must not equal codename): true
   manufacturer='Google' marketingName='Pixel 7a' codename='lynx'
 PRIMARY ABI IN SUPPORTED LIST: true
-UNSET PROPERTY: correctly rejected -> Invalid input: Property 'ro.pixeldesktop.not.real' is unset on device 3C261JEHN25632
+UNSET PROPERTY: correctly rejected -> Invalid input: Property 'ro.pixeldesktop.not.real' is unset on device DEADBEEF000000
 UNKNOWN SERIAL: correctly failed -> ADB command failed: getprop ro.build.version.release (exit code 1): adb: device 'NOSUCHSERIAL0000' not found
 RESULT: PASS
 ```
@@ -152,7 +152,7 @@ RESULT: PASS
 
 | Scenario | Expected | Observed |
 |---|---|---|
-| Unset property | Rejected | `invalidInput: Property '...' is unset on device 3C261JEHN25632` |
+| Unset property | Rejected | `invalidInput: Property '...' is unset on device DEADBEEF000000` |
 | Unknown serial | Command failure | `adbCommandFailed: ... (exit code 1): adb: device 'NOSUCHSERIAL0000' not found` |
 
 ---

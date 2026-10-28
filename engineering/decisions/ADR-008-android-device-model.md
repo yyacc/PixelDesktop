@@ -59,7 +59,7 @@ implemented, and defer all operations to Phase 4.
 
 ## Evidence
 
-Probed on the real Pixel 7a (serial `3C261JEHN25632`) **before** implementing, per §5.1:
+Probed on the real Pixel 7a (serial `DEADBEEF000000`) **before** implementing, per §5.1:
 
 | `getprop` key | Raw value returned | Exit |
 |---|---|---|

@@ -15,7 +15,7 @@
 | Thing | Value |
 |---|---|
 | Repo | `~/AICompany/PixelDesktop` — branch `main`, working tree clean at `8b42fca` |
-| Device | Pixel 7a, serial `3C261JEHN25632`, `transport_id=257`, online over USB |
+| Device | Pixel 7a, serial `DEADBEEF000000`, `transport_id=257`, online over USB |
 | Device state | `sys.boot_completed=1`; `com.pixeldesktop.worker` (v2.0) and `com.pixeldesktop.metadata` installed; no `com.pixeldesktop.disposable.probe` installed |
 | Toolchain | Xcode 27.0 (`27A266a`), Apple Swift 6.4, xcodegen 2.46.0, adb 1.0.41 |
 | Project file | Generated — `xcodegen generate` from `project.yml`. **Never hand-edit `project.pbxproj`** |
@@ -33,8 +33,8 @@ Design authority: `docs/PROPOSAL-PHASE-3-DURABILITY.md` (§5.6 = B5), `engineeri
 ```sh
 cd ~/AICompany/PixelDesktop
 git log --oneline -3 && git status --porcelain      # expect 8b42fca, 0 lines
-adb devices -l | grep 3C261JEHN25632                # expect "device", not "offline"/"unauthorized"
-adb -s 3C261JEHN25632 shell getprop sys.boot_completed   # expect 1
+adb devices -l | grep DEADBEEF000000                # expect "device", not "offline"/"unauthorized"
+adb -s DEADBEEF000000 shell getprop sys.boot_completed   # expect 1
 sha256sum engineering/evidence/b4-b5-probes/worker-backup.apk
 ```
 
@@ -192,7 +192,7 @@ Mirror `ADBPackageOperations.swift` exactly; do not invent a second trust idiom.
    ```sh
    A=.build/Build/Products/Debug/PixelDesktop.app; B=$A/Contents/PlugIns/PixelDesktopTests.xctest
    mkdir -p "$B/Contents/Frameworks" && cp "$A/Contents/MacOS/PixelDesktop.debug.dylib" "$B/Contents/Frameworks/"
-   PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632 xcrun xctest -XCTest PixelDesktopTests.<Suite>/<test> "$B"
+   PIXELDESKTOP_DEVICE_SERIAL=DEADBEEF000000 xcrun xctest -XCTest PixelDesktopTests.<Suite>/<test> "$B"
    ```
    Re-stage after **every** rebuild — the staged copy goes stale and you will test the previous binary.
 3. **Never run two `xcodebuild` invocations against the same `.build` at once.** One non-reproducible

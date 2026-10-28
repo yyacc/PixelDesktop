@@ -13,7 +13,7 @@ a new approval** — the §8 gate table is per-phase, and a `proceed` for Phase 
 - `~/AICompany/PixelDesktop`, working tree clean, HEAD is the commit that added this file.
 - **650 tests, 0 failures, 26 skipped** (full suite, `xcodebuild test -scheme PixelDesktop`).
   Baseline before this phase was 609 / 0 / 22.
-- Device: Pixel 7a (`lynx`), Android 16 / SDK 36, serial `3C261JEHN25632`, **USB only** — wireless
+- Device: Pixel 7a (`lynx`), Android 16 / SDK 36, serial `DEADBEEF000000`, **USB only** — wireless
   ADB is `adb_wifi_enabled=0` and `192.168.1.7:5555` is offline (ADR-017 §1.1 carries a dated note).
 - **The phone's OLED is dead. It does not display. Do not probe to re-establish this.** The
   framebuffer is alive, which is why `screencap` and `scrcpy` both work.

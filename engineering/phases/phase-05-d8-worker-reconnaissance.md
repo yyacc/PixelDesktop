@@ -9,7 +9,7 @@
 
 ## 1. Findings
 
-Every finding below was measured on the attached Pixel 7a (`3C261JEHN25632`). Nothing is
+Every finding below was measured on the attached Pixel 7a (`DEADBEEF000000`). Nothing is
 inferred from documentation. **No state-changing probe was performed** — no install, no
 uninstall, no launch.
 

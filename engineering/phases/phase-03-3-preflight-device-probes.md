@@ -5,7 +5,7 @@
 **Gate:** rnz — *"Proceed with your recommendation, except for 8. enable allow external apps to run
 commands"* (2026-10-25). That answers the Phase-3.2 decision checklist as: 1–7 as recommended,
 8 changed from *skip* to *do it*.
-**Device:** Pixel 7a `lynx`, serial `3C261JEHN25632`, Android 16 / SDK 36, USB.
+**Device:** Pixel 7a `lynx`, serial `DEADBEEF000000`, Android 16 / SDK 36, USB.
 
 This record closes the preflight items that 3.3 depends on. It contains **no product code** — it is
 evidence, so that 3.3 starts from measured behaviour instead of remembered behaviour.
@@ -211,7 +211,7 @@ silent-failure question. The version-skew note above is history, not a work item
 rnz approved **B4 only**, with seven conditions; **B5 (reboot / power-cycle) remains NOT approved**.
 Full command-level record: `engineering/evidence/b4-b5-probes/B4-ACCEPTANCE-REPORT.md`.
 
-Result: **PASS**, present → absent → present on `3C261JEHN25632`.
+Result: **PASS**, present → absent → present on `DEADBEEF000000`.
 
 - Integrity first: backup sha256 `b3318d6d…005f` = build artifact = **the then-installed** `base.apk`.
   All three are the same binary, so the thing removed is the thing restored.

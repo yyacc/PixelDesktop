@@ -1,6 +1,6 @@
 # Handoff — PixelDesktop Phase 1 (C1+C2) device verification
 
-**Date:** 2026-10-24 · **Device:** Pixel 7a, serial `3C261JEHN25632`, Android 16, aarch64 · **Termux:** 0.118
+**Date:** 2026-10-24 · **Device:** Pixel 7a, serial `DEADBEEF000000`, Android 16, aarch64 · **Termux:** 0.118
 **Model:** `gemma-3n-E4B-it-Q4_K_S.gguf`, 4,404,697,216 bytes, 6.87 B params, 6.87 B, ftype `Q4_K - Small`
 
 ---

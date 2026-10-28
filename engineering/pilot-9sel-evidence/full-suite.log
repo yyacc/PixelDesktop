@@ -26,15 +26,15 @@ GatherProvisioningInputs
 
 CreateBuildDescription
 
-ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk /Users/rhenzrobertbumanglag/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-7231f6df4def33e022ae2eb8f782df1a.sdkstatcache
-    cd /Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktop.xcodeproj
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -o /Users/rhenzrobertbumanglag/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-7231f6df4def33e022ae2eb8f782df1a.sdkstatcache
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk <home>/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-7231f6df4def33e022ae2eb8f782df1a.sdkstatcache
+    cd <home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktop.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -o <home>/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-7231f6df4def33e022ae2eb8f782df1a.sdkstatcache
 
-PruneExplicitPrecompiledModules /Users/rhenzrobertbumanglag/Library/Developer/Xcode/DerivedData/PixelDesktop-aimtzrupcmjbkzfgolyhuxtqarri/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+PruneExplicitPrecompiledModules <home>/Library/Developer/Xcode/DerivedData/PixelDesktop-aimtzrupcmjbkzfgolyhuxtqarri/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
 
-PruneExplicitPrecompiledModules /Users/rhenzrobertbumanglag/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules
+PruneExplicitPrecompiledModules <home>/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules
 
-PruneExplicitPrecompiledModules /Users/rhenzrobertbumanglag/Library/Developer/Xcode/DerivedData/PixelDesktop-aimtzrupcmjbkzfgolyhuxtqarri/Build/Intermediates.noindex/ExplicitPrecompiledModules
+PruneExplicitPrecompiledModules <home>/Library/Developer/Xcode/DerivedData/PixelDesktop-aimtzrupcmjbkzfgolyhuxtqarri/Build/Intermediates.noindex/ExplicitPrecompiledModules
 
 2026-10-09 14:08:55.910600+0800 PixelDesktop[18413:5285291] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
 2026-10-09 14:08:55.910790+0800 PixelDesktop[18413:5285291] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
@@ -50,16 +50,16 @@ Test Suite 'All tests' started at 2026-10-09 14:08:57.167.
 Test Suite 'PixelDesktopTests.xctest' started at 2026-10-09 14:08:57.168.
 Test Suite 'AndroidDeviceIntegrationTests' started at 2026-10-09 14:08:57.168.
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceBatchedReadAgreesWithSingleKeyReads]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2612: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceBatchedReadAgreesWithSingleKeyReads] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2612: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceBatchedReadAgreesWithSingleKeyReads] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceBatchedReadAgreesWithSingleKeyReads]' skipped (0.003 seconds).
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceDiscoveryAndEnrichment]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2553: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceDiscoveryAndEnrichment] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2553: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceDiscoveryAndEnrichment] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceDiscoveryAndEnrichment]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnknownSerialFails]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2649: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnknownSerialFails] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2649: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnknownSerialFails] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnknownSerialFails]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnsetPropertyIsRejected]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2626: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnsetPropertyIsRejected] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/PixelDesktopTests.swift:2626: -[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnsetPropertyIsRejected] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.AndroidDeviceIntegrationTests testRealDeviceUnsetPropertyIsRejected]' skipped (0.002 seconds).
 Test Suite 'AndroidDeviceIntegrationTests' passed at 2026-10-09 14:08:57.176.
 	 Executed 4 tests, with 4 tests skipped and 0 failures (0 unexpected) in 0.007 (0.008) seconds
@@ -163,10 +163,10 @@ Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testLargeOutputWithNonZeroE
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testNonZeroExitIsStillReturnedNotThrown]' started.
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testNonZeroExitIsStillReturnedNotThrown]' passed (0.009 seconds).
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeFailingReadIsStillDrained]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/ExecutePipeDrainTests.swift:290: -[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeFailingReadIsStillDrained] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device failing-read test
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/ExecutePipeDrainTests.swift:290: -[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeFailingReadIsStillDrained] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device failing-read test
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeFailingReadIsStillDrained]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeReadExceedsPipeBufferWithoutDeadlock]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/ExecutePipeDrainTests.swift:258: -[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeReadExceedsPipeBufferWithoutDeadlock] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device pipe-boundary test
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/ExecutePipeDrainTests.swift:258: -[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeReadExceedsPipeBufferWithoutDeadlock] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device pipe-boundary test
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testRealDeviceLargeReadExceedsPipeBufferWithoutDeadlock]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testSmallOutputStillReturnedVerbatim]' started.
 Test Case '-[PixelDesktopTests.ExecutePipeDrainTests testSmallOutputStillReturnedVerbatim]' passed (0.009 seconds).
@@ -440,40 +440,40 @@ Test Suite 'Phase7Amendment3Tests' passed at 2026-10-09 14:08:59.422.
 	 Executed 21 tests, with 0 failures (0 unexpected) in 0.010 (0.014) seconds
 Test Suite 'Phase7DeviceEvidenceHarness' started at 2026-10-09 14:08:59.422.
 Test Case '-[PixelDesktopTests.Phase7DeviceEvidenceHarness testCapabilityContractStillExcludesMeasurementsOnDevice]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7DeviceEvidenceHarness.swift:25: -[PixelDesktopTests.Phase7DeviceEvidenceHarness testCapabilityContractStillExcludesMeasurementsOnDevice] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7DeviceEvidenceHarness.swift:25: -[PixelDesktopTests.Phase7DeviceEvidenceHarness testCapabilityContractStillExcludesMeasurementsOnDevice] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7DeviceEvidenceHarness testCapabilityContractStillExcludesMeasurementsOnDevice]' skipped (0.002 seconds).
 Test Case '-[PixelDesktopTests.Phase7DeviceEvidenceHarness testStateObservationIsPopulatedFromTheRealDevice]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7DeviceEvidenceHarness.swift:25: -[PixelDesktopTests.Phase7DeviceEvidenceHarness testStateObservationIsPopulatedFromTheRealDevice] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7DeviceEvidenceHarness.swift:25: -[PixelDesktopTests.Phase7DeviceEvidenceHarness testStateObservationIsPopulatedFromTheRealDevice] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7DeviceEvidenceHarness testStateObservationIsPopulatedFromTheRealDevice]' skipped (0.001 seconds).
 Test Suite 'Phase7DeviceEvidenceHarness' passed at 2026-10-09 14:08:59.425.
 	 Executed 2 tests, with 2 tests skipped and 0 failures (0 unexpected) in 0.003 (0.003) seconds
 Test Suite 'Phase7StreamingDeviceHarness' started at 2026-10-09 14:08:59.426.
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testCancellationViaForceStopRemainsTheMechanism]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testCancellationViaForceStopRemainsTheMechanism] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testCancellationViaForceStopRemainsTheMechanism] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testCancellationViaForceStopRemainsTheMechanism]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testDeliberateTransportLossIsBoundedAndDoesNotFailTheJob]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testDeliberateTransportLossIsBoundedAndDoesNotFailTheJob] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testDeliberateTransportLossIsBoundedAndDoesNotFailTheJob] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testDeliberateTransportLossIsBoundedAndDoesNotFailTheJob]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testLiveSmokeTest]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testLiveSmokeTest] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testLiveSmokeTest] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testLiveSmokeTest]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testRawStreamingPrimitiveDeliversLines]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testRawStreamingPrimitiveDeliversLines] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testRawStreamingPrimitiveDeliversLines] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testRawStreamingPrimitiveDeliversLines]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testResultIsRecoverableAfterDeliberateTransportLoss]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testResultIsRecoverableAfterDeliberateTransportLoss] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testResultIsRecoverableAfterDeliberateTransportLoss] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testResultIsRecoverableAfterDeliberateTransportLoss]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamedDTCA1JobCompletesWithDurableResult]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamedDTCA1JobCompletesWithDurableResult] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamedDTCA1JobCompletesWithDurableResult] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamedDTCA1JobCompletesWithDurableResult]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamingPerformanceOnTheE1Workload]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamingPerformanceOnTheE1Workload] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamingPerformanceOnTheE1Workload] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamingPerformanceOnTheE1Workload]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamLossWhileWorkerContinuesIsRecoverable]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamLossWhileWorkerContinuesIsRecoverable] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamLossWhileWorkerContinuesIsRecoverable] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testStreamLossWhileWorkerContinuesIsRecoverable]' skipped (0.001 seconds).
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testWorkerDeathIsDetectedOnARealDevice]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testWorkerDeathIsDetectedOnARealDevice] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase7StreamingDeviceHarness.swift:29: -[PixelDesktopTests.Phase7StreamingDeviceHarness testWorkerDeathIsDetectedOnARealDevice] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase7StreamingDeviceHarness testWorkerDeathIsDetectedOnARealDevice]' skipped (0.001 seconds).
 Test Suite 'Phase7StreamingDeviceHarness' passed at 2026-10-09 14:08:59.436.
 	 Executed 9 tests, with 9 tests skipped and 0 failures (0 unexpected) in 0.008 (0.010) seconds
@@ -555,19 +555,19 @@ Test Suite 'Phase9DeviceSelectionTests' passed at 2026-10-09 14:09:02.627.
 	 Executed 6 tests, with 0 failures (0 unexpected) in 0.212 (0.215) seconds
 Test Suite 'Phase9HardwareVerificationTests' started at 2026-10-09 14:09:02.628.
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testARealSuccessNeverCarriesARefusal]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testARealSuccessNeverCarriesARefusal] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testARealSuccessNeverCarriesARefusal] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testARealSuccessNeverCarriesARefusal]' skipped (0.003 seconds).
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceAcceptsInputExactlyAtThePublishedBound]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceAcceptsInputExactlyAtThePublishedBound] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceAcceptsInputExactlyAtThePublishedBound] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceAcceptsInputExactlyAtThePublishedBound]' skipped (0.002 seconds).
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultMatchesIndependentMacRecomputation]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultMatchesIndependentMacRecomputation] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultMatchesIndependentMacRecomputation] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultMatchesIndependentMacRecomputation]' skipped (0.003 seconds).
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultOwnershipMatchesTheGeneratedJobId]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultOwnershipMatchesTheGeneratedJobId] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultOwnershipMatchesTheGeneratedJobId] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceResultOwnershipMatchesTheGeneratedJobId]' skipped (0.011 seconds).
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceRunProducesAVerifiableResult]' started.
-/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceRunProducesAVerifiableResult] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
+<home>/.hermes/cache/scratch/pd-pilot-9sel/PixelDesktopTests/Phase9HardwareVerificationTests.swift:35: -[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceRunProducesAVerifiableResult] : Test skipped - PIXELDESKTOP_DEVICE_SERIAL not set; skipping real-device verification
 Test Case '-[PixelDesktopTests.Phase9HardwareVerificationTests testRealDeviceRunProducesAVerifiableResult]' skipped (0.002 seconds).
 Test Suite 'Phase9HardwareVerificationTests' passed at 2026-10-09 14:09:02.651.
 	 Executed 5 tests, with 5 tests skipped and 0 failures (0 unexpected) in 0.021 (0.024) seconds
@@ -1384,7 +1384,7 @@ Test Case '-[PixelDesktopTests.PixelDesktopTests testDeviceManagerEnrichUnknownS
 Test Case '-[PixelDesktopTests.PixelDesktopTests testDeviceManagerEnrichUnknownSerialReturnsNil]' passed (0.001 seconds).
 Test Case '-[PixelDesktopTests.PixelDesktopTests testDeviceManagerEnrichUpdatesPublishedDevice]' started.
 2026-10-09 14:09:02.810874+0800 PixelDesktop[18413:5285259] [general] 14:09:02.811 [INFO] DeviceManager.refreshDevices: Found 1 device(s)
-2026-10-09 14:09:02.811023+0800 PixelDesktop[18413:5285259] [general] 14:09:02.811 [INFO] DeviceManager.enrichDevice: Enriched 3C261JEHN25632: Android 16, API 36, arm64-v8a
+2026-10-09 14:09:02.811023+0800 PixelDesktop[18413:5285259] [general] 14:09:02.811 [INFO] DeviceManager.enrichDevice: Enriched DEADBEEF000000: Android 16, API 36, arm64-v8a
 Test Case '-[PixelDesktopTests.PixelDesktopTests testDeviceManagerEnrichUpdatesPublishedDevice]' passed (0.001 seconds).
 Test Case '-[PixelDesktopTests.PixelDesktopTests testDeviceOperationDescriptions]' started.
 Test Case '-[PixelDesktopTests.PixelDesktopTests testDeviceOperationDescriptions]' passed (0.000 seconds).
@@ -1812,7 +1812,7 @@ Test Suite 'All tests' passed at 2026-10-09 14:09:17.584.
 2026-10-09 14:09:17.993 xcodebuild[18405:5285150] [MT] IDETestOperationsObserverDebug: 22.340 sec, +22.340 sec -- end
 
 Test session results, code coverage, and logs:
-	/Users/rhenzrobertbumanglag/Library/Developer/Xcode/DerivedData/PixelDesktop-aimtzrupcmjbkzfgolyhuxtqarri/Logs/Test/Test-PixelDesktop-2026.10.09_14-08-55-+0800.xcresult
+	<home>/Library/Developer/Xcode/DerivedData/PixelDesktop-aimtzrupcmjbkzfgolyhuxtqarri/Logs/Test/Test-PixelDesktop-2026.10.09_14-08-55-+0800.xcresult
 
 ** TEST SUCCEEDED **
 

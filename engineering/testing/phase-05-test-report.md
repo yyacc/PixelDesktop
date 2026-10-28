@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01
 **Phase:** 5 — Pixel Compute Worker (transfer contract scope)
-**Device:** Pixel 7a, serial `3C261JEHN25632`
+**Device:** Pixel 7a, serial `DEADBEEF000000`
 
 ---
 

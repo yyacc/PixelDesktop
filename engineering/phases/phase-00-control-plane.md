@@ -41,7 +41,7 @@ with preview, live logcat with priority floor and tag filter, forward management
 scrcpy commands as copyable text. There is deliberately **no tap/type/swipe control**: input
 injection is Phase 2 and must arrive behind a dry-run preview (proposal P3).
 
-## Evidence (real device, serial `3C261JEHN25632`)
+## Evidence (real device, serial `DEADBEEF000000`)
 
 Harness: production sources compiled with `swiftc` (ADR-006 Option D — `xcodebuild` still does not
 forward `PIXELDESKTOP_DEVICE_SERIAL`, re-confirmed this session: 4 device tests reported "skipped").

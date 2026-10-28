@@ -1,6 +1,6 @@
 # B4 acceptance — real worker APK uninstall/reinstall round-trip
 
-**Executed:** 2026-10-25 12:15–12:17 · **Device:** Pixel 7a, serial `3C261JEHN25632`, `transport_id=257`
+**Executed:** 2026-10-25 12:15–12:17 · **Device:** Pixel 7a, serial `DEADBEEF000000`, `transport_id=257`
 **Approval:** rnz, 2026-10-25 — *"I approve proceeding with B4, the worker APK uninstall/reinstall
 acceptance test on the Pixel 7a"*, with seven conditions. **B5 (reboot) explicitly NOT approved.**
 **Outcome:** PASS. Present → absent → present, byte-identical binary, identical functional output
@@ -18,7 +18,7 @@ through the product's own Swift path. No other package touched, ADB never droppe
 | Installed `base.apk` sha256 (pre-uninstall) | same as backup | identical | PASS — the binary about to be removed is the one backed up |
 | Package identity | one exact id, no ambiguity | `com.pixeldesktop.worker` only; the other `pixeldesktop` package is `com.pixeldesktop.metadata` (v1.0, installed 2026-09-22), a different app | PASS |
 | Installed version | v2.0 | `versionName=2.0 versionCode=2 minSdk=31 targetSdk=36` | PASS |
-| ADB link | one device, no reconnect needed | `3C261JEHN25632 device usb:… transport_id:257` | PASS |
+| ADB link | one device, no reconnect needed | `DEADBEEF000000 device usb:… transport_id:257` | PASS |
 
 **Note on recorded install path.** `apkpath.txt` records
 `/data/app/~~K3HPz77V6xcKRtci7lHXew==/com.pixeldesktop.worker-…/base.apk`, but at run time the package
@@ -102,7 +102,7 @@ shipped `WorkerStreamRunner` + `ADBTransport` + `WorkerLifecycle` against the re
 
 ```
 Test Case '…testLiveSmokeTest' passed (1.124 seconds)
-transport             : 3C261JEHN25632
+transport             : DEADBEEF000000
 outcome               : completed(resultJSON: {"status":"COMPLETED", …}, resultBytes: 401)
 events received       : 6          heartbeats: 1
 first event (s)       : 0.031      launch ack (s): 0.161
@@ -121,7 +121,7 @@ directly, with one staging step the built bundle needs:
 A=.build/Build/Products/Debug/PixelDesktop.app
 B=$A/Contents/PlugIns/PixelDesktopTests.xctest
 mkdir -p "$B/Contents/Frameworks" && cp "$A/Contents/MacOS/PixelDesktop.debug.dylib" "$B/Contents/Frameworks/"
-PIXELDESKTOP_DEVICE_SERIAL=3C261JEHN25632 xcrun xctest \
+PIXELDESKTOP_DEVICE_SERIAL=DEADBEEF000000 xcrun xctest \
   -XCTest PixelDesktopTests.Phase7StreamingDeviceHarness/testLiveSmokeTest "$B"
 ```
 

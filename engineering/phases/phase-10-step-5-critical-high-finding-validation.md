@@ -324,7 +324,7 @@ None. Every CRITICAL/HIGH finding was resolvable from source, tests, or direct m
 
 ## Appendix — Measurement Evidence
 
-Commands measured on the real Pixel 7a (`3C261JEHN25632`), 2026-10-04:
+Commands measured on the real Pixel 7a (`DEADBEEF000000`), 2026-10-04:
 
 | Command | Path | Bytes | vs 65,536 buffer |
 |---|---|---|---|

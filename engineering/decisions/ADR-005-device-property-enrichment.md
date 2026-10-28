@@ -60,7 +60,7 @@ owns the "what is this device" question and depends on the protocol, not the act
 
 ## Evidence
 
-Measured against the real Pixel 7a (`3C261JEHN25632`):
+Measured against the real Pixel 7a (`DEADBEEF000000`):
 
 | Property | `getprop` key | Observed value |
 |---|---|---|

@@ -52,7 +52,7 @@ job system, generalized process manager, Service, or daemon. All recorded as non
 
 ---
 
-## The Compute Proof (real device, serial `3C261JEHN25632`)
+## The Compute Proof (real device, serial `DEADBEEF000000`)
 
 ```
 === STEP 1: DEVICE ===

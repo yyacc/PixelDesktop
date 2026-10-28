@@ -879,3 +879,127 @@ final class Phase3RoutingGateTests: XCTestCase {
         XCTAssertNil(decision([soft], .requiresOverride).overridden(by: .unattended))
     }
 }
+
+// MARK: - 16. The memory floor is backend-aware
+//
+// The in-process path loads the model, so it must find room for the model plus ggml's loading
+// copy. The on-device server loaded its model when it started and holds it resident, so charging
+// those bytes again would defer every run against a device that is demonstrably serving. Measured
+// on a Pixel 7a holding Gemma 4 E2B (2.84 GB) resident: MemAvailable ~545 MB, which is below the
+// in-process floor of 1.54 GB and above the headroom floor, so each backend must answer differently.
+
+/// An inference observation whose available memory and model presence are the variables.
+struct MemoryBoundInferenceReader: PixelStateObserving {
+    let availableMemoryBytes: Int
+    let modelPresent: PixelStateObservation.ModelPresence
+
+    func observeState(
+        deviceSerial: String,
+        timeout: TimeInterval
+    ) async throws -> PixelStateObservation {
+        let now = Date()
+        return PixelStateObservation(
+            observedAt: now,
+            deviceSerial: deviceSerial,
+            availableMemoryBytes: .deviceReported(availableMemoryBytes, at: now, limitation: "test stub"),
+            freeStorageBytes: .deviceReported(8 * 1024 * 1024 * 1024, at: now, limitation: "test stub"),
+            workerInstalled: .deviceReported(.installed(versionCode: 7), at: now, limitation: "test stub"),
+            workerRunning: .deviceReported(false, at: now, limitation: "test stub"),
+            modelPresent: .deviceReported(modelPresent, at: now, limitation: "test stub"),
+            thermalStatus: .deviceReported(0, at: now, limitation: "test stub"),
+            deviceReachable: .deviceReported(true, at: now, limitation: "test stub")
+        )
+    }
+}
+
+final class Phase10MemoryFloorTests: XCTestCase {
+
+    private func healthyProbeTransport() async -> RunTransport {
+        let transport = RunTransport()
+        await transport.setShellPrefix(
+            "printf 'GET /health",
+            TransportResult(exitCode: 0, stdout: "HTTP/1.1 200 OK\r\n", stderr: "")
+        )
+        return transport
+    }
+
+    /// Below the in-process floor, above headroom: the server backend runs.
+    func testOnDeviceServerRunsOnHeadroomRatherThanTheModelSizedFloor() async throws {
+        let eligibility = DeviceExecutionEligibility(
+            transport: await healthyProbeTransport(),
+            backendPort: LlamaCppInferenceRuntime.onDeviceServerPort,
+            contractModelRequired: false,
+            reader: MemoryBoundInferenceReader(
+                availableMemoryBytes: 545_000_000,
+                modelPresent: .absent
+            )
+        )
+
+        let decision = await eligibility.decide(
+            deviceSerial: "TEST-SERIAL",
+            requirement: .inference,
+            context: .interactive
+        )
+
+        XCTAssertEqual(decision.outcome, .eligible)
+        let memory = try XCTUnwrap(decision.checks.first { $0.id == "available-memory" })
+        XCTAssertEqual(memory.verdict, .passed)
+        XCTAssertEqual(memory.threshold, "at least 256 MB",
+                       "the server backend is measured against headroom, not a model load")
+        XCTAssertFalse(
+            memory.explanation.contains("does not fit"),
+            "the explanation must describe headroom, not a model load: \(memory.explanation)")
+    }
+
+    /// The floor still exists, and it still blocks: headroom is not a licence to overcommit.
+    func testOnDeviceServerBelowHeadroomIsDeferred() async throws {
+        let eligibility = DeviceExecutionEligibility(
+            transport: await healthyProbeTransport(),
+            backendPort: LlamaCppInferenceRuntime.onDeviceServerPort,
+            contractModelRequired: false,
+            reader: MemoryBoundInferenceReader(
+                availableMemoryBytes: 128_000_000,
+                modelPresent: .absent
+            )
+        )
+
+        let decision = await eligibility.decide(
+            deviceSerial: "TEST-SERIAL",
+            requirement: .inference,
+            context: .interactive
+        )
+
+        XCTAssertEqual(decision.outcome, .deferred)
+        XCTAssertTrue(
+            decision.blockingChecks.contains { $0.id == "available-memory" },
+            "a memory shortfall must block regardless of backend")
+    }
+
+    /// The in-process backend is unchanged: it loads the model, so it must find room for it.
+    func testInProcessBackendStillNeedsTheModelSizedFloor() async throws {
+        let eligibility = DeviceExecutionEligibility(
+            transport: RunTransport(),
+            contractModelRequired: true,
+            reader: MemoryBoundInferenceReader(
+                availableMemoryBytes: 545_000_000,
+                modelPresent: .present(byteCount: ModelContract.expectedByteCount)
+            )
+        )
+
+        let decision = await eligibility.decide(
+            deviceSerial: "TEST-SERIAL",
+            requirement: .inference,
+            context: .interactive
+        )
+
+        XCTAssertEqual(decision.outcome, .deferred)
+        let memory = try XCTUnwrap(decision.checks.first { $0.id == "available-memory" })
+        XCTAssertEqual(memory.verdict, .failed,
+                       "545 MB is not enough to load a 1.04 GiB model and its copy")
+        XCTAssertTrue(memory.threshold.contains("GB"),
+                      "the in-process floor is model-sized: \(memory.threshold)")
+        XCTAssertTrue(
+            decision.blockingChecks.contains { $0.id == "available-memory" },
+            "the in-process path must keep blocking on the model-sized floor")
+    }
+}

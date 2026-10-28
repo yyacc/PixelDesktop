@@ -19,7 +19,7 @@
 //        PixelDesktop/Perception/Notifications.swift \
 //        PixelDesktop/Perception/NotificationParser.swift \
 //        PixelDesktop/Perception/NotificationStream.swift \
-//        -o /tmp/a5-evidence && /tmp/a5-evidence 3C261JEHN25632
+//        -o /tmp/a5-evidence && /tmp/a5-evidence DEADBEEF000000
 //
 //  What it measures, in order:
 //

@@ -23,7 +23,7 @@ import XCTest
 
 final class Phase2InputTests: XCTestCase {
 
-    private let serial = "3C261JEHN25632"
+    private let serial = "DEADBEEF000000"
 
     // MARK: - The gate
 

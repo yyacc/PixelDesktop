@@ -199,9 +199,9 @@ final class ExecutionEvidenceTests: XCTestCase {
     }
 
     func testEvidenceCarriesItsJobAndDevice() {
-        let evidence = PixelEvidenceReader.evidence(from: result(), deviceSerial: "3C261JEHN25632")
+        let evidence = PixelEvidenceReader.evidence(from: result(), deviceSerial: "DEADBEEF000000")
         XCTAssertEqual(evidence.jobId, "job-1")
-        XCTAssertEqual(evidence.deviceSerial, "3C261JEHN25632")
+        XCTAssertEqual(evidence.deviceSerial, "DEADBEEF000000")
     }
 
     func testMissingRuntimeContextIsSubstitutedAndFlagged() {

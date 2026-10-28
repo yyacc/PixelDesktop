@@ -149,7 +149,7 @@ Both failures were Mac-side boundary issues, not worker or transport issues. The
 
 ### Real-device verification
 
-Pixel 7a (serial `3C261JEHN25632`) connected via USB. Model `qwen2.5-1.5b-instruct-q4_k_m.gguf` (1,117,320,736 bytes) present at `/sdcard/Android/data/com.pixeldesktop.worker/files/model/`.
+Pixel 7a (serial `DEADBEEF000000`) connected via USB. Model `qwen2.5-1.5b-instruct-q4_k_m.gguf` (1,117,320,736 bytes) present at `/sdcard/Android/data/com.pixeldesktop.worker/files/model/`.
 
 **Execution:**
 ```

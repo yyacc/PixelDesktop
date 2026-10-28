@@ -1,17 +1,17 @@
 {
   "manifest_version": 1,
   "description": "Machine-readable record of resources created by the autonomous engineering process. Per the filesystem safety policy, only resources listed here may be deleted by the agent. Resources absent from this manifest are PRE-EXISTING and protected.",
-  "project_root": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop",
+  "project_root": "<home>/AICompany/PixelDesktop",
   "protected_pre_existing": [
     {
-      "path": "/Users/rhenzrobertbumanglag/Documents/PixelDesktop/",
+      "path": "<home>/Documents/PixelDesktop/",
       "note": "Legacy implementation. Source of engineering evidence. MUST NOT BE DELETED. Not modified by this rebuild.",
       "created_by": "pre-existing"
     }
   ],
   "resources": [
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/",
+      "path": "<home>/AICompany/PixelDesktop/engineering/",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,
@@ -20,7 +20,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-00-clean-start-audit.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-00-clean-start-audit.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,
@@ -29,7 +29,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/README.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/README.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,
@@ -38,7 +38,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-001-project-structure.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-001-project-structure.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,
@@ -47,7 +47,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-002-adb-transport.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-002-adb-transport.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,
@@ -56,7 +56,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-003-dtca1-worker-apk.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-003-dtca1-worker-apk.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,
@@ -65,7 +65,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-004-verification.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-004-verification.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,
@@ -74,7 +74,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-01-engineering-foundation.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-01-engineering-foundation.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 1,
@@ -83,7 +83,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/ai-development/ai-development-log.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/ai-development/ai-development-log.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 1,
@@ -92,7 +92,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-02-device-discovery.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-02-device-discovery.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -101,7 +101,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-005-device-property-enrichment.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-005-device-property-enrichment.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -110,7 +110,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-006-test-isolation.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-006-test-isolation.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -119,7 +119,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-02-test-report.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/testing/phase-02-test-report.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -128,7 +128,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/logs/engineering-journal.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/logs/engineering-journal.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -137,7 +137,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/best-practices/techniques.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/best-practices/techniques.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -146,7 +146,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-001-non-english-output.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/failures/FAIL-001-non-english-output.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -155,7 +155,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-002-transport-swift-runaway-fields.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/failures/FAIL-002-transport-swift-runaway-fields.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -164,7 +164,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Device/DeviceEnricher.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Device/DeviceEnricher.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -173,7 +173,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-007-authoritative-phase-sequence.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-007-authoritative-phase-sequence.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -182,7 +182,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/architecture/overview.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/architecture/overview.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -191,7 +191,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-03-android-device-model-proposal.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-03-android-device-model-proposal.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 3,
@@ -200,7 +200,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-008-android-device-model.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-008-android-device-model.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 3,
@@ -209,7 +209,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-03-android-device-model.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-03-android-device-model.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 3,
@@ -218,7 +218,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-03-test-report.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/testing/phase-03-test-report.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 3,
@@ -227,7 +227,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Core/Models/AndroidDevice.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Core/Models/AndroidDevice.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 3,
@@ -236,7 +236,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-04-application-process-control-proposal.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-04-application-process-control-proposal.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 4,
@@ -245,7 +245,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-009-application-operations-and-shell-containment.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-009-application-operations-and-shell-containment.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 4,
@@ -254,7 +254,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-04-application-process-control.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-04-application-process-control.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 4,
@@ -263,7 +263,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-04-test-report.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/testing/phase-04-test-report.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 4,
@@ -272,7 +272,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Operations/AppOperationsProtocol.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Operations/AppOperationsProtocol.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 4,
@@ -281,7 +281,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Operations/ADBAppOperations.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Operations/ADBAppOperations.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 4,
@@ -290,7 +290,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Core/Models/InstalledApp.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Core/Models/InstalledApp.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 4,
@@ -299,7 +299,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-transfer-contract-proposal.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-05-transfer-contract-proposal.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 5,
@@ -308,7 +308,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-010-worker-transfer-contract.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-010-worker-transfer-contract.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 5,
@@ -317,7 +317,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-transfer-contract.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-05-transfer-contract.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 5,
@@ -326,7 +326,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/phase-05-test-report.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/testing/phase-05-test-report.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 5,
@@ -335,7 +335,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-003-workspace-world-readable.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/failures/FAIL-003-workspace-world-readable.md",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 5,
@@ -344,7 +344,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerTransferContract.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerTransferContract.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 5,
@@ -353,7 +353,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerOperationsProtocol.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerOperationsProtocol.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 5,
@@ -362,7 +362,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-d8-worker-reconnaissance.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-05-d8-worker-reconnaissance.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -371,7 +371,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-d8-decision-review.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-05-d8-decision-review.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -380,7 +380,7 @@
       "status": "review"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-011-pixel-compute-worker-contract.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-011-pixel-compute-worker-contract.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -389,7 +389,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-05-d8-worker-implementation.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-05-d8-worker-implementation.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -398,7 +398,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-004-android-assumptions-falsified.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/failures/FAIL-004-android-assumptions-falsified.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -407,7 +407,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerInstaller.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerInstaller.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -416,7 +416,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerLifecycle.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerLifecycle.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -425,7 +425,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/DTCA1Job.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Worker/DTCA1Job.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -434,7 +434,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerComputeProof.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Worker/WorkerComputeProof.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -443,7 +443,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/",
+      "path": "<home>/AICompany/PixelDesktop/DTCA1Worker/",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 5,
@@ -452,7 +452,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-06-local-ai-reconnaissance.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-06-local-ai-reconnaissance.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -461,7 +461,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-012-local-ai-worker.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-012-local-ai-worker.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -470,7 +470,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-06-local-ai-implementation.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-06-local-ai-implementation.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -479,7 +479,7 @@
       "status": "complete"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/InferenceRuntime.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Inference/InferenceRuntime.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -488,7 +488,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/ModelProvisioning.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Inference/ModelProvisioning.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -497,7 +497,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/InferenceEvidence.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Inference/InferenceEvidence.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -506,7 +506,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase6InferenceTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase6InferenceTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -515,7 +515,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/cpp/llama_jni.cpp",
+      "path": "<home>/AICompany/PixelDesktop/DTCA1Worker/app/src/main/cpp/llama_jni.cpp",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -524,7 +524,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/cpp/CMakeLists.txt",
+      "path": "<home>/AICompany/PixelDesktop/DTCA1Worker/app/src/main/cpp/CMakeLists.txt",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -533,7 +533,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/java/com/pixeldesktop/worker/LlamaBridge.java",
+      "path": "<home>/AICompany/PixelDesktop/DTCA1Worker/app/src/main/java/com/pixeldesktop/worker/LlamaBridge.java",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -542,7 +542,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/DTCA1Worker/app/src/main/java/com/pixeldesktop/worker/LlmWorkload.java",
+      "path": "<home>/AICompany/PixelDesktop/DTCA1Worker/app/src/main/java/com/pixeldesktop/worker/LlmWorkload.java",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -551,7 +551,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "path": "<home>/AICompany/PixelDesktop/models/qwen2.5-1.5b-instruct-q4_k_m.gguf",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 6,
@@ -560,7 +560,7 @@
       "status": "external"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-routing-reconnaissance.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-07-routing-reconnaissance.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -569,7 +569,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-013-resource-aware-routing.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-013-resource-aware-routing.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -578,7 +578,7 @@
       "status": "superseded"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-architecture-reevaluation.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-07-architecture-reevaluation.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -587,7 +587,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-step-1-capability-contract.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-07-step-1-capability-contract.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -596,7 +596,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-005-prompt-exceeding-nbatch-aborts-worker.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/failures/FAIL-005-prompt-exceeding-nbatch-aborts-worker.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -605,7 +605,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/PixelCapabilityContract.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Inference/PixelCapabilityContract.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -614,7 +614,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7CapabilityContractTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase7CapabilityContractTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -623,7 +623,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-step-2-evidence.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-07-step-2-evidence.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -632,7 +632,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Inference/PixelEvidence.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Inference/PixelEvidence.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -641,7 +641,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7EvidenceTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase7EvidenceTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -650,7 +650,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7DeviceEvidenceHarness.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase7DeviceEvidenceHarness.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -659,7 +659,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/failures/FAIL-006-usb-connection-drops.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/failures/FAIL-006-usb-connection-drops.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -668,7 +668,7 @@
       "status": "complete"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/design/usb-aware-transport-design.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/design/usb-aware-transport-design.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -677,7 +677,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/design/wireless-adb-persistence-design.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/design/wireless-adb-persistence-design.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -686,7 +686,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/testing/wireless-serial-transport-verification.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/testing/wireless-serial-transport-verification.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -695,7 +695,7 @@
       "status": "complete"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/design/communication-architecture-reconnaissance.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/design/communication-architecture-reconnaissance.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -704,7 +704,7 @@
       "status": "proposal"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-e1-adb-streaming-experiment.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-07-e1-adb-streaming-experiment.md",
       "created_by": "Hermes",
       "created_at": "2026-10-02T00:00:00Z",
       "phase": 7,
@@ -785,7 +785,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-07-step-3-refusal-path.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-07-step-3-refusal-path.md",
       "created_by": "Hermes",
       "phase": 7,
       "task_id": "phase-07-step-3",
@@ -793,7 +793,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -802,7 +802,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/main.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/main.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -811,7 +811,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIInvocation.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLIInvocation.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -820,7 +820,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIEnvelope.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLIEnvelope.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -829,7 +829,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIEnvelopeRenderer.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLIEnvelopeRenderer.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -838,7 +838,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIJSONPresentation.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLIJSONPresentation.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -847,7 +847,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLICommands.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLICommands.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -856,7 +856,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIDeviceSelection.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLIDeviceSelection.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -865,7 +865,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase9CLITests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase9CLITests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -874,7 +874,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-1-publication-interface.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-09-step-1-publication-interface.md",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -883,7 +883,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-014-read-only-publication-interface.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-014-read-only-publication-interface.md",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -892,7 +892,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase7Amendment2Tests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase7Amendment2Tests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 7,
@@ -901,7 +901,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-3a-contract-fidelity.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-09-step-3a-contract-fidelity.md",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -910,7 +910,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIRunCommand.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLIRunCommand.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -919,7 +919,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopCLI/CLIRunResult.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopCLI/CLIRunResult.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -928,7 +928,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase9RunTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase9RunTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -937,7 +937,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-4-execution-boundary.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-09-step-4-execution-boundary.md",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -946,7 +946,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase9HardwareVerificationTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase9HardwareVerificationTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -955,7 +955,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-4-real-device-verification.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-09-step-4-real-device-verification.md",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -964,7 +964,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-09-step-5-reconnaissance.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-09-step-5-reconnaissance.md",
       "created_by": "Hermes",
       "created_at": "2026-10-03T00:00:00Z",
       "phase": 9,
@@ -973,7 +973,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-08-ui-wiring.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-08-ui-wiring.md",
       "created_by": "Hermes",
       "created_at": "2026-10-04T00:00:00Z",
       "phase": 8,
@@ -982,7 +982,7 @@
       "status": "complete"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-015-appstate-ui-bridge.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-015-appstate-ui-bridge.md",
       "created_by": "Hermes",
       "created_at": "2026-10-04T00:00:00Z",
       "phase": 8,
@@ -991,7 +991,7 @@
       "status": "accepted"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase8UIWiringTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase8UIWiringTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-04T00:00:00Z",
       "phase": 8,
@@ -1000,7 +1000,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/Ciel/design/reasoning-state/CR-4-reasoning-model.md",
+      "path": "<home>/AICompany/Ciel/design/reasoning-state/CR-4-reasoning-model.md",
       "created_by": "Hermes",
       "created_at": "2026-10-05T00:00:00Z",
       "phase": "CR-4",
@@ -1010,7 +1010,7 @@
       "note": "Ciel reasoning-architecture project. NOT a PixelDesktop phase."
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/Ciel/design/reasoning-state/CR-7-mechanism-design-superseded.md",
+      "path": "<home>/AICompany/Ciel/design/reasoning-state/CR-7-mechanism-design-superseded.md",
       "created_by": "Hermes",
       "created_at": "2026-10-05T02:30:00Z",
       "phase": "CR-7",
@@ -1020,7 +1020,7 @@
       "note": "Ciel reasoning-architecture project. NOT a PixelDesktop phase."
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/Ciel/design/reasoning-state/CR-7-mechanism-design.md",
+      "path": "<home>/AICompany/Ciel/design/reasoning-state/CR-7-mechanism-design.md",
       "created_by": "Hermes",
       "created_at": "2026-10-05T03:10:00Z",
       "phase": "CR-9",
@@ -1030,7 +1030,7 @@
       "note": "Ciel reasoning-architecture project. NOT a PixelDesktop phase."
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityConfig.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityConfig.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1039,7 +1039,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityError.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityError.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1048,7 +1048,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ServiceStatus.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ServiceStatus.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1057,7 +1057,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/OpenCodeModels.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/OpenCodeModels.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1066,7 +1066,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/SSEParser.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/SSEParser.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1075,7 +1075,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityHTTP.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ObservabilityHTTP.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1084,7 +1084,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/CredentialProvider.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/CredentialProvider.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1093,7 +1093,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/OpenCodeClient.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/OpenCodeClient.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1102,7 +1102,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ModelServerClient.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ModelServerClient.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1111,7 +1111,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoObservabilityStore.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoObservabilityStore.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1120,7 +1120,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoDashboardView.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoDashboardView.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1129,7 +1129,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSessionViews.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSessionViews.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1138,7 +1138,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSourcePanelsView.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSourcePanelsView.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1147,7 +1147,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ObservabilityFormat.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/Observability/ObservabilityFormat.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1156,7 +1156,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/RootView.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/RootView.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1165,7 +1165,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ObservabilityTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/ObservabilityTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1174,7 +1174,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoObservabilityStoreTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/ZenoObservabilityStoreTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1183,7 +1183,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ObservabilityLiveTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/ObservabilityLiveTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1192,7 +1192,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/design/zeno-observability-architecture.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/design/zeno-observability-architecture.md",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1201,7 +1201,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-016-zeno-observability-dashboard.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-016-zeno-observability-dashboard.md",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1210,7 +1210,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-11-observability-mvp.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-11-observability-mvp.md",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1219,7 +1219,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/PixelDesktopApp.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/PixelDesktopApp.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-09T00:00:00Z",
       "phase": 11,
@@ -1228,7 +1228,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoSQLiteModels.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoSQLiteModels.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 12,
@@ -1237,7 +1237,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/SQLiteDatabaseReader.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/SQLiteDatabaseReader.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 12,
@@ -1246,7 +1246,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoSessionStoreAdapter.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoSessionStoreAdapter.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 12,
@@ -1255,7 +1255,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSQLiteSessionViews.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoSQLiteSessionViews.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 12,
@@ -1264,7 +1264,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoSQLiteAdapterTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/ZenoSQLiteAdapterTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 12,
@@ -1273,7 +1273,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-12-zeno-activity-reconnaissance.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-12-zeno-activity-reconnaissance.md",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 12,
@@ -1282,7 +1282,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoEventModels.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoEventModels.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 13,
@@ -1291,7 +1291,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoEventStoreAdapter.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Observability/ZenoEventStoreAdapter.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 13,
@@ -1300,7 +1300,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoEventTimelineView.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/Observability/ZenoEventTimelineView.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 13,
@@ -1309,7 +1309,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoEventStoreAdapterTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/ZenoEventStoreAdapterTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 13,
@@ -1318,7 +1318,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-13-zeno-event-timeline.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-13-zeno-event-timeline.md",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 13,
@@ -1327,7 +1327,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-13-independent-audit.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-13-independent-audit.md",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 13,
@@ -1336,7 +1336,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/ZenoEventStoreIntegrationTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/ZenoEventStoreIntegrationTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-10T00:00:00Z",
       "phase": 13,
@@ -1345,7 +1345,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase5IntegrationTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase5IntegrationTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-17T00:00:00Z",
       "phase": 5,
@@ -1354,7 +1354,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Device/TransportDiagnosis.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Device/TransportDiagnosis.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 1,
@@ -1363,7 +1363,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/decisions/ADR-017-wireless-transport-persistence.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/decisions/ADR-017-wireless-transport-persistence.md",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 1,
@@ -1372,7 +1372,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/docs/PROPOSAL-DEVICE-INTERACTION.md",
+      "path": "<home>/AICompany/PixelDesktop/docs/PROPOSAL-DEVICE-INTERACTION.md",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 1,
@@ -1381,7 +1381,7 @@
       "status": "approved"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/device-probe-lockscreen-20261024.png",
+      "path": "<home>/AICompany/PixelDesktop/engineering/evidence/device-probe-lockscreen-20261024.png",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 1,
@@ -1390,7 +1390,7 @@
       "status": "active"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/scrcpy-frame-20261024.png",
+      "path": "<home>/AICompany/PixelDesktop/engineering/evidence/scrcpy-frame-20261024.png",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1401,7 +1401,7 @@
       "bytes": 860973
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/scrcpy-recording-20261024.mkv",
+      "path": "<home>/AICompany/PixelDesktop/engineering/evidence/scrcpy-recording-20261024.mkv",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1412,7 +1412,7 @@
       "bytes": 15873727
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/HANDOFF.md",
+      "path": "<home>/AICompany/PixelDesktop/HANDOFF.md",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1423,7 +1423,7 @@
       "bytes": 4610
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/UIElement.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Perception/UIElement.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1434,7 +1434,7 @@
       "bytes": 6881
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/UIHierarchyParser.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Perception/UIHierarchyParser.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1445,7 +1445,7 @@
       "bytes": 5611
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/DevicePerceptionProtocol.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Perception/DevicePerceptionProtocol.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1456,7 +1456,7 @@
       "bytes": 5947
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/ADBDevicePerception.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Perception/ADBDevicePerception.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1467,7 +1467,7 @@
       "bytes": 4313
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/LogcatLine.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Perception/LogcatLine.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1478,7 +1478,7 @@
       "bytes": 7938
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/LogcatStream.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Perception/LogcatStream.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1489,7 +1489,7 @@
       "bytes": 6376
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Perception/PortForwarding.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Perception/PortForwarding.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1500,7 +1500,7 @@
       "bytes": 6175
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/App/PerceptionView.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/App/PerceptionView.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1511,7 +1511,7 @@
       "bytes": 17267
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase0PerceptionTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase0PerceptionTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1522,7 +1522,7 @@
       "bytes": 18800
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktopTests/Phase0DeviceVerificationTests.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktopTests/Phase0DeviceVerificationTests.swift",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1533,7 +1533,7 @@
       "bytes": 7883
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/docs/SCRCPY-EXTERNAL-TOOL.md",
+      "path": "<home>/AICompany/PixelDesktop/docs/SCRCPY-EXTERNAL-TOOL.md",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1544,7 +1544,7 @@
       "bytes": 2805
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/phases/phase-00-control-plane.md",
+      "path": "<home>/AICompany/PixelDesktop/engineering/phases/phase-00-control-plane.md",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1555,7 +1555,7 @@
       "bytes": 6645
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/engineering/evidence/device-screenshot-phase0.png",
+      "path": "<home>/AICompany/PixelDesktop/engineering/evidence/device-screenshot-phase0.png",
       "created_by": "Hermes",
       "created_at": "2026-10-24T00:00:00Z",
       "phase": 0,
@@ -1568,7 +1568,7 @@
   ],
   "evidence_artifacts_outside_repo": [
     {
-      "path": "/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-evidence/Transport.swift.corrupted",
+      "path": "<home>/.hermes/cache/scratch/pd-evidence/Transport.swift.corrupted",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -1579,7 +1579,7 @@
       "note": "Lives outside the repository. Scratch cache entries are pruned after 24h idle; the SHA-256 and full diagnosis are recorded in FAIL-002 so the finding survives."
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/.hermes/cache/scratch/pd-verify/",
+      "path": "<home>/.hermes/cache/scratch/pd-verify/",
       "created_by": "Hermes",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 2,
@@ -1588,7 +1588,7 @@
       "status": "preserved"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/.hermes/plugins/ciel-working-state/",
+      "path": "<home>/.hermes/plugins/ciel-working-state/",
       "created_by": "Hermes",
       "created_at": "2026-10-05T03:30:00Z",
       "phase": "CR-10",
@@ -1598,7 +1598,7 @@
       "note": "Ciel reasoning-architecture project. User plugin, enabled in ~/.hermes/config.yaml. Delete to roll back."
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/.hermes/working_state/",
+      "path": "<home>/.hermes/working_state/",
       "created_by": "Hermes",
       "created_at": "2026-10-05T03:32:00Z",
       "phase": "CR-10",
@@ -1610,7 +1610,7 @@
   ],
   "removed_resources": [
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Core/Models/PixelDevice.swift",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Core/Models/PixelDevice.swift",
       "removed_by": "Hermes",
       "removed_at": "2026-10-01T00:00:00Z",
       "phase": 3,
@@ -1619,7 +1619,7 @@
       "status": "removed"
     },
     {
-      "path": "/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/PixelDesktop/Video/",
+      "path": "<home>/AICompany/PixelDesktop/PixelDesktop/Video/",
       "created_by": "pre-existing",
       "created_at": "2026-10-01T00:00:00Z",
       "phase": 0,

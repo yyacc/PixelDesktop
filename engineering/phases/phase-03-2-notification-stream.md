@@ -153,7 +153,7 @@ Executed 776 tests, with 30 tests skipped and 0 failures (0 unexpected)  [26.9 s
 The 4 new skips are the device-gated A5 tests, consistent with the Phase 2–9 convention. No previously
 passing test changed.
 
-### 5.2 Real device (`3C261JEHN25632`, Pixel 7a, Android 16)
+### 5.2 Real device (`DEADBEEF000000`, Pixel 7a, Android 16)
 
 `engineering/harnesses/a5-notification-evidence.swift`, compiled with `swiftc` over 60 production
 sources (ADR-006: `xcodebuild` does not forward `PIXELDESKTOP_DEVICE_SERIAL` here).

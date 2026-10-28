@@ -26,7 +26,7 @@ final class PixelCapabilityContractTests: XCTestCase {
     private func pixel7a() -> AndroidDevice {
         AndroidDevice(
             id: "test-id",
-            serialNumber: "3C261JEHN25632",
+            serialNumber: "DEADBEEF000000",
             deviceCodename: "lynx",
             marketingName: "Pixel 7a",
             manufacturer: "Google",

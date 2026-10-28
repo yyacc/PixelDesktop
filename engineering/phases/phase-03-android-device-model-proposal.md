@@ -53,7 +53,7 @@ discovery, representation, and operations.
 `parseDeviceList` populates it from the `device:` token of `adb devices -l`:
 
 ```
-3C261JEHN25632  device usb:1048576X product:lynx model:Pixel_7a device:lynx
+DEADBEEF000000  device usb:1048576X product:lynx model:Pixel_7a device:lynx
                                                         ^^^^^^^^^^^  ^^^^^^^^^^^
                                                         codename     codename again
 ```

@@ -79,7 +79,7 @@ It is **not production code** and has been deleted.
 === IOKit USB NOTIFICATION PROBE ===
 watching IOUSBHostDevice  (started 14:42:14.815)
 attach notification registered (result=0)
-[14:42:14.820] PRESENT-AT-START: Pixel 7a  0x18d1/0x4ee2  serial=3C261JEHN25632
+[14:42:14.820] PRESENT-AT-START: Pixel 7a  0x18d1/0x4ee2  serial=DEADBEEF000000
 detach notification registered (result=0)
 ```
 
@@ -87,7 +87,7 @@ detach notification registered (result=0)
 |---|---|
 | Does IOKit deliver USB notifications? | **Yes.** `IOServiceAddMatchingNotification` returned `KERN_SUCCESS` (0) for **both** `kIOFirstMatchNotification` and `kIOTerminatedNotification` |
 | Is `IOUSBHostDevice` the right matching class? | **Yes.** It matches the Pixel — confirmed against the live registry |
-| Can the **specific device** be identified? | **Yes.** `kUSBSerialNumberString` = **`3C261JEHN25632`** — **the same serial ADB uses** |
+| Can the **specific device** be identified? | **Yes.** `kUSBSerialNumberString` = **`DEADBEEF000000`** — **the same serial ADB uses** |
 | Is `IOUSBHost.framework` present? | **Yes** — `/System/Library/Frameworks/IOUSBHost.framework` |
 | Is `IOKit.framework` present? | **Yes** |
 | Does it need root or entitlements? | **No.** The probe ran as an ordinary user process |
@@ -499,7 +499,7 @@ fine but ADB is broken" is valuable regardless of whether transport switching is
 
 **Verified by running code:** IOKit `IOServiceAddMatchingNotification` returns `KERN_SUCCESS` for
 attach and detach on macOS 27.0; `IOUSBHostDevice` matches the Pixel; `kUSBSerialNumberString`
-returns `3C261JEHN25632`; no root or entitlement required. Probe deleted after use.
+returns `DEADBEEF000000`; no root or entitlement required. Probe deleted after use.
 
 **Verified by source inspection:** `TransportProtocol` is device-targeted; no wireless/mDNS/TCP
 handling exists; `DeviceState` models a different axis; the `usb:` field is parsed and discarded.

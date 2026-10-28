@@ -15,7 +15,7 @@
 |---|---|
 | Connected | yes |
 | Authorized | yes |
-| Serial | `3C261JEHN25632` |
+| Serial | `DEADBEEF000000` |
 | `adb devices -l` | `device usb:1048576X product:lynx model:Pixel_7a device:lynx transport_id:12` |
 | `adb mdns services` | empty |
 | **Connection type** | **USB** — determined from the `usb:` token; mdns empty means it is not wireless |

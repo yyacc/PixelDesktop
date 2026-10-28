@@ -331,11 +331,11 @@ PixelDesktop/Device/
 └── DeviceEnricher.swift     batched read → enriched AndroidDevice
 ```
 
-**Verified device model** (Pixel 7a, `3C261JEHN25632`):
+**Verified device model** (Pixel 7a, `DEADBEEF000000`):
 
 | Field | Value | Source |
 |---|---|---|
-| `serialNumber` | `3C261JEHN25632` | `adb devices -l` |
+| `serialNumber` | `DEADBEEF000000` | `adb devices -l` |
 | `deviceCodename` | `lynx` | `adb devices -l` `device:` token |
 | `marketingName` | `Pixel 7a` | `ro.product.model` |
 | `manufacturer` | `Google` | `ro.product.manufacturer` |

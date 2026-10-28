@@ -26,7 +26,7 @@
 
 ## Baseline
 
-Real device `3C261JEHN25632`, measured 2026-10-04:
+Real device `DEADBEEF000000`, measured 2026-10-04:
 
 | Attribute | Value |
 |---|---|

@@ -50,15 +50,15 @@ hypothesis holds.
 | Device | Pixel 7a, Android **16**, API **36**, `BP3A.251005.004.B1` |
 | Pixel IP | **`192.168.1.9`** |
 | Mac IP | `192.168.1.10` (same subnet, SSID `RCB`) |
-| USB serial | **`3C261JEHN25632`** |
-| **Wireless serial** | **`adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp`** |
+| USB serial | **`DEADBEEF000000`** |
+| **Wireless serial** | **`adb-DEADBEEF000000-laKyZz._adb-tls-connect._tcp`** |
 | mDNS service | `_adb-tls-connect._tcp` at `192.168.1.9:<port>` |
 | Security | TLS, `ro.adb.secure=1`. **No unauthenticated TCP ADB was used.** |
 
 ### How wireless debugging was enabled
 
 ```
-adb -s 3C261JEHN25632 shell 'settings put global adb_wifi_enabled 1'
+adb -s DEADBEEF000000 shell 'settings put global adb_wifi_enabled 1'
 ```
 
 **This succeeded** (`0` → `1`), confirming the design document's §12 claim that the shell's
@@ -76,14 +76,14 @@ predicted. **No pairing code was needed and no key material was read, copied, or
 
 ```
 List of discovered mdns services
-adb-3C261JEHN25632-laKyZz   _adb-tls-connect._tcp   192.168.1.9:35987
+adb-DEADBEEF000000-laKyZz   _adb-tls-connect._tcp   192.168.1.9:35987
 ```
 
 ### adb auto-connected with NO manual `adb connect`
 
 ```
-3C261JEHN25632                                     device usb:...    transport_id:19
-adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp    device            transport_id:20
+DEADBEEF000000                                     device usb:...    transport_id:19
+adb-DEADBEEF000000-laKyZz._adb-tls-connect._tcp    device            transport_id:20
 ```
 
 **T-029 is confirmed on real hardware: adb performs mDNS discovery and connection automatically via
@@ -101,22 +101,22 @@ After `adb disconnect`:
 ## 4. THE CRITICAL FINDING — the wireless serial is not the USB serial
 
 ```
-3C261JEHN25632                                      device usb:1048576X ...   <- USB
-adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp     device ...                <- WIRELESS
+DEADBEEF000000                                      device usb:1048576X ...   <- USB
+adb-DEADBEEF000000-laKyZz._adb-tls-connect._tcp     device ...                <- WIRELESS
 ```
 
 **These are two independent device entries with different serials.**
 
 | Property | USB | Wireless |
 |---|---|---|
-| serial | `3C261JEHN25632` | `adb-3C261JEHN25632-laKyZz._adb-tls-connect._tcp` |
+| serial | `DEADBEEF000000` | `adb-DEADBEEF000000-laKyZz._adb-tls-connect._tcp` |
 | format | plain hardware serial | `adb-<hwserial>-<random6>._adb-tls-connect._tcp` |
 | independence | confirmed — disconnecting one leaves the other | confirmed |
 
 ### Why this matters
 
 `AndroidDevice.serialNumber` is documented as coming from `adb devices -l`. **If PixelDesktop
-targets `3C261JEHN25632` and only the wireless transport is available, the command still reaches the
+targets `DEADBEEF000000` and only the wireless transport is available, the command still reaches the
 device — because adb resolves the hardware serial to the connected transport.**
 
 **However, `adb devices` lists them as two separate devices.** So:

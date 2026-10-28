@@ -1,7 +1,7 @@
 # Phase 10 Step 5 — Code, Architecture, and Security Review
 
 - **Date:** 2026-10-04
-- **Repository:** `/Users/rhenzrobertbumanglag/AICompany/PixelDesktop/`
+- **Repository:** `<home>/AICompany/PixelDesktop/`
 - **Scope:** 41 Swift source files across `PixelDesktop/`, `PixelDesktopCLI/`, `PixelDesktopTests/`
 - **Mode:** READ-ONLY review. No production code modified. No commits.
 - **Method:** Static inspection of source + tests as evidence. Two-part: direct source inspection of the review-critical files, plus an exhaustive file-by-file pass over all 41 files.
